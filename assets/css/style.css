@@ -77,8 +77,12 @@ acronym, abbr {
 
 
 h1 {
-	font-size: 17px;
+	/*font-size: 17px;
 	margin: 0 0 10px 0;
+  font-size: 51px;*/
+  margin-bottom: -13px;
+  padding-top: 0px;
+  margin-top: -30px;
 }
 h2 {
 	font-size: 15px;
@@ -119,8 +123,9 @@ h3 {
 	margin: 40px auto 50px auto;
 }
 #header h1 {
-	font-size: 32px;
-	margin-bottom: 4px;
+	font-size: 45px;
+  margin-bottom: -10px;
+  padding-top: 6px;
 }
 #header h1 a {
 	border: none;
@@ -201,6 +206,12 @@ img.center {
 	display: block;
 	text-align: center;
 	margin: 0 auto 1em auto;
+}
+img#logo{
+  height: 33px;
+  float: left;
+  margin-top: 29px;
+  margin-right: 15px;
 }
 
 
