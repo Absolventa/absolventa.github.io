@@ -1,3 +1,9 @@
-name: ABSOLVENTA Dev-Blog
-markdown: redcarpet
+name: Devnull
+url: http://absolventa.de
+description: The blog of the ABSOLVENTA Dev Team
+
+permalink: /:year/:month/:day/:title/
+paginate: 10
 pygments: true
+
+exclude: ['README.md', 'Gemfile.lock', 'Gemfile', 'Rakefile']
