@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Devnull</title>
+		<description>The blog of the ABSOLVENTA Dev Team</description>
+		<link>http://absolventa.de</link>
+		<atom:link href="http://absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
+		
+			<item>
+				<title>Markdown</title>
+				<description>
+&lt;p&gt;&lt;strong&gt;Liebe Leserinnen, liebe Leser,&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;heute gibt es den zweiten Eintrag im neuen Dev-Blog. Er wird vor allem Syntax-Beispiele für das Gestalten eines Blogeintrages enthalten und richtet sich somit eher an das Dev-Team.&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;h2 id=&quot;grundlegendes&quot;&gt;Grundlegendes&lt;/h2&gt;
+
+&lt;p&gt;Die Blogs werden in “markdown” verfasst. Das ist ein text-to-HTML conversion tool, was dem Schreiberling die Möglichkeit bietet, leicht zu lesenden (“Quell”-)Text zu verfassen und zu gestalten, ohne HTML erlernen zu müssen. Ein paar einfache Regeln genügen um mit Hilfe von “markdown” valides HTML zu generieren.&lt;/p&gt;
+
+&lt;h2 id=&quot;syntax&quot;&gt;Syntax&lt;/h2&gt;
+
+&lt;p&gt;Nun folgen ein paar einfache Beispiele&lt;/p&gt;
+
+&lt;h3 id=&quot;berschriften&quot;&gt;Überschriften&lt;/h3&gt;
+
+&lt;p&gt;Überschriften werden mittels &lt;code&gt;#&lt;/code&gt; als solche gekennzeichnet.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# Überschrift 1
+## Überschrift 2
+##### Überschrift 5&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Am Ende können abschließende &lt;code&gt;#&lt;/code&gt; gesetzt werden, was allerdings nicht nötig ist.&lt;/p&gt;
+
+&lt;h3 id=&quot;darstellungen&quot;&gt;Darstellungen&lt;/h3&gt;
+
+&lt;p&gt;Worte und Textpassagen können &lt;em&gt;kursiv&lt;/em&gt;, &lt;strong&gt;fett&lt;/strong&gt; oder &lt;strong&gt;&lt;em&gt;fett&amp;amp;kursiv&lt;/em&gt;&lt;/strong&gt; sein. Auch hierfür gibt es entsprechende Tags, die genutzt werden können.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;*kursiv* oder _kursiv_
+**fett\*\* *oder* __fett__
+***fett&amp;amp;kursiv*** oder ___fett&amp;amp;kursiv___ &lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;listen_aufzhlungen&quot;&gt;Listen, Aufzählungen&lt;/h3&gt;
+
+&lt;p&gt;Listen, geordnet, verschachtelt, mit und ohne Nummerierung sind einfach durch das entsprechende Aufzählungszeichen (Ziffern &lt;code&gt;[0..9]&lt;/code&gt;, &lt;code&gt;*&lt;/code&gt;, &lt;code&gt;-&lt;/code&gt; oder &lt;code&gt;+&lt;/code&gt;) am Beginn der Zeile zu erzeugen. Die Einrückung entsteht durch einfache Leerzeichen vor der Zeile.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Erstes Element&lt;/li&gt;
+
+&lt;li&gt;Zweites Element&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt;a. Erstes Unterelement von Element 2&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Drittes Element&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt;* Ein ungeordnetes Unterelement von Element 3&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Der entsprechende Code ist&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;1. Erstes Element
+2. Zweites Element
+  a. erstes Unterelement von Element 2
+3. Drittes Element
+  * Ein ungeordnetes Unterelement von Element 3&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;quellcode&quot;&gt;Quellcode&lt;/h3&gt;
+
+&lt;p&gt;Quelltexte, Codeschnipsel und Ähnliches können mittels markdown sehr komportabel dargestellt werden. Als erstes ein ein Biespiel für eine kleine Ruby-Funktion&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;&lt;span class='k'&gt;def&lt;/span&gt; &lt;span class='nf'&gt;say_hello&lt;/span&gt;
+  &lt;span class='nb'&gt;puts&lt;/span&gt; &lt;span class='s1'&gt;&amp;#39;Hello&amp;#39;&lt;/span&gt;
+&lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Die Quellcode als solchen darzustellen müssen die Zeilen nur mittels Tab (oder 4 Leerzeichen) eingerückt werden. Wenn jedoch Syntax-Highlighting unterstützt werden soll, muss der Code mit &lt;code&gt;{&lt;/code&gt;&lt;code&gt;% highlight ruby %}&lt;/code&gt; eingeleitet werden. Die letzte Zeile schließt ihn mit &lt;code&gt;{&lt;/code&gt;&lt;code&gt;% endhighlight %}&lt;/code&gt; ab.&lt;/p&gt;
+
+&lt;p&gt;Markdown unterstützt hierbei im Übrigen alle gängigen Sprachen und stellt den Quellcode spezifisch dar. Dazu muss nur die entsprechende Sprache am Anfang angegeben werden, z.B. für Java &lt;code&gt;’{&lt;/code&gt;&lt;code&gt;% highlight java %}&lt;/code&gt; … &lt;code&gt;{&lt;/code&gt;&lt;code&gt;% endhighlight %}&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;zitate_kommentare&quot;&gt;Zitate, Kommentare&lt;/h3&gt;
+
+&lt;p&gt;Zitate, Kommentare oder Ähnliches werden mittels &lt;code&gt;&amp;gt;&lt;/code&gt; erzeugt werden.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Das ist ein Zitat.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;sieht in der markdown-Syntax so aus:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;gt; Das ist ein Zitat.&lt;/code&gt;&lt;/pre&gt;
+</description>
+				<pubDate>Tue, 08 Oct 2013 09:00:00 +0200</pubDate>
+				<link>http://absolventa.de/2013/10/08/Markdown/</link>
+				<guid isPermaLink="true">http://absolventa.de/2013/10/08/Markdown/</guid>
+			</item>
+		
+			<item>
+				<title>Welcome</title>
+				<description>
+&lt;p&gt;&lt;strong&gt;Dear Reader&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;This is the brand new blog from the Dev-Team of ABSOLVENTA with a lot of important and interesting stuff everybody should know!&lt;/p&gt;
+
+&lt;p&gt;Stay tuned!&lt;/p&gt;
+</description>
+				<pubDate>Mon, 07 Oct 2013 08:00:00 +0200</pubDate>
+				<link>http://absolventa.de/2013/10/07/Welcome/</link>
+				<guid isPermaLink="true">http://absolventa.de/2013/10/07/Welcome/</guid>
+			</item>
+		
+	</channel>
+</rss>
