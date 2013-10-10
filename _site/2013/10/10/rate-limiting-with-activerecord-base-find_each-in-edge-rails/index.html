@@ -65,7 +65,7 @@
 <p>I wrapped that method into a module and out came this:</p>
 <script src='https://gist.github.com/carpodaster/6920157.js?file=rate_limiter.rb'><![CDATA[]]></script>
 <p>This is how the specs look like:</p>
-<script src='https://gist.github.com/carpodaster/6920157.js?file=rate_limiter.rb'><![CDATA[]]></script>
+<script src='https://gist.github.com/carpodaster/6920157.js?file=rate_limiter_spec.rb'><![CDATA[]]></script>
 <p>Unfortunately and unlike other enumerable methods, the batch finder <code>ActiveRecord::Base.find_each</code> does not return an Enumerator when called without a block. Not in Rails 3.2 and not in Rails 4.0.</p>
 
 <p>Luckily, it has been solved in Edge Rails (see <a href="https://github.com/rails/rails/commit/840c552047a660d0a66883fb9c0cb144d5e728fb">840c552</a>) and I quickly created a Rails 4.1.0.beta app to go for the following code:</p>

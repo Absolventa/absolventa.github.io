@@ -33,7 +33,7 @@ I wrapped that method into a module and out came this:
 
 This is how the specs look like:
 
-<script src="https://gist.github.com/carpodaster/6920157.js?file=rate_limiter.rb"></script>
+<script src="https://gist.github.com/carpodaster/6920157.js?file=rate_limiter_spec.rb"></script>
 
 Unfortunately and unlike other enumerable methods, the batch finder ``ActiveRecord::Base.find_each``
 does not return an Enumerator when called without a block. Not in Rails 3.2 and not in

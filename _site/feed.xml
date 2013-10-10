@@ -20,7 +20,7 @@
 &lt;p&gt;I wrapped that method into a module and out came this:&lt;/p&gt;
 &lt;script src=&#39;https://gist.github.com/carpodaster/6920157.js?file=rate_limiter.rb&#39;&gt;&lt;![CDATA[]]&gt;&lt;/script&gt;
 &lt;p&gt;This is how the specs look like:&lt;/p&gt;
-&lt;script src=&#39;https://gist.github.com/carpodaster/6920157.js?file=rate_limiter.rb&#39;&gt;&lt;![CDATA[]]&gt;&lt;/script&gt;
+&lt;script src=&#39;https://gist.github.com/carpodaster/6920157.js?file=rate_limiter_spec.rb&#39;&gt;&lt;![CDATA[]]&gt;&lt;/script&gt;
 &lt;p&gt;Unfortunately and unlike other enumerable methods, the batch finder &lt;code&gt;ActiveRecord::Base.find_each&lt;/code&gt; does not return an Enumerator when called without a block. Not in Rails 3.2 and not in Rails 4.0.&lt;/p&gt;
 
 &lt;p&gt;Luckily, it has been solved in Edge Rails (see &lt;a href=&quot;https://github.com/rails/rails/commit/840c552047a660d0a66883fb9c0cb144d5e728fb&quot;&gt;840c552&lt;/a&gt;) and I quickly created a Rails 4.1.0.beta app to go for the following code:&lt;/p&gt;
