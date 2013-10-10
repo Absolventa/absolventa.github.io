@@ -1,3 +1,5 @@
+require 'active_support/core_ext'
+
 posts_dir       = "_posts"    # directory for blog files
 new_post_ext    = "md"  # default new post file extension when using the new_post task
 author          = "ABSOLVENTA Dev-Team"
@@ -9,11 +11,7 @@ task :new_post, :title do |t, args|
   else
     title = get_stdin("Enter a title for your post: ")
   end
-  if title.split(/ /).length > 1 
-    title_url = title[" "]= "-"
-  else
-    title_url = title
-  end
+  title_url = title.parameterize
 
   filename = "#{posts_dir}/#{Time.now.strftime('%Y-%m-%d')}-#{title_url}.#{new_post_ext}"
   if File.exist?(filename)
