@@ -37,7 +37,3 @@ def get_stdin(message)
   print message
   STDIN.gets.chomp
 end
-
-def String.to_url
-  "BLA"
-end
