@@ -17,7 +17,7 @@ task :new_post, :title do |t, args|
 
   filename = "#{posts_dir}/#{Time.now.strftime('%Y-%m-%d')}-#{title_url}.#{new_post_ext}"
   if File.exist?(filename)
-    abort("rake aborted!") if ask("#{filename} already exists. Do you want to overwrite?", ['y', 'n']) == 'n'
+    abort("rake aborted!") if get_stdin("#{filename} already exists. Do you want to overwrite? ['y', 'n'] ") == 'n'
   end
   puts "Creating new post: #{filename}"
   open(filename, 'w') do |post|
