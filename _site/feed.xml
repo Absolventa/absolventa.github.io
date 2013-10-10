@@ -3,8 +3,34 @@
 	<channel>
 		<title>Devnull</title>
 		<description>The blog of the ABSOLVENTA Dev Team</description>
-		<link>http://absolventa.de</link>
-		<atom:link href="http://absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
+		<link>http://devnull.absolventa.de</link>
+		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
+		
+			<item>
+				<title>Rate Limiting Work On ActiveRecord::Base With .find_each In Edge Rails</title>
+				<description>
+&lt;p&gt;I was working with several maintenance tasks that query external webservices for a collection of ActiveRecord objects. In order to avoid hitting the webservices’ rate limit, we pause every other iteration for a fraction of a second before we continue.&lt;/p&gt;
+
+&lt;p&gt;The code looks something like this:&lt;/p&gt;
+&lt;script src=&#39;https://gist.github.com/carpodaster/6920157.js?file=old_code.rb&#39;&gt;&lt;![CDATA[]]&gt;&lt;/script&gt;
+&lt;p&gt;I didn’t like that the information of our rate limit guard clauses was so scattered: there were bits before the block and others in the block. I had the urge to refactor it into a more concise form using a Ruby block itself.&lt;/p&gt;
+
+&lt;p&gt;My idea was to create a method that takes the rate limit, the sleep time and an enumeration and then yield the elements of the enum to a block.&lt;/p&gt;
+
+&lt;p&gt;I wrapped that method into a module and out came this:&lt;/p&gt;
+&lt;script src=&#39;https://gist.github.com/carpodaster/6920157.js?file=rate_limiter.rb&#39;&gt;&lt;![CDATA[]]&gt;&lt;/script&gt;
+&lt;p&gt;This is how the specs look like:&lt;/p&gt;
+&lt;script src=&#39;https://gist.github.com/carpodaster/6920157.js?file=rate_limiter.rb&#39;&gt;&lt;![CDATA[]]&gt;&lt;/script&gt;
+&lt;p&gt;Unfortunately and unlike other enumerable methods, the batch finder &lt;code&gt;ActiveRecord::Base.find_each&lt;/code&gt; does not return an Enumerator when called without a block. Not in Rails 3.2 and not in Rails 4.0.&lt;/p&gt;
+
+&lt;p&gt;Luckily, it has been solved in Edge Rails (see &lt;a href=&quot;https://github.com/rails/rails/commit/840c552047a660d0a66883fb9c0cb144d5e728fb&quot;&gt;840c552&lt;/a&gt;) and I quickly created a Rails 4.1.0.beta app to go for the following code:&lt;/p&gt;
+&lt;script src=&#39;https://gist.github.com/carpodaster/6920157.js?file=external_service.rb&#39;&gt;&lt;![CDATA[]]&gt;&lt;/script&gt;
+&lt;p&gt;&lt;code&gt;ActiveRecord::Base.find_each&lt;/code&gt; now returns a proper &lt;code&gt;Enumerator&lt;/code&gt; that can be passed into the rate limiter. If you want to learn more about Enumerators in Ruby (or if you’d like to refresh your memory), I can recommend this excellent &lt;a href=&quot;http://devblog.avdi.org/2013/09/10/rubytapas-freebie-enumerator/&quot;&gt;Ruby Tapas&lt;/a&gt; episode by &lt;a href=&quot;https://twitter.com/avdi&quot;&gt;Avdi Grimm&lt;/a&gt;.&lt;/p&gt;
+</description>
+				<pubDate>Thu, 10 Oct 2013 17:04:00 +0200</pubDate>
+				<link>http://devnull.absolventa.de/2013/10/10/rate-limiting-with-activerecord-base-find_each-in-edge-rails/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2013/10/10/rate-limiting-with-activerecord-base-find_each-in-edge-rails/</guid>
+			</item>
 		
 			<item>
 				<title>Markdown</title>
@@ -89,8 +115,8 @@
 &lt;pre&gt;&lt;code&gt;&amp;gt; Das ist ein Zitat.&lt;/code&gt;&lt;/pre&gt;
 </description>
 				<pubDate>Tue, 08 Oct 2013 09:00:00 +0200</pubDate>
-				<link>http://absolventa.de/2013/10/08/Markdown/</link>
-				<guid isPermaLink="true">http://absolventa.de/2013/10/08/Markdown/</guid>
+				<link>http://devnull.absolventa.de/2013/10/08/Markdown/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2013/10/08/Markdown/</guid>
 			</item>
 		
 			<item>
@@ -103,8 +129,8 @@
 &lt;p&gt;Stay tuned!&lt;/p&gt;
 </description>
 				<pubDate>Mon, 07 Oct 2013 08:00:00 +0200</pubDate>
-				<link>http://absolventa.de/2013/10/07/Welcome/</link>
-				<guid isPermaLink="true">http://absolventa.de/2013/10/07/Welcome/</guid>
+				<link>http://devnull.absolventa.de/2013/10/07/Welcome/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2013/10/07/Welcome/</guid>
 			</item>
 		
 	</channel>

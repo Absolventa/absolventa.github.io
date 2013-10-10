@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+  <title>Rate Limiting Work On ActiveRecord::Base With .find_each In Edge Rails</title>
+  <meta name="viewport" content="width=device-width">
+
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="/assets/css/style.css" rel="stylesheet" />
+  <!-- <link href="/assets/css/colors-dark.css" rel="stylesheet" /> -->
+  <link href="/assets/css/colors-light.css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+
+
+  <header id="header">
+    <img id="logo" src="/images/absolventa_logo_large.png">
+    <h1><a href="/">Devnull</a></h1>
+    <p>The blog of the ABSOLVENTA Dev Team</p>
+  </header>
+
+
+
+  <div id="page">
+
+
+
+    <div id="sidebar">
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/archives">Archive</a></li>
+          <!-- <li><a href="/about">About</a></li>
+          <li><a href="http://twitter.com/redwall_hp">Twitter</a></li>
+          <li><a href="/feed.xml">RSS Feed</a></li> -->
+        </ul>
+      </nav>
+    </div>
+
+
+
+    <div id="content">
+      <article class="post">
+
+	
+		<h1><a href="/2013/10/10/rate-limiting-with-activerecord-base-find_each-in-edge-rails/">Rate Limiting Work On ActiveRecord::Base With .find_each In Edge Rails</a></h1>
+	
+
+	<div class="post-content">
+<p>I was working with several maintenance tasks that query external webservices for a collection of ActiveRecord objects. In order to avoid hitting the webservices’ rate limit, we pause every other iteration for a fraction of a second before we continue.</p>
+
+<p>The code looks something like this:</p>
+<script src='https://gist.github.com/carpodaster/6920157.js?file=old_code.rb'><![CDATA[]]></script>
+<p>I didn’t like that the information of our rate limit guard clauses was so scattered: there were bits before the block and others in the block. I had the urge to refactor it into a more concise form using a Ruby block itself.</p>
+
+<p>My idea was to create a method that takes the rate limit, the sleep time and an enumeration and then yield the elements of the enum to a block.</p>
+
+<p>I wrapped that method into a module and out came this:</p>
+<script src='https://gist.github.com/carpodaster/6920157.js?file=rate_limiter.rb'><![CDATA[]]></script>
+<p>This is how the specs look like:</p>
+<script src='https://gist.github.com/carpodaster/6920157.js?file=rate_limiter.rb'><![CDATA[]]></script>
+<p>Unfortunately and unlike other enumerable methods, the batch finder <code>ActiveRecord::Base.find_each</code> does not return an Enumerator when called without a block. Not in Rails 3.2 and not in Rails 4.0.</p>
+
+<p>Luckily, it has been solved in Edge Rails (see <a href="https://github.com/rails/rails/commit/840c552047a660d0a66883fb9c0cb144d5e728fb">840c552</a>) and I quickly created a Rails 4.1.0.beta app to go for the following code:</p>
+<script src='https://gist.github.com/carpodaster/6920157.js?file=external_service.rb'><![CDATA[]]></script>
+<p><code>ActiveRecord::Base.find_each</code> now returns a proper <code>Enumerator</code> that can be passed into the rate limiter. If you want to learn more about Enumerators in Ruby (or if you’d like to refresh your memory), I can recommend this excellent <a href="http://devblog.avdi.org/2013/09/10/rubytapas-freebie-enumerator/">Ruby Tapas</a> episode by <a href="https://twitter.com/avdi">Avdi Grimm</a>.</p>
+</div>
+
+	<p class="meta">Posted on <span class="postdate">Oct 10, 2013</span></p>
+
+</article>
+    </div>
+
+
+
+  </div>
+
+
+
+  <footer id="footer">
+    <p class="copyright">Copyright &copy; 2013 Absolventa GmbH. Powered by <a href="http://jekyllrb.com">Jekyll</a>, theme by <a href="http://www.webmaster-source.com">Matt Harzewski</a></p>
+  </footer>
+
+
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+  <script src="/assets/js/jquery.mobilemenu.min.js"></script>
+
+  <script>
+    $(document).ready(function(){
+      $('#sidebar nav ul').mobileMenu({'topOptionText': 'Menu', 'prependTo': '#sidebar nav'});
+    });
+  </script>
+
+  <script type="text/javascript">
+    var _gauges = _gauges || [];
+    (function() {
+      var t   = document.createElement('script');
+      t.type  = 'text/javascript';
+      t.async = true;
+      t.id    = 'gauges-tracker';
+      t.setAttribute('data-site-id', '52567bcc613f5d6ad7000042');
+      t.src = '//secure.gaug.es/track.js';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(t, s);
+    })();
+  </script>
+
+
+
+</body>
+</html>
