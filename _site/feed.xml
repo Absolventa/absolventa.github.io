@@ -68,13 +68,13 @@
 &lt;h3 id=&quot;quellcode&quot;&gt;Quellcode&lt;/h3&gt;
 
 &lt;p&gt;Quelltexte, Codeschnipsel und Ähnliches können mittels markdown sehr komportabel dargestellt werden. Als erstes ein ein Biespiel für eine kleine Ruby-Funktion&lt;/p&gt;
-&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;&lt;span class='k'&gt;def&lt;/span&gt; &lt;span class='nf'&gt;say_hello&lt;/span&gt;
-  &lt;span class='nb'&gt;puts&lt;/span&gt; &lt;span class='s1'&gt;&amp;#39;Hello&amp;#39;&lt;/span&gt;
-&lt;span class='k'&gt;end&lt;/span&gt;
+&lt;div class=&#39;highlight&#39;&gt;&lt;pre&gt;&lt;code class=&#39;ruby&#39;&gt;&lt;span class=&#39;k&#39;&gt;def&lt;/span&gt; &lt;span class=&#39;nf&#39;&gt;say_hello&lt;/span&gt;
+  &lt;span class=&#39;nb&#39;&gt;puts&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;Hello&amp;#39;&lt;/span&gt;
+&lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Die Quellcode als solchen darzustellen müssen die Zeilen nur mittels Tab (oder 4 Leerzeichen) eingerückt werden. Wenn jedoch Syntax-Highlighting unterstützt werden soll, muss der Code mit &lt;code&gt;{&lt;/code&gt;&lt;code&gt;% highlight ruby %}&lt;/code&gt; eingeleitet werden. Die letzte Zeile schließt ihn mit &lt;code&gt;{&lt;/code&gt;&lt;code&gt;% endhighlight %}&lt;/code&gt; ab.&lt;/p&gt;
 
-&lt;p&gt;Markdown unterstützt hierbei im Übrigen alle gängigen Sprachen und stellt den Quellcode spezifisch dar. Dazu muss nur die entsprechende Sprache am Anfang angegeben werden, z.B. für Java &lt;code&gt;’{&lt;/code&gt;&lt;code&gt;% highlight java %}&lt;/code&gt; … &lt;code&gt;{&lt;/code&gt;&lt;code&gt;% endhighlight %}&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Markdown unterstützt hierbei im Übrigen alle gängigen Sprachen und stellt den Quellcode spezifisch dar. Dazu muss nur die entsprechende Sprache am Anfang angegeben werden, z.B. für Java &lt;code&gt;&amp;#39;{&lt;/code&gt;&lt;code&gt;% highlight java %}&lt;/code&gt; … &lt;code&gt;{&lt;/code&gt;&lt;code&gt;% endhighlight %}&lt;/code&gt;.&lt;/p&gt;
 
 &lt;h3 id=&quot;zitate_kommentare&quot;&gt;Zitate, Kommentare&lt;/h3&gt;
 
