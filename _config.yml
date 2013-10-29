@@ -7,3 +7,15 @@ paginate: 10
 pygments: true
 
 exclude: ['README.md', 'Gemfile.lock', 'Gemfile', 'Rakefile', 'CNAME']
+
+colors:
+  highlight: '#0F0'
+
+theme:
+  name: Devnull
+  highlight_color: '#0d586b'
+  gauges_key: '52567bcc613f5d6ad7000042'
+
+  social:
+    github: Absolventa
+    twitter: ABSOLVENTA

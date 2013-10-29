@@ -1,91 +1,42 @@
 <!DOCTYPE html>
-<html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ site.theme.name }} - {{ page.title }}</title>
+  <meta name="author" content="ABSOLVENTA" />
+  <meta name="description" content="The blog of the ABSOLVENTA Dev Team" />
+  <link rel="canonical" href="{{ site.url }}{{ page.url | replace:'index.html','' }}" />
 
-  <meta charset="UTF-8">
-  <title>{{ page.title }}</title>
-  <meta name="viewport" content="width=device-width">
+  <!-- <link href="//fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css"> -->
+  <!-- <link href='http://fonts.googleapis.com/css?family=Gudea' rel='stylesheet' type='text/css'> -->
+  <link href='http://fonts.googleapis.com/css?family=Rosario' rel='stylesheet' type='text/css'>
+  <link rel="shortcut icon" href="/favicon.png">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.theme.name }}" href="{{site.url}}/feed.xml" />
 
-  <!--[if lt IE 9]>
-    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
-
-  <link href="/assets/css/style.css" rel="stylesheet" />
-  <!-- <link href="/assets/css/colors-dark.css" rel="stylesheet" /> -->
-  <link href="/assets/css/colors-light.css" rel="stylesheet" />
-
+  <link rel="stylesheet" href="/assets/css/all.css">
+<!--[if IE 7]>
+  <link rel="stylesheet" href="/assets/css/font-awesome-ie7.min.css">
+<![endif]-->
 </head>
-
 <body>
-
-
-
-  <header id="header">
-    <img id="logo" src="/images/absolventa_logo_large.png">
-    <h1><a href="/">{{ site.name }}</a></h1>
-    <p>{{ site.description }}</p>
-  </header>
-
-
-
-  <div id="page">
-
-
-
-    <div id="sidebar">
-      <nav>
-        <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/archives">Archive</a></li>
-          <!-- <li><a href="/about">About</a></li>
-          <li><a href="http://twitter.com/redwall_hp">Twitter</a></li>
-          <li><a href="/feed.xml">RSS Feed</a></li> -->
-        </ul>
-      </nav>
+  <div class="container">
+    <div class="four columns sidebar">
+      {% include sidebar.html %}
     </div>
 
-
-
-    <div id="content">
+    <div class="eleven columns content">
       {{ content }}
+    
+      <div class="footer">
+        {% include footer.html %}
+      </div>
     </div>
-
-
-
   </div>
 
-
-
-  <footer id="footer">
-    <p class="copyright">Copyright &copy; 2013 Absolventa GmbH. Powered by <a href="http://jekyllrb.com">Jekyll</a>, theme by <a href="http://www.webmaster-source.com">Matt Harzewski</a></p>
-  </footer>
-
-
-
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-  <script src="/assets/js/jquery.mobilemenu.min.js"></script>
-
-  <script>
-    $(document).ready(function(){
-      $('#sidebar nav ul').mobileMenu({'topOptionText': 'Menu', 'prependTo': '#sidebar nav'});
-    });
-  </script>
-
-  <script type="text/javascript">
-    var _gauges = _gauges || [];
-    (function() {
-      var t   = document.createElement('script');
-      t.type  = 'text/javascript';
-      t.async = true;
-      t.id    = 'gauges-tracker';
-      t.setAttribute('data-site-id', '52567bcc613f5d6ad7000042');
-      t.src = '//secure.gaug.es/track.js';
-      var s = document.getElementsByTagName('script')[0];
-      s.parentNode.insertBefore(t, s);
-    })();
-  </script>
-
-
-
+{% include analytics.html %}
 </body>
 </html>
