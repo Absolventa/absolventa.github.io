@@ -112,7 +112,7 @@
 	blockquote { margin: 0px; padding: 0px 20px 0 15px; border-left: 2px solid #ddd; }
 	blockquote cite { display: block; font-size: 12px; color: #555; }
 	blockquote cite:before { content: "\2014 \0020"; }
-	blockquote cite a, blockquote cite a:visited, blockquote cite a:visited { color: ; }
+	blockquote cite a, blockquote cite a:visited, blockquote cite a:visited { color: #0F0; }
 
 	hr { border: solid #ddd; border-width: 1px 0 0; clear: both; margin: 10px 0 30px; height: 0; }
 
@@ -610,7 +610,7 @@ body {
   color: #222222;
   line-height: 24px;
   margin: 0;
-  border-top: 7px solid ;
+  border-top: 7px solid #0d586b;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -641,21 +641,36 @@ h3 {
 
 ul {
   margin: 1em 0;
-  list-style: disc;
+  list-style: square;
+}
+
+ul.tags {
+  margin: 0.2em 0;
+  float: left;
+  list-style: none;
+}
+
+ul.tags li {
+  float: left;
+  margin-right: 0.5em;
+}
+
+ul.tags li a {
+  color: gray;
 }
 
 a {
-  color: ;
+  color: #0d586b;
   text-decoration: none;
 }
 
 a:hover {
-  color: ;
-  text-decoration: underline;
+  color: #0d586b;
+  text-decoration: none;
 }
 
 a:visited {
-  color: ;
+  color: #0d586b;
 }
 
 table {
@@ -667,6 +682,10 @@ img {
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+img#logo {
+  margin-left: 0
 }
 
 ul.posts {
@@ -701,7 +720,11 @@ ul.posts span {
 }
 
 nav h1, nav h2 {
-  text-align: center;
+  text-align: left;
+}
+
+nav h1 a {
+  color: black;
 }
 
 nav hr {
@@ -741,7 +764,7 @@ nav hr {
 
 .sidebar {
   padding-top: 25px;
-  font-family: "open sans", sans-serif;
+  font-family: "Rosario", sans-serif;
 }
 
 .sidebar p {
@@ -753,7 +776,7 @@ nav hr {
 }
 
 .content {
-  font: 400 16px/22px "open sans", sans-serif;
+  font: 400 16px/22px "Rosario", sans-serif;
   border-left: 1px solid #DDD;
   padding-left: 40px;
   padding-top: 25px;
@@ -777,7 +800,7 @@ nav hr {
 }
 
 #home h2 {
-  color: ;
+  color: #0d586b;
 }
 
 #logo {
@@ -803,7 +826,7 @@ nav hr {
 
 #stalker a:hover {
   text-decoration: none;
-  color: ;
+  color: #0d586b;
 }
 
 span.icon-hn {
