@@ -2,7 +2,7 @@ require 'active_support/core_ext'
 
 posts_dir       = "_posts"    # directory for blog files
 new_post_ext    = "md"  # default new post file extension when using the new_post task
-author          = "ABSOLVENTA Dev-Team"
+author          = `finger $USER | sed -e '/Name/!d' -e 's/.*Name: //'` || "ABSOLVENTA Dev-Team"
 # usage rake new_post[my-new-post] or rake new_post['my new post'] or rake new_post (defaults to "new-post")
 desc "Begin a new post in #{posts_dir}"
 task :new_post, :title do |t, args|
