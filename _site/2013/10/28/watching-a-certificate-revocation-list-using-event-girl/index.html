@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+  <title>Watching A Certificate Revocation List Using Event Girl</title>
+  <meta name="viewport" content="width=device-width">
+
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="/assets/css/style.css" rel="stylesheet" />
+  <!-- <link href="/assets/css/colors-dark.css" rel="stylesheet" /> -->
+  <link href="/assets/css/colors-light.css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+
+
+  <header id="header">
+    <img id="logo" src="/images/absolventa_logo_large.png">
+    <h1><a href="/">Devnull</a></h1>
+    <p>The blog of the ABSOLVENTA Dev Team</p>
+  </header>
+
+
+
+  <div id="page">
+
+
+
+    <div id="sidebar">
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/archives">Archive</a></li>
+          <!-- <li><a href="/about">About</a></li>
+          <li><a href="http://twitter.com/redwall_hp">Twitter</a></li>
+          <li><a href="/feed.xml">RSS Feed</a></li> -->
+        </ul>
+      </nav>
+    </div>
+
+
+
+    <div id="content">
+      <article class="post">
+
+	
+		<h1><a href="/2013/10/28/watching-a-certificate-revocation-list-using-event-girl/">Watching A Certificate Revocation List Using Event Girl</a></h1>
+	
+
+	<div class="post-content">
+<p>ABSOLVENTA uses WPA2-Enterprise to control acccess to the company’s wifi network. Authentication is done using x509 certificates issued by our local, self-signed Certificate Authority (CA). We use a FreeRadius server on a <a href="https://www.freebsd.org">FreeBSD</a> machine to check for the validity of the presented certificate.</p>
+
+<p>I wrote a simple <abbr title='Command Line Interface'>CLI</abbr> to faciliate the certificate management and automatically configuring the Radius server, including certificate revocation. The next-update field of the generated <a href="http://en.wikipedia.org/wiki/Certificate_revocation_list">certificate revocation list</a> (CRL) file is set to +100 days whenever a certificate is revoked, assuming there will always be at least an intern who leaves the company within three months’ time.</p>
+
+<p>Yesterday morning, I was denied access to our wifi network. Working from an ethernet-less Macbook Air I had to wire myself somewhere to debug the problem. The Radius server was alive and kicking but looking at the logs it was evident that it couldn’t verify certificates anymore as its CRL was no longer valid.</p>
+
+<p>Regenerating a new CRL was easy enough, but it was clear that my initial assumption of »100 days is a safe enough bet« was false. I didn’t want to increase the lifetime of the CRL as an overly old CRL kind of defeats its purpose. I wrote a simple Ruby CRL parser named <a href="https://github.com/Absolventa/crl_watchdog">crl_watchdog</a> and a shell script as an early warning system:</p>
+<script src='https://gist.github.com/7196906.js'><![CDATA[ ]]></script>
+<p>The file resides in <code>/etc/periodic/daily</code> which is FreeBSD’s equivalent of <code>/etc/cron.daily</code> on most Linux distributions.</p>
+
+<p>You’ll notice the various <a href="https://github.com/Absolventa/event_girl">Event Girl</a> statements: The shell script makes use of the <a href="https://github.com/Absolventa/event_girl_client">event_girl_client</a> CLI. Event Girl is the outcome of the <a href="http://railsgirlssummerofcode.org">Rails Girls Summer of Code</a> team <a href="http://highwaytorails.tumblr.com">Highway to Rails</a> we’ve been hosting from July 1st to September 30th and it’s awesome.</p>
+
+<p>The Event Girl app has two event expectations: one »backward« expectation that will inform us when the daily script doesn’t run for whatever reason and another that will send an email instantly when the CRL will expire within the next 14 days (line 22).</p>
+
+<p>Using Event Girl, I can not only make sure not to run into an outdated CRL again, but also feel at ease that the CRL actually remains being monitored. Also, I don’t have to bother about sending mails from the server and can leave that to the Event Girl app.</p>
+</div>
+
+  <p class="meta">Posted on <span class="postdate">Oct 28, 2013</span> by <span class="author">Carsten Zimmermann</span></p>
+
+</article>
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <footer id="footer">
+    <p class="copyright">Copyright &copy; 2013 Absolventa GmbH. Powered by <a href="http://jekyllrb.com">Jekyll</a>, theme by <a href="http://www.webmaster-source.com">Matt Harzewski</a></p>
+  </footer>
+
+
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+  <script src="/assets/js/jquery.mobilemenu.min.js"></script>
+
+  <script>
+    $(document).ready(function(){
+      $('#sidebar nav ul').mobileMenu({'topOptionText': 'Menu', 'prependTo': '#sidebar nav'});
+    });
+  </script>
+
+  <script type="text/javascript">
+    var _gauges = _gauges || [];
+    (function() {
+      var t   = document.createElement('script');
+      t.type  = 'text/javascript';
+      t.async = true;
+      t.id    = 'gauges-tracker';
+      t.setAttribute('data-site-id', '52567bcc613f5d6ad7000042');
+      t.src = '//secure.gaug.es/track.js';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(t, s);
+    })();
+  </script>
+
+
+
+</body>
+</html>
