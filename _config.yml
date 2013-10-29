@@ -14,6 +14,7 @@ colors:
 theme:
   name: Devnull
   highlight_color: '#0d586b'
+  gauges_key: '52567bcc613f5d6ad7000042'
 
   social:
     github: Absolventa
