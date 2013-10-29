@@ -21,7 +21,7 @@
 
 &lt;p&gt;You’ll notice the various &lt;a href=&quot;https://github.com/Absolventa/event_girl&quot;&gt;Event Girl&lt;/a&gt; statements: The shell script makes use of the &lt;a href=&quot;https://github.com/Absolventa/event_girl_client&quot;&gt;event_girl_client&lt;/a&gt; CLI. Event Girl is the outcome of the &lt;a href=&quot;http://railsgirlssummerofcode.org&quot;&gt;Rails Girls Summer of Code&lt;/a&gt; team &lt;a href=&quot;http://highwaytorails.tumblr.com&quot;&gt;Highway to Rails&lt;/a&gt; we’ve been hosting from July 1st to September 30th and it’s awesome.&lt;/p&gt;
 
-&lt;p&gt;The Event Girl app has two event expectations: one »backward« expectation that will inform us when the daily script doesn’t run for whatever reason and another that will send an email instantly when the CRL will expire within the next 14 days (line 22).&lt;/p&gt;
+&lt;p&gt;The Event Girl app has two event expectations: one »backward« expectation that will inform us when the daily script doesn’t run for whatever reason and a »forward« one which will send an email instantly when the CRL will expire within the next 14 days (as notified in line 22).&lt;/p&gt;
 
 &lt;p&gt;Using Event Girl, I can not only make sure not to run into an outdated CRL again, but also feel at ease that the CRL actually remains being monitored. Also, I don’t have to bother about sending mails from the server and can leave that to the Event Girl app.&lt;/p&gt;
 </description>
