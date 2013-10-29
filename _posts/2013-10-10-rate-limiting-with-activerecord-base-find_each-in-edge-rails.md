@@ -4,11 +4,12 @@ title: "Rate Limiting Work On ActiveRecord::Base With .find_each In Edge Rails"
 date: 2013-10-10 17:04
 author: Carsten Zimmermann
 comments: true
-categories:
-  - Enumerator
-  - ActiveRecord
-  - Enumerable
-  - Edge Rails
+tags:
+  - ruby
+  - enumerator
+  - activerecord
+  - enumerable
+  - edgerails
 ---
 
 I was working with several maintenance tasks that query external webservices

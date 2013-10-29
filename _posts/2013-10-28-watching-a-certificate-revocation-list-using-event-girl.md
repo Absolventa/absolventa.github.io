@@ -4,12 +4,11 @@ title: "Watching A Certificate Revocation List Using Event Girl"
 date: 2013-10-28 15:34
 author: Carsten Zimmermann
 comments: true
-categories: 
-  - Event Girl
-  - OpenSSL
-  - WPA2-Enterprise
-  - DevOps
-  - Wifi
+tags: 
+  - event-girl
+  - openssl
+  - devops
+  - wifi
 ---
 
 ABSOLVENTA uses WPA2-Enterprise to control acccess to the company's wifi
