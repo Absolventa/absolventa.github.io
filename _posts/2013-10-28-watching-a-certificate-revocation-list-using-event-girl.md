@@ -18,7 +18,7 @@ self-signed Certificate Authority (CA). We use a FreeRadius server on a
 presented certificate.
 
 I wrote a simple <abbr title="Command Line Interface">CLI</abbr> to faciliate
-the certificate management and automatically configuring the Radius server,
+the certificate management and to automatically configure the Radius server,
 including certificate revocation. The next-update field of the generated
 [certificate revocation
 list](http://en.wikipedia.org/wiki/Certificate_revocation_list) (CRL) file is
