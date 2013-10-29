@@ -44,7 +44,22 @@ h3 {
 
 ul {
   margin: 1em 0;
-  list-style: disc;
+  list-style: square;
+}
+
+ul.tags {
+  margin: 0.2em 0;
+  float: left;
+  list-style: none;
+}
+
+ul.tags li {
+  float: left;
+  margin-right: 0.5em;
+}
+
+ul.tags li a {
+  color: gray;
 }
 
 a {

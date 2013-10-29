@@ -6,8 +6,8 @@ layout: default
 
 <p class="meta">
   Posted on {{ page.date | date: "%B %d, %Y" }} by {{ page.author }}
+  {% include tags.html %}
 </p>
-
 
 <div id="post">
   {{ content }}
