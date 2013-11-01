@@ -52,7 +52,7 @@ from July 1st to September 30th and it's awesome.
 The Event Girl app has two event expectations: one »backward« expectation that
 will inform us when the daily script doesn't run for whatever reason and a
 »forward« one which will send an email instantly when the CRL will expire
-within the next 14 days (as notified in line 22).
+within the next 14 days (as notified in line 20).
 
 Using Event Girl, I can not only make sure not to run into an outdated CRL again,
 but also feel at ease that the CRL actually remains being monitored. Also, I
