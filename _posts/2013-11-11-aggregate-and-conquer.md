@@ -4,7 +4,11 @@ title: "Aggregate and conquer"
 date: 2013-11-11 09:00
 author: Robin Neumann
 comments: true
-categories: ActiveRecord, PostgreSQL, Rails
+tags:
+  - activerecord
+  - postgresql
+  - rails
+  - statistics
 ---
 
 Collecting stats is awesome. Analytical brains love being fed with stats. So wait, let’s 
