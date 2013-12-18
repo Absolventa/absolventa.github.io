@@ -7,6 +7,20 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Binary Christmas Tree</title>
+				<description>
+&lt;p&gt;Season’s Greetings!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/binary_christmas_tree.gif&quot; alt=&quot;Merry Christmas&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The ABSOLVENTA Dev-Team says: Merry (Christ|X)mas! From left to right: Mignon, Felix, Markus (kneeling) and Carsten, Daniel and Robin (standing). Image credit: Mignon.&lt;/p&gt;
+</description>
+				<pubDate>Wed, 18 Dec 2013 14:00:00 +0100</pubDate>
+				<link>http://devnull.absolventa.de/2013/12/18/binary-christmas-tree/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2013/12/18/binary-christmas-tree/</guid>
+			</item>
+		
+			<item>
 				<title>Aggregate And Conquer</title>
 				<description>
 &lt;p&gt;Collecting stats is awesome. Analytical brains love being fed with stats. So let’s fire these tiny queries at our database asking for favourite customer choices of recent years and – meanwhile – grab a coffee … or write a book or a whole new app until your answer is served.&lt;/p&gt;
