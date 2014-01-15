@@ -78,8 +78,9 @@
     </p>
     <div class="post-content">
       
-        <p>Saving a record in a controller has at least two outcomes: it can succeed or it can fail and you want to test this branching.</p> <p>In order to decouple a functional test from the concrete attributes or other states that define its validity, it’s good to skip the actual validation and stub it out instead.</p> <p>Stubbing a failing record for a create or update request is fairly easy for a vanilla controller:</p> <div class='highlight'><pre><code class='ruby'><span...
+        Testing the outcome of a failed create or update action can be a pain with inherited_resources due to its somewhat different understanding of how a failed record looks like. This article show a handy shortcut to stub it out nicely with rspec-mocks.
       
+      <p></p>
       <p> <a href="/2014/01/15/stubbing-an-invalid-record-for-inherited_resources/">Read more&hellip;</a></p>
     </div>
 
@@ -106,6 +107,7 @@
 <p>The ABSOLVENTA Dev-Team says: Merry (Christ|X)mas! From left to right: Mignon, Felix, Markus (kneeling) and Carsten, Daniel and Robin (standing). Image credit: Mignon.</p>
 
       
+      <p></p>
       <p> <a href="/2013/12/18/binary-christmas-tree/">Read more&hellip;</a></p>
     </div>
 
@@ -126,6 +128,7 @@
       
         <p>Collecting stats is awesome. Analytical brains love being fed with stats. So let’s fire these tiny queries at our database asking for favourite customer choices of recent years and – meanwhile – grab a coffee … or write a book or a whole new app until your answer is served.</p> <p>Persisting events over years is no problem for modern database systems in general, but accessing them later could be. Of course, you can come over...
       
+      <p></p>
       <p> <a href="/2013/11/11/aggregate-and-conquer/">Read more&hellip;</a></p>
     </div>
 
@@ -146,6 +149,7 @@
       
         <p>ABSOLVENTA uses WPA2-Enterprise to control acccess to the company’s wifi network. Authentication is done using x509 certificates issued by our local, self-signed Certificate Authority (CA). We use a FreeRadius server on a <a href="https://www.freebsd.org">FreeBSD</a> machine to check for the validity of the presented certificate.</p> <p>I wrote a simple <abbr title='Command Line Interface'>CLI</abbr> to faciliate the certificate management and to automatically configure the Radius server, including certificate revocation. The next-update field of the generated <a href="http://en.wikipedia.org/wiki/Certificate_revocation_list">certificate...
       
+      <p></p>
       <p> <a href="/2013/10/28/watching-a-certificate-revocation-list-using-event-girl/">Read more&hellip;</a></p>
     </div>
 
@@ -166,6 +170,7 @@
       
         <p>I was working with several maintenance tasks that query external webservices for a collection of ActiveRecord objects. In order to avoid hitting the webservices’ rate limit, we pause every other iteration for a fraction of a second before we continue.</p> <p>The code looks something like this:</p> <script src='https://gist.github.com/6920157.js?file=old_code.rb'><![CDATA[ ]]></script> <p>I didn’t like that the information of our rate limit guard clauses was so scattered: there were bits before the block and others in the block....
       
+      <p></p>
       <p> <a href="/2013/10/10/rate-limiting-with-activerecord-base-find_each-in-edge-rails/">Read more&hellip;</a></p>
     </div>
 

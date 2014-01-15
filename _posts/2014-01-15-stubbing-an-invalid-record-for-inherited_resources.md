@@ -4,6 +4,7 @@ title: "Stubbing an invalid record for inherited_resources"
 date: 2014-01-15 17:58
 author: Carsten Zimmermann
 comments: true
+teaser: 'Testing the outcome of a failed create or update action can be a pain with inherited_resources due to its somewhat different understanding of how a failed record looks like. This article show a handy shortcut to stub it out nicely with rspec-mocks.'
 tags:
   - ruby
   - rspec
