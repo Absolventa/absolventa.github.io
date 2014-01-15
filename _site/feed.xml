@@ -7,6 +7,69 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Stubbing an invalid record for inherited_resources</title>
+				<description>
+&lt;p&gt;Saving a record in a controller has at least two outcomes: it can succeed or it can fail and you want to test this branching.&lt;/p&gt;
+
+&lt;p&gt;In order to decouple a functional test from the concrete attributes or other states that define its validity, it’s good to skip the actual validation and stub it out instead.&lt;/p&gt;
+
+&lt;p&gt;Stubbing a failing record for a create or update request is fairly easy for a vanilla controller:&lt;/p&gt;
+&lt;div class=&#39;highlight&#39;&gt;&lt;pre&gt;&lt;code class=&#39;ruby&#39;&gt;&lt;span class=&#39;n&#39;&gt;describe&lt;/span&gt; &lt;span class=&#39;no&#39;&gt;MyController&lt;/span&gt; &lt;span class=&#39;k&#39;&gt;do&lt;/span&gt;
+  &lt;span class=&#39;n&#39;&gt;describe&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;POST create&amp;#39;&lt;/span&gt; &lt;span class=&#39;k&#39;&gt;do&lt;/span&gt;
+    &lt;span class=&#39;n&#39;&gt;it&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;creates a record&amp;#39;&lt;/span&gt; &lt;span class=&#39;k&#39;&gt;do&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;allow_any_instance_of&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;no&#39;&gt;MyModel&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;to&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;receive&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;ss&#39;&gt;:valid?&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;and_return&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;kp&#39;&gt;true&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;expect&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;post&lt;/span&gt; &lt;span class=&#39;ss&#39;&gt;:create&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;}&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;to&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;change&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt; &lt;span class=&#39;no&#39;&gt;MyModel&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;count&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;}&lt;/span&gt;
+    &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+
+    &lt;span class=&#39;n&#39;&gt;it&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;fails to create a record&amp;#39;&lt;/span&gt; &lt;span class=&#39;k&#39;&gt;do&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;allow_any_instance_of&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;no&#39;&gt;MyModel&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;to&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;receive&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;ss&#39;&gt;:valid?&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;and_return&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;kp&#39;&gt;false&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;expect&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;post&lt;/span&gt; &lt;span class=&#39;ss&#39;&gt;:create&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;}&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;not_to&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;change&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt; &lt;span class=&#39;no&#39;&gt;MyModel&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;count&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;}&lt;/span&gt;
+    &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+  &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+&lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;However, it isn’t that easy with &lt;a href=&quot;https://github.com/josevalim/inherited_resources&quot;&gt;inherited_recources&lt;/a&gt;. (or more accurately with &lt;a href=&quot;https://github.com/plataformatec/responders&quot;&gt;responders&lt;/a&gt; which is used behind the scenes). Inherited Resources considers a record invalid when it has &lt;code&gt;errors&lt;/code&gt; (see also &lt;a href=&quot;https://github.com/josevalim/inherited_resources/issues/38&quot;&gt;this issue&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Here is an approach to properly stub record validity for use with Inherited Resources:&lt;/p&gt;
+&lt;div class=&#39;highlight&#39;&gt;&lt;pre&gt;&lt;code class=&#39;ruby&#39;&gt;&lt;span class=&#39;c1&#39;&gt;# spec/support/advanced_validity_stubbing.rb&lt;/span&gt;
+&lt;span class=&#39;k&#39;&gt;module&lt;/span&gt; &lt;span class=&#39;nn&#39;&gt;AdvancedValidityStubbing&lt;/span&gt;
+  &lt;span class=&#39;k&#39;&gt;def&lt;/span&gt; &lt;span class=&#39;nf&#39;&gt;stub_validity&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;klass&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;,&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;validity&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;
+    &lt;span class=&#39;n&#39;&gt;allow_any_instance_of&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;klass&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;to&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;receive&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;ss&#39;&gt;:valid?&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;and_return&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;validity&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;
+    &lt;span class=&#39;k&#39;&gt;unless&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;validity&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;errors&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;=&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;klass&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;new&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;errors&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;errors&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;add&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;ss&#39;&gt;:base&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;,&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;Stubbed to be bad&amp;#39;&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;allow_any_instance_of&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;klass&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;to&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;receive&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;ss&#39;&gt;:errors&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;and_return&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;errors&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;
+    &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+  &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+&lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+
+&lt;span class=&#39;c1&#39;&gt;# spec/spec_helper.rb&lt;/span&gt;
+&lt;span class=&#39;no&#39;&gt;RSpec&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;configure&lt;/span&gt; &lt;span class=&#39;k&#39;&gt;do&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;|&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;config&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;|&lt;/span&gt;
+  &lt;span class=&#39;c1&#39;&gt;# ...&lt;/span&gt;
+  &lt;span class=&#39;n&#39;&gt;config&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;include&lt;/span&gt; &lt;span class=&#39;no&#39;&gt;AdvancedValidityStubbing&lt;/span&gt;
+&lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The modified controller spec may look like this:&lt;/p&gt;
+&lt;div class=&#39;highlight&#39;&gt;&lt;pre&gt;&lt;code class=&#39;ruby&#39;&gt;&lt;span class=&#39;n&#39;&gt;describe&lt;/span&gt; &lt;span class=&#39;no&#39;&gt;MyController&lt;/span&gt; &lt;span class=&#39;k&#39;&gt;do&lt;/span&gt;
+  &lt;span class=&#39;n&#39;&gt;describe&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;POST create&amp;#39;&lt;/span&gt; &lt;span class=&#39;k&#39;&gt;do&lt;/span&gt;
+    &lt;span class=&#39;n&#39;&gt;it&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;creates a record&amp;#39;&lt;/span&gt; &lt;span class=&#39;k&#39;&gt;do&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;stub_validity&lt;/span&gt; &lt;span class=&#39;no&#39;&gt;MyModel&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;,&lt;/span&gt; &lt;span class=&#39;kp&#39;&gt;true&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;expect&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;post&lt;/span&gt; &lt;span class=&#39;ss&#39;&gt;:create&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;}&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;to&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;change&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt; &lt;span class=&#39;no&#39;&gt;MyModel&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;count&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;}&lt;/span&gt;
+    &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+
+    &lt;span class=&#39;n&#39;&gt;it&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;fails to create a record&amp;#39;&lt;/span&gt; &lt;span class=&#39;k&#39;&gt;do&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;stub_validity&lt;/span&gt; &lt;span class=&#39;no&#39;&gt;MyModel&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;,&lt;/span&gt; &lt;span class=&#39;kp&#39;&gt;false&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;expect&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;post&lt;/span&gt; &lt;span class=&#39;ss&#39;&gt;:create&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;}&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;not_to&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;change&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt; &lt;span class=&#39;no&#39;&gt;MyModel&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;count&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;}&lt;/span&gt;
+    &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+  &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+&lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+				<pubDate>Wed, 15 Jan 2014 17:58:00 +0100</pubDate>
+				<link>http://devnull.absolventa.de/2014/01/15/stubbing-an-invalid-record-for-inherited_resources/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2014/01/15/stubbing-an-invalid-record-for-inherited_resources/</guid>
+			</item>
+		
+			<item>
 				<title>Binary Christmas Tree</title>
 				<description>
 &lt;p&gt;Season’s Greetings!&lt;/p&gt;
