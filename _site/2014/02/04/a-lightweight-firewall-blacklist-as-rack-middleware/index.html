@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devnull - A Lightweight Firewall/Blacklist as Rack-Middleware</title>
+  <meta name="author" content="ABSOLVENTA" />
+  <meta name="description" content="The blog of the ABSOLVENTA Dev Team" />
+  <link rel="canonical" href="http://devnull.absolventa.de/2014/02/04/a-lightweight-firewall-blacklist-as-rack-middleware/" />
+
+  <!-- <link href="//fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css"> -->
+  <!-- <link href='http://fonts.googleapis.com/css?family=Gudea' rel='stylesheet' type='text/css'> -->
+  <link href='http://fonts.googleapis.com/css?family=Rosario' rel='stylesheet' type='text/css'>
+  <link rel="shortcut icon" href="/favicon.png">
+  <link rel="alternate" type="application/rss+xml" title="Devnull" href="http://devnull.absolventa.de/feed.xml" />
+
+  <link rel="stylesheet" href="/assets/css/all.css">
+<!--[if IE 7]>
+  <link rel="stylesheet" href="/assets/css/font-awesome-ie7.min.css">
+<![endif]-->
+</head>
+<body>
+  <div class="container">
+    <div class="four columns sidebar">
+      <nav>
+  <a href="/">
+    <img src="/images/absolventa_logo_large.png" id="logo" alt="Blog logo"/>
+  </a>
+  <h1><a href="/">Devnull</a></h1>
+  <hr/>
+  <ul>
+    <p>The Blog of the <a href="https://www.absolventa.de/">ABSOLVENTA</a> Dev Team.</p>
+  <hr/>
+  <div>
+    <div id="social">
+      Follow us:
+<div id="stalker">
+  
+  <a title="Absolventa on Github" href="http://github.com/Absolventa">
+    <i class="icon-github-sign"></i>
+  </a>
+  
+
+  
+
+  
+  <a title="ABSOLVENTA on Twitter" href="http://twitter.com/ABSOLVENTA">
+    <i class="icon-twitter-sign"></i>
+  </a>
+  
+
+  <a title="RSS feed" id="rss" href="/feed.xml">
+    <i class="icon-rss-sign"></i>
+  </a>
+</div>
+
+    </div>
+  </div>
+  </ul>
+</nav>
+
+    </div>
+
+    <div class="eleven columns content">
+      <h1 class="title">A Lightweight Firewall/Blacklist as Rack-Middleware</h1>
+
+<p class="meta">
+  Posted on February 04, 2014 by Carsten Zimmermann
+  <ul class="tags">
+  
+    <li><a href='/tag/ruby'>ruby</a></li>
+  
+    <li><a href='/tag/rack'>rack</a></li>
+  
+    <li><a href='/tag/middleware'>middleware</a></li>
+  
+    <li><a href='/tag/blacklist'>blacklist</a></li>
+  
+</ul>
+<div style="clear:both"></div>
+
+</p>
+
+<div id="post">
+  
+<p>I recently fell in love with <a href="http://railscasts.com/episodes/151-rack-middleware">Rack middleware</a>. Rack’s simplicity of serving web requests by nothing but an <code>Array</code> with three elements alone is charming. But using it as a bouncer to handle (and possibly already return) all sorts of stuff before your requests even touch your Rails app is the <em>real</em> appeal.</p>
+
+<p>We had an annoying bot hitting on of our applications today. There was no harm done but while it was nowhere near a <a href="http://en.wikipedia.org/wiki/Denial-of-service_attack" title="Denial of Service">DoS</a>, its requests did put some load on our servers. All requests came from one source IP and it would have been easy to block it on the network layer, but as we host our sites on Heroku, that was not an option.</p>
+
+<p>Enter a quick middleware hack:</p>
+<div class='highlight'><pre><code class='ruby'><span class='k'>class</span> <span class='nc'>Firewall</span> <span class='o'>&lt;</span> <span class='no'>Struct</span><span class='o'>.</span><span class='n'>new</span><span class='p'>(</span><span class='ss'>:app</span><span class='p'>)</span>
+
+  <span class='k'>class</span> <span class='o'>&lt;&lt;</span> <span class='nb'>self</span>
+    <span class='k'>def</span> <span class='nf'>blacklist</span>
+      <span class='vi'>@blacklist</span> <span class='o'>||=</span> <span class='o'>[</span><span class='s1'>&#39;192.0.2.1&#39;</span><span class='o'>].</span><span class='n'>freeze</span> <span class='c1'># Example IP, see RFC 5735</span>
+    <span class='k'>end</span>
+  <span class='k'>end</span>
+
+  <span class='k'>def</span> <span class='nf'>call</span><span class='p'>(</span><span class='n'>env</span><span class='p'>)</span>
+    <span class='k'>if</span> <span class='nb'>self</span><span class='o'>.</span><span class='n'>class</span><span class='o'>.</span><span class='n'>blacklist</span><span class='o'>.</span><span class='n'>include?</span> <span class='n'>env</span><span class='o'>[</span><span class='s1'>&#39;HTTP_X_FORWARDED_FOR&#39;</span><span class='o'>]</span>
+      <span class='n'>message</span> <span class='o'>=</span> <span class='s1'>&#39;Your IP-address has been banned for security reasons.&#39;</span> <span class='o'>+</span>
+                <span class='s1'>&#39;If you feel this is a mistake, please contact &#39;</span> <span class='o'>+</span>
+                <span class='s1'>&#39;support@absolventa.de&#39;</span>
+      <span class='o'>[</span><span class='mi'>403</span><span class='p'>,</span> <span class='p'>{},</span> <span class='o'>[</span><span class='n'>message</span><span class='o'>]]</span>
+    <span class='k'>else</span>
+      <span class='n'>app</span><span class='o'>.</span><span class='n'>call</span><span class='p'>(</span><span class='n'>env</span><span class='p'>)</span>
+    <span class='k'>end</span>
+  <span class='k'>end</span>
+<span class='k'>end</span>
+</code></pre></div>
+<p>It’s pretty good to test-drive as well: <a href="https://gist.github.com/carpodaster/8807139#file-firewall_spec-rb">take a look at the spec</a>. There is nice article that <a href="http://taylorluk.com/post/54982679495/how-to-test-rack-middleware-with-rspec">illustrates how to test Rack-apps</a>.</p>
+
+<p>We have our middleware classes stowed in <code>app/middleware</code>. You can hook it in with a simple one-liner in your <code>config/appliaction.rb</code>:</p>
+<div class='highlight'><pre><code class='ruby'><span class='n'>config</span><span class='o'>.</span><span class='n'>middleware</span><span class='o'>.</span><span class='n'>insert_after</span> <span class='ss'>Rack</span><span class='p'>:</span><span class='ss'>:Runtime</span><span class='p'>,</span> <span class='s1'>&#39;Firewall&#39;</span>
+</code></pre></div>
+<p>Sure, you need a deployment for every new IP that needs to be blacklisted. But it’s fast and simple. You’re heartily invited to <a href="https://gist.github.com/carpodaster/8807139#file-firewall-rb">improve the code</a> (send a PR our way).</p>
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+    <li>
+      <span>15 Jan 2014 &raquo;</span> <a href="/2014/01/15/stubbing-an-invalid-record-for-inherited_resources/">Stubbing an invalid record for inherited_resources</a>
+    </li>
+    
+    <li>
+      <span>18 Dec 2013 &raquo;</span> <a href="/2013/12/18/binary-christmas-tree/">Binary Christmas Tree</a>
+    </li>
+    
+    <li>
+      <span>11 Nov 2013 &raquo;</span> <a href="/2013/11/11/aggregate-and-conquer/">Aggregate And Conquer</a>
+    </li>
+    
+  </ul>
+</div>
+
+    
+      <div class="footer">
+        <div class="disclaimer">
+  
+
+  <p>
+    © ABSOLVENTA, 2013 &mdash; built with Jekyll using Lagom theme
+  </p>
+</div>
+
+      </div>
+    </div>
+  </div>
+
+
+<script type="text/javascript">
+  var _gauges = _gauges || [];
+  (function() {
+   var t   = document.createElement('script');
+   t.type  = 'text/javascript';
+   t.async = true;
+   t.id    = 'gauges-tracker';
+   t.setAttribute('data-site-id', '52567bcc613f5d6ad7000042');
+   t.src = '//secure.gaug.es/track.js';
+   var s = document.getElementsByTagName('script')[0];
+   s.parentNode.insertBefore(t, s);
+   })();
+</script>
+
+
+
+</body>
+</html>

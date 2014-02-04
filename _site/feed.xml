@@ -7,6 +7,46 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>A Lightweight Firewall/Blacklist as Rack-Middleware</title>
+				<description>
+&lt;p&gt;I recently fell in love with &lt;a href=&quot;http://railscasts.com/episodes/151-rack-middleware&quot;&gt;Rack middleware&lt;/a&gt;. Rack’s simplicity of serving web requests by nothing but an &lt;code&gt;Array&lt;/code&gt; with three elements alone is charming. But using it as a bouncer to handle (and possibly already return) all sorts of stuff before your requests even touch your Rails app is the &lt;em&gt;real&lt;/em&gt; appeal.&lt;/p&gt;
+
+&lt;p&gt;We had an annoying bot hitting on of our applications today. There was no harm done but while it was nowhere near a &lt;a href=&quot;http://en.wikipedia.org/wiki/Denial-of-service_attack&quot; title=&quot;Denial of Service&quot;&gt;DoS&lt;/a&gt;, its requests did put some load on our servers. All requests came from one source IP and it would have been easy to block it on the network layer, but as we host our sites on Heroku, that was not an option.&lt;/p&gt;
+
+&lt;p&gt;Enter a quick middleware hack:&lt;/p&gt;
+&lt;div class=&#39;highlight&#39;&gt;&lt;pre&gt;&lt;code class=&#39;ruby&#39;&gt;&lt;span class=&#39;k&#39;&gt;class&lt;/span&gt; &lt;span class=&#39;nc&#39;&gt;Firewall&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#39;no&#39;&gt;Struct&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;new&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;ss&#39;&gt;:app&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;
+
+  &lt;span class=&#39;k&#39;&gt;class&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#39;nb&#39;&gt;self&lt;/span&gt;
+    &lt;span class=&#39;k&#39;&gt;def&lt;/span&gt; &lt;span class=&#39;nf&#39;&gt;blacklist&lt;/span&gt;
+      &lt;span class=&#39;vi&#39;&gt;@blacklist&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;||=&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;[&lt;/span&gt;&lt;span class=&#39;s1&#39;&gt;&amp;#39;192.0.2.1&amp;#39;&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;].&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;freeze&lt;/span&gt; &lt;span class=&#39;c1&#39;&gt;# Example IP, see RFC 5735&lt;/span&gt;
+    &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+  &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+
+  &lt;span class=&#39;k&#39;&gt;def&lt;/span&gt; &lt;span class=&#39;nf&#39;&gt;call&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;env&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;
+    &lt;span class=&#39;k&#39;&gt;if&lt;/span&gt; &lt;span class=&#39;nb&#39;&gt;self&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;class&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;blacklist&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;include?&lt;/span&gt; &lt;span class=&#39;n&#39;&gt;env&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;[&lt;/span&gt;&lt;span class=&#39;s1&#39;&gt;&amp;#39;HTTP_X_FORWARDED_FOR&amp;#39;&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;]&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;message&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;=&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;Your IP-address has been banned for security reasons.&amp;#39;&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;+&lt;/span&gt;
+                &lt;span class=&#39;s1&#39;&gt;&amp;#39;If you feel this is a mistake, please contact &amp;#39;&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;+&lt;/span&gt;
+                &lt;span class=&#39;s1&#39;&gt;&amp;#39;support@absolventa.de&amp;#39;&lt;/span&gt;
+      &lt;span class=&#39;o&#39;&gt;[&lt;/span&gt;&lt;span class=&#39;mi&#39;&gt;403&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;,&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{},&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;[&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;message&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;]]&lt;/span&gt;
+    &lt;span class=&#39;k&#39;&gt;else&lt;/span&gt;
+      &lt;span class=&#39;n&#39;&gt;app&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;call&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;env&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt;
+    &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+  &lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+&lt;span class=&#39;k&#39;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;It’s pretty good to test-drive as well: &lt;a href=&quot;https://gist.github.com/carpodaster/8807139#file-firewall_spec-rb&quot;&gt;take a look at the spec&lt;/a&gt;. There is nice article that &lt;a href=&quot;http://taylorluk.com/post/54982679495/how-to-test-rack-middleware-with-rspec&quot;&gt;illustrates how to test Rack-apps&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;We have our middleware classes stowed in &lt;code&gt;app/middleware&lt;/code&gt;. You can hook it in with a simple one-liner in your &lt;code&gt;config/appliaction.rb&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#39;highlight&#39;&gt;&lt;pre&gt;&lt;code class=&#39;ruby&#39;&gt;&lt;span class=&#39;n&#39;&gt;config&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;middleware&lt;/span&gt;&lt;span class=&#39;o&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;n&#39;&gt;insert_after&lt;/span&gt; &lt;span class=&#39;ss&#39;&gt;Rack&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;:&lt;/span&gt;&lt;span class=&#39;ss&#39;&gt;:Runtime&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;,&lt;/span&gt; &lt;span class=&#39;s1&#39;&gt;&amp;#39;Firewall&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Sure, you need a deployment for every new IP that needs to be blacklisted. But it’s fast and simple. You’re heartily invited to &lt;a href=&quot;https://gist.github.com/carpodaster/8807139#file-firewall-rb&quot;&gt;improve the code&lt;/a&gt; (send a PR our way).&lt;/p&gt;
+</description>
+				<pubDate>Tue, 04 Feb 2014 17:03:00 +0100</pubDate>
+				<link>http://devnull.absolventa.de/2014/02/04/a-lightweight-firewall-blacklist-as-rack-middleware/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2014/02/04/a-lightweight-firewall-blacklist-as-rack-middleware/</guid>
+			</item>
+		
+			<item>
 				<title>Stubbing an invalid record for inherited_resources</title>
 				<description>
 &lt;p&gt;Saving a record in a controller has at least two outcomes: it can succeed or it can fail and you want to test this branching.&lt;/p&gt;
