@@ -13,6 +13,10 @@ layout: default
   {{ content }}
 </div>
 
+{% if page.comments %}
+  {% include disqus.html %}
+{% endif %}
+
 <div id="related">
   <h3>Related Posts</h3>
   <ul class="posts">
