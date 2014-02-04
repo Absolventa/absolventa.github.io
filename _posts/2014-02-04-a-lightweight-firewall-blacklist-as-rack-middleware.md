@@ -17,7 +17,7 @@ alone is charming. But using it as a bouncer to handle (and possibly already
 return) all sorts of stuff before your requests even touch your Rails app
 is the _real_ appeal.
 
-We had an annoying bot hitting on of our applications today. There was no
+We had an annoying bot hitting one of our applications today. There was no
 harm done but while it was nowhere near a
 [DoS](http://en.wikipedia.org/wiki/Denial-of-service_attack "Denial of Service"),
 its requests did put some load on our servers. All requests came from one
@@ -55,7 +55,7 @@ There is nice article that
 [illustrates how to test Rack-apps](http://taylorluk.com/post/54982679495/how-to-test-rack-middleware-with-rspec).
 
 We have our middleware classes stowed in `app/middleware`. You can hook it in with
-a simple one-liner in your `config/appliaction.rb`:
+a simple one-liner in your `config/application.rb`:
 
 {% highlight ruby %}
 config.middleware.insert_after Rack::Runtime, 'Firewall'
