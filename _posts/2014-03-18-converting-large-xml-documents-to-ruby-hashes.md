@@ -12,7 +12,7 @@ tags:
   - active_support
 ---
 
-A lot of web services out there are dealing with XML documents. To connect to a SOAP-based web 
+A lot of web services out there are dealing with XML documents. To connect a SOAP-based web 
 service to one of our Rails Applications, we need to translate XML documents to Ruby Hashes. 
  
 First of all - we already had a solution implemented. For that we parsed the XML with 
