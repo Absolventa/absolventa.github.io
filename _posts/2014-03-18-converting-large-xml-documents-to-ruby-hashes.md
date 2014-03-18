@@ -37,7 +37,7 @@ a ``RuntimeError``:
 As far I can trace it out, this a known problem with ``REXML``, that is used behind 
 the scenes by this method. I tried to came over it by using the famous C-library ``libxml2``, 
 that originally was developed for the GNOME project. Happily I noticed that
-there's a wrapping gem for it called ``libxml-ruby``. 
+there's a wrapping gem for it called ``libxml-ruby``, to which we at ABSOLVENTA [already contributed to](https://github.com/xml4r/libxml-ruby/commit/0e96dacd14f6e430750ed58bc26a668bd5415e1f).
 
 All I need was a tiny algorithm for applying ``libxml``'s methods. Having hacked a few 
 experimental lines into my editor, I noticed that there already *is* a Ruby gem for this job. 
