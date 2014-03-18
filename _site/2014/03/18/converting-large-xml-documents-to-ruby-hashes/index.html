@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devnull - Converting large XML documents to Ruby Hashes</title>
+  <meta name="author" content="ABSOLVENTA" />
+  <meta name="description" content="The blog of the ABSOLVENTA Dev Team" />
+  <link rel="canonical" href="http://devnull.absolventa.de/2014/03/18/converting-large-xml-documents-to-ruby-hashes/" />
+
+  <!-- <link href="//fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css"> -->
+  <!-- <link href='http://fonts.googleapis.com/css?family=Gudea' rel='stylesheet' type='text/css'> -->
+  <link href='http://fonts.googleapis.com/css?family=Rosario' rel='stylesheet' type='text/css'>
+  <link rel="shortcut icon" href="/favicon.png">
+  <link rel="alternate" type="application/rss+xml" title="Devnull" href="http://devnull.absolventa.de/feed.xml" />
+
+  <link rel="stylesheet" href="/assets/css/all.css">
+<!--[if IE 7]>
+  <link rel="stylesheet" href="/assets/css/font-awesome-ie7.min.css">
+<![endif]-->
+</head>
+<body>
+  <div class="container">
+    <div class="four columns sidebar">
+      <nav>
+  <a href="/">
+    <img src="/images/absolventa_logo_large.png" id="logo" alt="Blog logo"/>
+  </a>
+  <h1><a href="/">Devnull</a></h1>
+  <hr/>
+  <ul>
+    <p>The Blog of the <a href="https://www.absolventa.de/">ABSOLVENTA</a> Dev Team.</p>
+  <hr/>
+  <div>
+    <div id="social">
+      Follow us:
+<div id="stalker">
+  
+  <a title="Absolventa on Github" href="http://github.com/Absolventa">
+    <i class="icon-github-sign"></i>
+  </a>
+  
+
+  
+
+  
+  <a title="ABSOLVENTA on Twitter" href="http://twitter.com/ABSOLVENTA">
+    <i class="icon-twitter-sign"></i>
+  </a>
+  
+
+  <a title="RSS feed" id="rss" href="/feed.xml">
+    <i class="icon-rss-sign"></i>
+  </a>
+</div>
+
+    </div>
+  </div>
+  </ul>
+</nav>
+
+    </div>
+
+    <div class="eleven columns content">
+      <h1 class="title">Converting large XML documents to Ruby Hashes</h1>
+
+<p class="meta">
+  Posted on March 18, 2014 by Robin Neumann
+  <ul class="tags">
+  
+    <li><a href='/tag/XML'>XML</a></li>
+  
+    <li><a href='/tag/Ruby'>Ruby</a></li>
+  
+    <li><a href='/tag/nokogiri'>nokogiri</a></li>
+  
+    <li><a href='/tag/libxml2'>libxml2</a></li>
+  
+    <li><a href='/tag/active_support'>active_support</a></li>
+  
+</ul>
+<div style="clear:both"></div>
+
+</p>
+
+<div id="post">
+  <p>A lot of web services out there are dealing with XML documents. To connect a SOAP-based web service to one of our Rails Applications, we need to translate XML documents to Ruby Hashes.</p>
+
+<p>First of all - we already had a solution implemented. For that we parsed the XML with <code>Nokogiri</code> and and use a custom method to iterate over the node-structure Nokogiri detected. The method we use is a slightly modified version of these discussed <a href="http://stackoverflow.com/questions/1230741/convert-a-nokogiri-document-to-a-ruby-hash">in this stackoverflow article</a>.</p>
+
+<p>Encouraged to improve our code quality I dropped our custom XMl-Hash-converting method in favor of a method provided by <code>ActiveSupport</code> that looks tempting elegant at the first glance:</p>
+
+<p>Once you picked up some xml in a string, say <code>content</code>, just call <code>Hash.from_xml content</code> to get a proper Hash for further processing. And of course you’re free to call it on HashWithIndifferentAccess if you need to.</p>
+
+<p>Unfortunately this strategy is not stable enough to handle large amounts of xml data. Given plenty of xml stuff saved in <code>large.xml</code>, we can watch this method fail with a RuntimeError:</p>
+<script src='https://gist.github.com/9550517.js'> </script>
+<p>As far I can trace it out, this a known problem with <code>REXML</code>, that is used behind the scenes by this method. I tried to came over it by using the famous C-library <code>libxml2</code>, that originally was developed for the GNOME project. Happily I noticed that there’s a wrapping gem for it called <code>libxml-ruby</code>.</p>
+
+<p>All I need was a tiny algorithm for applying <code>libxml</code>’s methods. Having hacked a few experimental lines into my editor, I noticed that there already <em>is</em> a Ruby gem for this job. And it works for me using it in single Ruby script like this:</p>
+<script src='https://gist.github.com/9550623.js'> </script>
+<p>In particular it worked with my evil dark-matter-xml docs!</p>
+
+<p>Programmer’s world would be so easy without all the <em>if’s</em> in this world. Here it means: The solution above works <em>if I use it seperated from any other gems</em>. I can’t get it work into a living Rails environment together with e.g. Nokogiri. For some reason, Nokogiri ships (at least internally) with an own version of <strong>libxml2</strong>. In my case this led to errors when trying to load Nokogiri and libxml-ruby together. I strongly believe that this can be resolved, but I haven’t found the right way to puzzle them together yet… (Feel free to drop me a note if you know how it’s possible!)</p>
+
+<h3 id="finally">Finally</h3>
+
+<p>The intention for all research above was getting replacing the complex <code>xml_node_to_hash</code>-method in favor of a better tested solution maybe encapsulated in a gem or module.</p>
+
+<p>No need to mention that it survived all my tackles to get rid off it. And finally we’re friends.</p>
+</div>
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_shortname = 'absolventa-devnull'; // required: replace example with your forum shortname
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+ var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+ dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+ (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+ })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+    <li>
+      <span>04 Feb 2014 &raquo;</span> <a href="/2014/02/04/a-lightweight-firewall-blacklist-as-rack-middleware/">A Lightweight Firewall/Blacklist as Rack-Middleware</a>
+    </li>
+    
+    <li>
+      <span>15 Jan 2014 &raquo;</span> <a href="/2014/01/15/stubbing-an-invalid-record-for-inherited_resources/">Stubbing an invalid record for inherited_resources</a>
+    </li>
+    
+    <li>
+      <span>18 Dec 2013 &raquo;</span> <a href="/2013/12/18/binary-christmas-tree/">Binary Christmas Tree</a>
+    </li>
+    
+  </ul>
+</div>
+
+    
+      <div class="footer">
+        <div class="disclaimer">
+  
+
+  <p>
+    © ABSOLVENTA, 2013 &mdash; built with Jekyll using Lagom theme
+  </p>
+</div>
+
+      </div>
+    </div>
+  </div>
+
+
+<script type="text/javascript">
+  var _gauges = _gauges || [];
+  (function() {
+   var t   = document.createElement('script');
+   t.type  = 'text/javascript';
+   t.async = true;
+   t.id    = 'gauges-tracker';
+   t.setAttribute('data-site-id', '52567bcc613f5d6ad7000042');
+   t.src = '//secure.gaug.es/track.js';
+   var s = document.getElementsByTagName('script')[0];
+   s.parentNode.insertBefore(t, s);
+   })();
+</script>
+
+
+
+</body>
+</html>
