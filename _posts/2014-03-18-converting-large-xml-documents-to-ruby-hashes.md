@@ -61,5 +61,5 @@ The intention for all research above was getting replacing the complex
 ``xml_node_to_hash``-method in favor of a better tested solution maybe 
 encapsulated in a gem or module. 
 
-No need to mention that it survived all my tackles to get rid off it. 
+No need to mention that it survived all my tackles to get rid of it. 
 And finally we're friends.
