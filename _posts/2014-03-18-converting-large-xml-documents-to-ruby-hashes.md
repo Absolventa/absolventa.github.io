@@ -12,25 +12,25 @@ tags:
   - active_support
 ---
 
-A lot of web services out there are dealing with XML documents. To connect a SOAP-based web 
+A lot of web services out there are dealing with XML documents. To connect to a SOAP-based web 
 service to one of our Rails Applications, we need to translate XML documents to Ruby Hashes. 
  
 First of all - we already had a solution implemented. For that we parsed the XML with 
-``Nokogiri`` and and use a custom method to iterate over the node-structure 
-Nokogiri detected. The method we use is a slightly modified version of these discussed 
+``Nokogiri`` and used a custom method to iterate over the node-structure 
+Nokogiri detected. The method we used is a slightly modified version of these discussed 
 [in this stackoverflow article](http://stackoverflow.com/questions/1230741/convert-a-nokogiri-document-to-a-ruby-hash).  
 
-Encouraged to improve our code quality I dropped our custom XMl-Hash-converting method 
-in favor of a method provided by ``ActiveSupport`` that looks tempting elegant at the 
+Encouraged to improve our code quality I dropped our custom XML-Hash-converting method 
+in favor of a method provided by ``ActiveSupport`` that looks temptingly elegant at the 
 first glance:
  
 Once you picked up some xml in a string, say ``content``, just call ``Hash.from_xml content`` 
 to get a proper Hash for further processing. And of course you're free to call it on 
-HashWithIndifferentAccess if you need to.  
+``HashWithIndifferentAccess`` if you need to.  
   
 Unfortunately this strategy is not stable enough to handle large amounts of xml data. 
 Given plenty of xml stuff saved in ``large.xml``, we can watch this method fail with 
-a RuntimeError: 
+a ``RuntimeError``: 
 
 {% gist 9550517 %}
 
@@ -47,10 +47,10 @@ And it works for me using it in single Ruby script like this:
 
 In particular it worked with my evil dark-matter-xml docs! 
 
-Programmer's world would be so easy without all the *if's* in this world.
+A programmer's world would be so easy without all the *if's* in this world.
 Here it means: The solution above works *if I use it seperated from any other gems*. 
-I can't get it work into a living Rails environment together with e.g. Nokogiri. 
-For some reason, Nokogiri ships (at least internally) with an own version of **libxml2**. 
+I can't get it to work in a living Rails environment together with e.g. Nokogiri. 
+For some reason, Nokogiri ships (at least internally) with its own version of **libxml2**. 
 In my case this led to errors when trying to load Nokogiri and libxml-ruby together. 
 I strongly believe that this can be resolved, but I haven't found the right way to 
 puzzle them together yet... (Feel free to drop me a note if you know how it's possible!)
@@ -59,7 +59,7 @@ puzzle them together yet... (Feel free to drop me a note if you know how it's po
 
 The intention for all research above was getting replacing the complex 
 ``xml_node_to_hash``-method in favor of a better tested solution maybe 
-encapsulated in a gem or module. 
+encapsulated in a gem or module.
 
 No need to mention that it survived all my tackles to get rid of it. 
 And finally we're friends.
