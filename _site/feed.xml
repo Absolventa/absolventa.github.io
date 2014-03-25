@@ -7,6 +7,116 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>JSDoc and the Revealing Module Pattern</title>
+				<description>
+&lt;p&gt;Before the grand &lt;a href=&quot;http://en.wikipedia.org/wiki/Beta_version#Beta&quot;&gt;v1.0.0&lt;/a&gt; of an internal asset pipeline gem with lots of extracted javascript from our various Rails apps, I wanted to see what our API documentation looked like in colourful HTML.&lt;/p&gt;
+
+&lt;p&gt;Much to my surprise, &lt;a href=&quot;http://usejsdoc.org/&quot;&gt;JSDoc&lt;/a&gt; didn’t show a thing when I ran it over our .js files: We use the &lt;a href=&quot;http://www.klauskomenda.com/code/javascript-%20programming-patterns/#revealing&quot;&gt;Revealing Module Pattern&lt;/a&gt; with self-executing code to define our Javascript and JSDoc had some trouble parsing it.&lt;/p&gt;
+
+&lt;p&gt;Documentation on how to fix this was scarce - everyone seemed to have a slightly different use case – so here’s what we came up with after some trial and error runs with varias JSDoc keywords.&lt;/p&gt;
+
+&lt;p&gt;Our Javascript looks like this:&lt;/p&gt;
+&lt;div class=&#39;highlight&#39;&gt;&lt;pre&gt;&lt;code class=&#39;javascript&#39;&gt;&lt;span class=&#39;c1&#39;&gt;// In file: namespace.js&lt;/span&gt;
+&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;kd&#39;&gt;function&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;()&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt;
+    &lt;span class=&#39;nb&#39;&gt;window&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;nx&#39;&gt;Absolventa&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;=&lt;/span&gt; &lt;span class=&#39;nb&#39;&gt;window&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;nx&#39;&gt;Absolventa&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;||&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{};&lt;/span&gt;
+&lt;span class=&#39;p&#39;&gt;}());&lt;/span&gt;
+
+&lt;span class=&#39;c1&#39;&gt;// In file: modules/urlify.js&lt;/span&gt;
+&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;kd&#39;&gt;function&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;()&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt;
+    &lt;span class=&#39;s2&#39;&gt;&amp;quot;use strict&amp;quot;&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;;&lt;/span&gt;
+    &lt;span class=&#39;nx&#39;&gt;Absolventa&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;nx&#39;&gt;Urlify&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;=&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;kd&#39;&gt;function&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;()&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt;
+        &lt;span class=&#39;kd&#39;&gt;var&lt;/span&gt; &lt;span class=&#39;nx&#39;&gt;init&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;;&lt;/span&gt;
+
+        &lt;span class=&#39;cm&#39;&gt;/**&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt;         * @param {string} foo&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt;         */&lt;/span&gt;
+        &lt;span class=&#39;nx&#39;&gt;init&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;=&lt;/span&gt; &lt;span class=&#39;kd&#39;&gt;function&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;nx&#39;&gt;foo&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt;
+          &lt;span class=&#39;c1&#39;&gt;// Magick!&lt;/span&gt;
+        &lt;span class=&#39;p&#39;&gt;};&lt;/span&gt;
+
+        &lt;span class=&#39;k&#39;&gt;return&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt;
+          &lt;span class=&#39;nx&#39;&gt;init&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;:&lt;/span&gt; &lt;span class=&#39;nx&#39;&gt;init&lt;/span&gt;
+        &lt;span class=&#39;p&#39;&gt;};&lt;/span&gt;
+    &lt;span class=&#39;p&#39;&gt;}());&lt;/span&gt;
+&lt;span class=&#39;p&#39;&gt;}());&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;JSDoc wouldn’t recognize &lt;code&gt;Urlify&lt;/code&gt; as part of the &lt;code&gt;Absolventa&lt;/code&gt; namespace, nor would it find the &lt;code&gt;Absolventa.Urlify.init()&lt;/code&gt; static method.&lt;/p&gt;
+
+&lt;p&gt;Behold the necessary JSDoc tags to tie it all together:&lt;/p&gt;
+&lt;div class=&#39;highlight&#39;&gt;&lt;pre&gt;&lt;code class=&#39;javascript&#39;&gt;&lt;span class=&#39;cm&#39;&gt;/**&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt; * @namespace Absolventa&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt; */&lt;/span&gt;
+&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;kd&#39;&gt;function&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;()&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt;
+    &lt;span class=&#39;nb&#39;&gt;window&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;nx&#39;&gt;Absolventa&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;=&lt;/span&gt; &lt;span class=&#39;nb&#39;&gt;window&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;nx&#39;&gt;Absolventa&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;||&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{};&lt;/span&gt;
+&lt;span class=&#39;p&#39;&gt;}());&lt;/span&gt;
+
+&lt;span class=&#39;cm&#39;&gt;/**&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt; * @namespace Urlify&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt; * @memberof Absolventa&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt; * @requires {@link Absolventa.Helpers}&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt; */&lt;/span&gt;
+&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;kd&#39;&gt;function&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;()&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt;
+    &lt;span class=&#39;s2&#39;&gt;&amp;quot;use strict&amp;quot;&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;;&lt;/span&gt;
+    &lt;span class=&#39;nx&#39;&gt;Absolventa&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;.&lt;/span&gt;&lt;span class=&#39;nx&#39;&gt;Urlify&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;=&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;kd&#39;&gt;function&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;()&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt;
+        &lt;span class=&#39;kd&#39;&gt;var&lt;/span&gt; &lt;span class=&#39;nx&#39;&gt;init&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;;&lt;/span&gt;
+
+        &lt;span class=&#39;cm&#39;&gt;/**&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt;         * @function init&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt;         * @memberof! Absolventa.Urlify&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt;         * @param {string} foo&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt;         * @example&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt;         * Absolventa.Urlify.init(&amp;#39;hello world&amp;#39;)&lt;/span&gt;
+&lt;span class=&#39;cm&#39;&gt;         */&lt;/span&gt;
+        &lt;span class=&#39;nx&#39;&gt;init&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;=&lt;/span&gt; &lt;span class=&#39;kd&#39;&gt;function&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;(&lt;/span&gt;&lt;span class=&#39;nx&#39;&gt;foo&lt;/span&gt;&lt;span class=&#39;p&#39;&gt;)&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt;
+          &lt;span class=&#39;c1&#39;&gt;// Magick!&lt;/span&gt;
+        &lt;span class=&#39;p&#39;&gt;};&lt;/span&gt;
+
+        &lt;span class=&#39;k&#39;&gt;return&lt;/span&gt; &lt;span class=&#39;p&#39;&gt;{&lt;/span&gt;
+          &lt;span class=&#39;nx&#39;&gt;init&lt;/span&gt; &lt;span class=&#39;o&#39;&gt;:&lt;/span&gt; &lt;span class=&#39;nx&#39;&gt;init&lt;/span&gt;
+        &lt;span class=&#39;p&#39;&gt;};&lt;/span&gt;
+    &lt;span class=&#39;p&#39;&gt;}());&lt;/span&gt;
+&lt;span class=&#39;p&#39;&gt;}());&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Et voilá! All inner functions must be declared with a &lt;code&gt;@memberof!&lt;/code&gt; and a &lt;code&gt;@function &amp;lt;name&amp;gt;&lt;/code&gt; tag.Note that it defines namespaces where we would refer to it as modules, but it’s just for the sake of documentation … and it’s a namespace after all.&lt;/p&gt;
+</description>
+				<pubDate>Tue, 25 Mar 2014 16:35:00 +0100</pubDate>
+				<link>http://devnull.absolventa.de/2014/03/25/jsdoc-and-the-revealing-module-pattern/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2014/03/25/jsdoc-and-the-revealing-module-pattern/</guid>
+			</item>
+		
+			<item>
+				<title>Converting large XML documents to Ruby Hashes</title>
+				<description>
+&lt;p&gt;A lot of web services out there are dealing with XML documents. To connect a SOAP-based web service to one of our Rails Applications, we need to translate XML documents to Ruby Hashes.&lt;/p&gt;
+
+&lt;p&gt;First of all - we already had a solution implemented. For that we parsed the XML with &lt;code&gt;Nokogiri&lt;/code&gt; and used a custom method to iterate over the node-structure Nokogiri detected. The method we used is a slightly modified version of these discussed &lt;a href=&quot;http://stackoverflow.com/questions/1230741/convert-a-nokogiri-document-to-a-ruby-hash&quot;&gt;in this stackoverflow article&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Encouraged to improve our code quality I dropped our custom XML-Hash-converting method in favor of a method provided by &lt;code&gt;ActiveSupport&lt;/code&gt; that looks temptingly elegant at the first glance:&lt;/p&gt;
+
+&lt;p&gt;Once you picked up some xml in a string, say &lt;code&gt;content&lt;/code&gt;, just call &lt;code&gt;Hash.from_xml content&lt;/code&gt; to get a proper Hash for further processing. And of course you’re free to call it on &lt;code&gt;HashWithIndifferentAccess&lt;/code&gt; if you need to.&lt;/p&gt;
+
+&lt;p&gt;Unfortunately this strategy is not stable enough to handle large amounts of xml data. Given plenty of xml stuff saved in &lt;code&gt;large.xml&lt;/code&gt;, we can watch this method fail with a &lt;code&gt;RuntimeError&lt;/code&gt;:&lt;/p&gt;
+&lt;script src=&#39;https://gist.github.com/9550517.js&#39;&gt;&lt;![CDATA[ ]]&gt;&lt;/script&gt;
+&lt;p&gt;As far I can trace it out, this a known problem with &lt;code&gt;REXML&lt;/code&gt;, that is used behind the scenes by this method. I tried to came over it by using the famous C-library &lt;code&gt;libxml2&lt;/code&gt;, that originally was developed for the GNOME project. Happily I noticed that there’s a wrapping gem for it called &lt;code&gt;libxml-ruby&lt;/code&gt;, to which we at ABSOLVENTA &lt;a href=&quot;https://github.com/xml4r/libxml-ruby/commit/0e96dacd14f6e430750ed58bc26a668bd5415e1f&quot;&gt;already contributed to&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;All I need was a tiny algorithm for applying &lt;code&gt;libxml&lt;/code&gt;’s methods. Having hacked a few experimental lines into my editor, I noticed that there already &lt;em&gt;is&lt;/em&gt; a Ruby gem for this job. And it works for me using it in single Ruby script like this:&lt;/p&gt;
+&lt;script src=&#39;https://gist.github.com/9550623.js&#39;&gt;&lt;![CDATA[ ]]&gt;&lt;/script&gt;
+&lt;p&gt;In particular it worked with my evil dark-matter-xml docs!&lt;/p&gt;
+
+&lt;p&gt;A programmer’s world would be so easy without all the &lt;em&gt;if’s&lt;/em&gt; in this world. Here it means: The solution above works &lt;em&gt;if I use it seperated from any other gems&lt;/em&gt;. I can’t get it to work in a living Rails environment together with e.g. Nokogiri. For some reason, Nokogiri ships (at least internally) with its own version of &lt;strong&gt;libxml2&lt;/strong&gt;. In my case this led to errors when trying to load Nokogiri and libxml-ruby together. I strongly believe that this can be resolved, but I haven’t found the right way to puzzle them together yet… (Feel free to drop me a note if you know how it’s possible!)&lt;/p&gt;
+
+&lt;h3 id=&quot;finally&quot;&gt;Finally&lt;/h3&gt;
+
+&lt;p&gt;The intention for all research above was getting replacing the complex &lt;code&gt;xml_node_to_hash&lt;/code&gt;-method in favor of a better tested solution maybe encapsulated in a gem or module.&lt;/p&gt;
+
+&lt;p&gt;No need to mention that it survived all my tackles to get rid of it. And finally we’re friends.&lt;/p&gt;
+</description>
+				<pubDate>Tue, 18 Mar 2014 10:00:00 +0100</pubDate>
+				<link>http://devnull.absolventa.de/2014/03/18/converting-large-xml-documents-to-ruby-hashes/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2014/03/18/converting-large-xml-documents-to-ruby-hashes/</guid>
+			</item>
+		
+			<item>
 				<title>A Lightweight Firewall/Blacklist as Rack-Middleware</title>
 				<description>
 &lt;p&gt;I recently fell in love with &lt;a href=&quot;http://railscasts.com/episodes/151-rack-middleware&quot;&gt;Rack middleware&lt;/a&gt;. Rack’s simplicity of serving web requests by nothing but an &lt;code&gt;Array&lt;/code&gt; with three elements alone is charming. But using it as a bouncer to handle (and possibly already return) all sorts of stuff before your requests even touch your Rails app is the &lt;em&gt;real&lt;/em&gt; appeal.&lt;/p&gt;

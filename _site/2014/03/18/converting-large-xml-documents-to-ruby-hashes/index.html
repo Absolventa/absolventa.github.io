@@ -87,29 +87,31 @@
 </p>
 
 <div id="post">
-  <p>A lot of web services out there are dealing with XML documents. To connect a SOAP-based web service to one of our Rails Applications, we need to translate XML documents to Ruby Hashes.</p>
+  
+<p>A lot of web services out there are dealing with XML documents. To connect a SOAP-based web service to one of our Rails Applications, we need to translate XML documents to Ruby Hashes.</p>
 
-<p>First of all - we already had a solution implemented. For that we parsed the XML with <code>Nokogiri</code> and and use a custom method to iterate over the node-structure Nokogiri detected. The method we use is a slightly modified version of these discussed <a href="http://stackoverflow.com/questions/1230741/convert-a-nokogiri-document-to-a-ruby-hash">in this stackoverflow article</a>.</p>
+<p>First of all - we already had a solution implemented. For that we parsed the XML with <code>Nokogiri</code> and used a custom method to iterate over the node-structure Nokogiri detected. The method we used is a slightly modified version of these discussed <a href="http://stackoverflow.com/questions/1230741/convert-a-nokogiri-document-to-a-ruby-hash">in this stackoverflow article</a>.</p>
 
-<p>Encouraged to improve our code quality I dropped our custom XMl-Hash-converting method in favor of a method provided by <code>ActiveSupport</code> that looks tempting elegant at the first glance:</p>
+<p>Encouraged to improve our code quality I dropped our custom XML-Hash-converting method in favor of a method provided by <code>ActiveSupport</code> that looks temptingly elegant at the first glance:</p>
 
-<p>Once you picked up some xml in a string, say <code>content</code>, just call <code>Hash.from_xml content</code> to get a proper Hash for further processing. And of course you’re free to call it on HashWithIndifferentAccess if you need to.</p>
+<p>Once you picked up some xml in a string, say <code>content</code>, just call <code>Hash.from_xml content</code> to get a proper Hash for further processing. And of course you’re free to call it on <code>HashWithIndifferentAccess</code> if you need to.</p>
 
-<p>Unfortunately this strategy is not stable enough to handle large amounts of xml data. Given plenty of xml stuff saved in <code>large.xml</code>, we can watch this method fail with a RuntimeError:</p>
-<script src='https://gist.github.com/9550517.js'> </script>
-<p>As far I can trace it out, this a known problem with <code>REXML</code>, that is used behind the scenes by this method. I tried to came over it by using the famous C-library <code>libxml2</code>, that originally was developed for the GNOME project. Happily I noticed that there’s a wrapping gem for it called <code>libxml-ruby</code>.</p>
+<p>Unfortunately this strategy is not stable enough to handle large amounts of xml data. Given plenty of xml stuff saved in <code>large.xml</code>, we can watch this method fail with a <code>RuntimeError</code>:</p>
+<script src='https://gist.github.com/9550517.js'><![CDATA[ ]]></script>
+<p>As far I can trace it out, this a known problem with <code>REXML</code>, that is used behind the scenes by this method. I tried to came over it by using the famous C-library <code>libxml2</code>, that originally was developed for the GNOME project. Happily I noticed that there’s a wrapping gem for it called <code>libxml-ruby</code>, to which we at ABSOLVENTA <a href="https://github.com/xml4r/libxml-ruby/commit/0e96dacd14f6e430750ed58bc26a668bd5415e1f">already contributed to</a>.</p>
 
 <p>All I need was a tiny algorithm for applying <code>libxml</code>’s methods. Having hacked a few experimental lines into my editor, I noticed that there already <em>is</em> a Ruby gem for this job. And it works for me using it in single Ruby script like this:</p>
-<script src='https://gist.github.com/9550623.js'> </script>
+<script src='https://gist.github.com/9550623.js'><![CDATA[ ]]></script>
 <p>In particular it worked with my evil dark-matter-xml docs!</p>
 
-<p>Programmer’s world would be so easy without all the <em>if’s</em> in this world. Here it means: The solution above works <em>if I use it seperated from any other gems</em>. I can’t get it work into a living Rails environment together with e.g. Nokogiri. For some reason, Nokogiri ships (at least internally) with an own version of <strong>libxml2</strong>. In my case this led to errors when trying to load Nokogiri and libxml-ruby together. I strongly believe that this can be resolved, but I haven’t found the right way to puzzle them together yet… (Feel free to drop me a note if you know how it’s possible!)</p>
+<p>A programmer’s world would be so easy without all the <em>if’s</em> in this world. Here it means: The solution above works <em>if I use it seperated from any other gems</em>. I can’t get it to work in a living Rails environment together with e.g. Nokogiri. For some reason, Nokogiri ships (at least internally) with its own version of <strong>libxml2</strong>. In my case this led to errors when trying to load Nokogiri and libxml-ruby together. I strongly believe that this can be resolved, but I haven’t found the right way to puzzle them together yet… (Feel free to drop me a note if you know how it’s possible!)</p>
 
 <h3 id="finally">Finally</h3>
 
 <p>The intention for all research above was getting replacing the complex <code>xml_node_to_hash</code>-method in favor of a better tested solution maybe encapsulated in a gem or module.</p>
 
-<p>No need to mention that it survived all my tackles to get rid off it. And finally we’re friends.</p>
+<p>No need to mention that it survived all my tackles to get rid of it. And finally we’re friends.</p>
+
 </div>
 
 
@@ -135,15 +137,15 @@ var disqus_shortname = 'absolventa-devnull'; // required: replace example with y
   <ul class="posts">
     
     <li>
+      <span>25 Mar 2014 &raquo;</span> <a href="/2014/03/25/jsdoc-and-the-revealing-module-pattern/">JSDoc and the Revealing Module Pattern</a>
+    </li>
+    
+    <li>
       <span>04 Feb 2014 &raquo;</span> <a href="/2014/02/04/a-lightweight-firewall-blacklist-as-rack-middleware/">A Lightweight Firewall/Blacklist as Rack-Middleware</a>
     </li>
     
     <li>
       <span>15 Jan 2014 &raquo;</span> <a href="/2014/01/15/stubbing-an-invalid-record-for-inherited_resources/">Stubbing an invalid record for inherited_resources</a>
-    </li>
-    
-    <li>
-      <span>18 Dec 2013 &raquo;</span> <a href="/2013/12/18/binary-christmas-tree/">Binary Christmas Tree</a>
     </li>
     
   </ul>
