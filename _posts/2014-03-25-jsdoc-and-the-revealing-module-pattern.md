@@ -18,7 +18,7 @@ Pattern](http://www.klauskomenda.com/code/javascript-%20programming-patterns/#re
 with self-executing code to define our Javascript and JSDoc had some trouble
 parsing it.
 
-Documentation on how to fix this was scarce - everyone seemed to have a slightly different use case – so here's what we came up with after some trial and error runs with varias JSDoc keywords.
+Documentation on how to fix this was scarce - everyone seemed to have a slightly different use case – so here's what we came up with after some trial and error runs with various JSDoc keywords.
 
 Our Javascript looks like this:
 

@@ -13,7 +13,7 @@
 
 &lt;p&gt;Much to my surprise, &lt;a href=&quot;http://usejsdoc.org/&quot;&gt;JSDoc&lt;/a&gt; didn’t show a thing when I ran it over our .js files: We use the &lt;a href=&quot;http://www.klauskomenda.com/code/javascript-%20programming-patterns/#revealing&quot;&gt;Revealing Module Pattern&lt;/a&gt; with self-executing code to define our Javascript and JSDoc had some trouble parsing it.&lt;/p&gt;
 
-&lt;p&gt;Documentation on how to fix this was scarce - everyone seemed to have a slightly different use case – so here’s what we came up with after some trial and error runs with varias JSDoc keywords.&lt;/p&gt;
+&lt;p&gt;Documentation on how to fix this was scarce - everyone seemed to have a slightly different use case – so here’s what we came up with after some trial and error runs with various JSDoc keywords.&lt;/p&gt;
 
 &lt;p&gt;Our Javascript looks like this:&lt;/p&gt;
 &lt;div class=&#39;highlight&#39;&gt;&lt;pre&gt;&lt;code class=&#39;javascript&#39;&gt;&lt;span class=&#39;c1&#39;&gt;// In file: namespace.js&lt;/span&gt;
