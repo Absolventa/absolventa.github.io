@@ -8,6 +8,7 @@ tags:
   - javascript
   - module
   - jsdoc
+teaser: "Generating documentation for your JavaScript with JSDoc can be tricky for a combination of the Revealing Module Pattern and self-executing Javascript functions. This article shows how JSDoc can be convinced to parse the code anyway."
 ---
 
 Before the grand [v1.0.0](http://en.wikipedia.org/wiki/Beta_version#Beta) of an internal asset pipeline gem  with lots of extracted javascript from our various Rails apps, I wanted to see what our API documentation looked like in colourful HTML.
@@ -90,6 +91,6 @@ Behold the necessary JSDoc tags to tie it all together:
 {% endhighlight %}
 
 Et voilá! All inner functions must be declared with a `@memberof!` and a
-`@function <name>` tag.Note that it defines namespaces where we would refer to
+`@function <name>` tag. Note that it defines namespaces where we would refer to
 it as modules, but it's just for the sake of documentation … and it's a
 namespace after all.
