@@ -1,6 +1,6 @@
 ---
 layout: default
-title: About
+title: What is ABSOLVENTA?
 description: "Jobs for students, graduates and young professionals: What is ABSOLVENTA?"
 ---
 
