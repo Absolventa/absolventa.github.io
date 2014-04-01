@@ -1,11 +1,42 @@
 ---
 layout: default
 title: About
+description: "Jobs for students, graduates and young professionals: What is ABSOLVENTA?"
 ---
 
-This is where you would but a short bio, and/or a description of your site. It also serves as an example of how to set up a standalone page. For example:
+# What is ABSOLVENTA?
 
-<img src="/images/shakespeare.png" class="right" />
-**William Shakespeare** (26 April 1564 – 23 April 1616) was an English poet and playwright, widely regarded as the greatest writer in the English language and the world's pre-eminent dramatist. He is often called England's national poet and the "Bard of Avon". His extant works, including some collaborations, consist of about 38 plays, 154 sonnets, two long narrative poems, and a few other verses, the authorship of some of which is uncertain. His plays have been translated into every major living language and are performed more often than those of any other playwright.
+## The Platform
 
-Shakespeare was born and brought up in Stratford-upon-Avon. At the age of 18, he married Anne Hathaway—no, not *that* Anne Hathaway—with whom he had three children.
+ABSOLVENTA is a job platform for students, graduates and young professionals in
+Germany. We actively support students with their career preparations, get
+graduates their first regular job and help young professionals work their way
+up the corporate ladder.
+
+ABSOLVENTA allows users to browse job offers traditionally. They may also
+upload their CV and be contacted passively by recruiting companies who browse
+our database. Never fear: all data will stay anonymized unless a user
+explicitely grants permission to see his or her name and contact info.
+
+ABSOLVENTA provides companies with tailored recruiting-tools for the targeted
+audience of young academics and conjointly deploys efficient employer-branding
+concepts. Founded in 2008, ABSOLVENTA GmbH currently employs about 40 people in
+the heart of Berlin.
+
+## Technology
+
+ABSOLVENTA is run by a pretty standard Ruby on Rails stack using a PostgreSQL
+database backend and this is the place where the development team talks about
+it.
+
+Please find a selection of recent articles below:
+
+<div id="related">
+  <ul class="posts">
+    {% for post in site.posts limit:3 %}
+    <li>
+      <span>{{ post.date | date_to_string }} &raquo;</span> <a href="{{ post.url }}">{{ post.title }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
