@@ -14,8 +14,8 @@ graduates their first regular job and help young professionals work their way
 up the corporate ladder.
 
 ABSOLVENTA allows users to browse job offers traditionally. They may also
-upload their CV and be contacted passively by recruiting companies who browse
-our database. Never fear: all data will stay anonymized unless a user
+upload their CV and can be contacted passively by recruiting companies who
+browse our database. Never fear: all data will stay anonymized unless a user
 explicitely grants permission to see his or her name and contact info.
 
 ABSOLVENTA provides companies with tailored recruiting-tools for the targeted
@@ -25,9 +25,8 @@ the heart of Berlin.
 
 ## Technology
 
-ABSOLVENTA is run by a pretty standard Ruby on Rails stack using a PostgreSQL
-database backend and this is the place where the development team talks about
-it.
+ABSOLVENTA runs on a pretty standard Ruby on Rails stack using a PostgreSQL
+database backend. This is the place where the development team talks about it.
 
 Please find a selection of recent articles below:
 
