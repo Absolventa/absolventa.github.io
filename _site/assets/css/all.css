@@ -356,7 +356,10 @@
 	.half-bottom { margin-bottom: 10px !important; }
 	.add-bottom { margin-bottom: 20px !important; }
 
-
+nav ul {
+  list-style: none;
+  font-weight: 300;
+}
 
 /*
 * Skeleton V1.1
@@ -772,7 +775,7 @@ nav hr {
 }
 
 .sidebar a {
-  font-weight: 600;
+  font-weight: 300;
 }
 
 .content {
