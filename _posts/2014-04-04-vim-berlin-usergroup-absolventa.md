@@ -7,7 +7,7 @@ comments: true
 tags:
   - vim
   - social
-teaser: "Vim is the goto editor for about half out team. Inviting the friendly people of <a href='//vimberlin.de'>Vim Berlin</a> over was only natural. It wasn’t overly crowded, but cancelling wasn't an option without being laughed at by the Emacs folks who met the same day."
+teaser: "Vim is the goto editor for about half our team. Inviting the friendly people of <a href='//vimberlin.de'>Vim Berlin</a> over was only natural. It wasn’t overly crowded, but cancelling wasn't an option without being laughed at by the Emacs folks who met the same day."
 ---
 
 Robin, Markus and I are all avid [Vim](http://vim.org) users. We invited Berlin's user group over
