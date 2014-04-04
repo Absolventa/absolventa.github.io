@@ -7,6 +7,22 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Vim Berlin Usergroup @ ABSOLVENTA</title>
+				<description>
+&lt;p&gt;Robin, Markus and I are all avid &lt;a href=&quot;http://vim.org&quot;&gt;Vim&lt;/a&gt; users. We invited Berlin’s user group over to hold their first meeting in 2014 in our kitchen slash leisure zone. It wasn’t overly crowded, but as pointed out by &lt;a href=&quot;//tasche.me&quot;&gt;Bodo&lt;/a&gt;, canceling it wasn’t an option: the Emacs user group Berlin had a meeting on the same day and we would have been laughed at.&lt;/p&gt;
+
+&lt;p&gt;Although there were no prepared talks, we had a good time: We talked about the progress being made on &lt;a href=&quot;//neovim.org&quot;&gt;Neovim&lt;/a&gt;, discussed a highly customised and plugin-rich &lt;code&gt;.vimrc&lt;/code&gt; vs. vanilla Vim and had a look at Christian’s vim config.&lt;/p&gt;
+
+&lt;p&gt;A nice and cosy evening that, yet again, got everyone a few more plugins to try out.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/vimberlin-2013-2.jpg&quot; alt=&quot;Vim Usergroup @ ABSOLVENTA&quot; /&gt;&lt;/p&gt;
+</description>
+				<pubDate>Fri, 04 Apr 2014 17:56:00 +0200</pubDate>
+				<link>http://devnull.absolventa.de/2014/04/04/vim-berlin-usergroup-absolventa/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2014/04/04/vim-berlin-usergroup-absolventa/</guid>
+			</item>
+		
+			<item>
 				<title>JSDoc and the Revealing Module Pattern</title>
 				<description>
 &lt;p&gt;Before the grand &lt;a href=&quot;http://en.wikipedia.org/wiki/Beta_version#Beta&quot;&gt;v1.0.0&lt;/a&gt; of an internal asset pipeline gem with lots of extracted javascript from our various Rails apps, I wanted to see what our API documentation looked like in colourful HTML.&lt;/p&gt;
