@@ -89,76 +89,87 @@
 </p>
 
 <div id="post">
-  
-<p>Before the grand <a href="http://en.wikipedia.org/wiki/Beta_version#Beta">v1.0.0</a> of an internal asset pipeline gem with lots of extracted javascript from our various Rails apps, I wanted to see what our API documentation looked like in colourful HTML.</p>
+  <p>Before the grand <a href="http://en.wikipedia.org/wiki/Beta_version#Beta">v1.0.0</a> of an internal asset pipeline gem  with lots of extracted javascript from our various Rails apps, I wanted to see what our API documentation looked like in colourful HTML.</p>
 
-<p>Much to my surprise, <a href="http://usejsdoc.org/">JSDoc</a> didn’t show a thing when I ran it over our .js files: We use the <a href="http://www.klauskomenda.com/code/javascript-%20programming-patterns/#revealing">Revealing Module Pattern</a> with self-executing code to define our Javascript and JSDoc had some trouble parsing it.</p>
+<p>Much to my surprise, <a href="http://usejsdoc.org/">JSDoc</a> didn’t show a thing when I
+ran it over our .js files: We use the <a href="http://www.klauskomenda.com/code/javascript-%20programming-patterns/#revealing">Revealing Module
+Pattern</a>
+with self-executing code to define our Javascript and JSDoc had some trouble
+parsing it.</p>
 
 <p>Documentation on how to fix this was scarce - everyone seemed to have a slightly different use case – so here’s what we came up with after some trial and error runs with various JSDoc keywords.</p>
 
 <p>Our Javascript looks like this:</p>
-<div class='highlight'><pre><code class='javascript'><span class='c1'>// In file: namespace.js</span>
-<span class='p'>(</span><span class='kd'>function</span><span class='p'>()</span> <span class='p'>{</span>
-    <span class='nb'>window</span><span class='p'>.</span><span class='nx'>Absolventa</span> <span class='o'>=</span> <span class='nb'>window</span><span class='p'>.</span><span class='nx'>Absolventa</span> <span class='o'>||</span> <span class='p'>{};</span>
-<span class='p'>}());</span>
 
-<span class='c1'>// In file: modules/urlify.js</span>
-<span class='p'>(</span><span class='kd'>function</span><span class='p'>()</span> <span class='p'>{</span>
-    <span class='s2'>&quot;use strict&quot;</span><span class='p'>;</span>
-    <span class='nx'>Absolventa</span><span class='p'>.</span><span class='nx'>Urlify</span> <span class='o'>=</span> <span class='p'>(</span><span class='kd'>function</span><span class='p'>()</span> <span class='p'>{</span>
-        <span class='kd'>var</span> <span class='nx'>init</span><span class='p'>;</span>
+<div class="highlight"><pre><code class="javascript"><span class="c1">// In file: namespace.js</span>
+<span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">Absolventa</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">Absolventa</span> <span class="o">||</span> <span class="p">{};</span>
+<span class="p">}());</span>
 
-        <span class='cm'>/**</span>
-<span class='cm'>         * @param {string} foo</span>
-<span class='cm'>         */</span>
-        <span class='nx'>init</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>foo</span><span class='p'>)</span> <span class='p'>{</span>
-          <span class='c1'>// Magick!</span>
-        <span class='p'>};</span>
+<span class="c1">// In file: modules/urlify.js</span>
+<span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="s2">&quot;use strict&quot;</span><span class="p">;</span>
+    <span class="nx">Absolventa</span><span class="p">.</span><span class="nx">Urlify</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">init</span><span class="p">;</span>
 
-        <span class='k'>return</span> <span class='p'>{</span>
-          <span class='nx'>init</span> <span class='o'>:</span> <span class='nx'>init</span>
-        <span class='p'>};</span>
-    <span class='p'>}());</span>
-<span class='p'>}());</span>
+        <span class="cm">/**</span>
+<span class="cm">         * @param {string} foo</span>
+<span class="cm">         */</span>
+        <span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
+          <span class="c1">// Magick!</span>
+        <span class="p">};</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+          <span class="nx">init</span> <span class="o">:</span> <span class="nx">init</span>
+        <span class="p">};</span>
+    <span class="p">}());</span>
+<span class="p">}());</span>
 </code></pre></div>
-<p>JSDoc wouldn’t recognize <code>Urlify</code> as part of the <code>Absolventa</code> namespace, nor would it find the <code>Absolventa.Urlify.init()</code> static method.</p>
+
+<p>JSDoc wouldn’t recognize <code>Urlify</code> as part of the <code>Absolventa</code> namespace, nor would it find
+the <code>Absolventa.Urlify.init()</code> static method.</p>
 
 <p>Behold the necessary JSDoc tags to tie it all together:</p>
-<div class='highlight'><pre><code class='javascript'><span class='cm'>/**</span>
-<span class='cm'> * @namespace Absolventa</span>
-<span class='cm'> */</span>
-<span class='p'>(</span><span class='kd'>function</span><span class='p'>()</span> <span class='p'>{</span>
-    <span class='nb'>window</span><span class='p'>.</span><span class='nx'>Absolventa</span> <span class='o'>=</span> <span class='nb'>window</span><span class='p'>.</span><span class='nx'>Absolventa</span> <span class='o'>||</span> <span class='p'>{};</span>
-<span class='p'>}());</span>
 
-<span class='cm'>/**</span>
-<span class='cm'> * @namespace Urlify</span>
-<span class='cm'> * @memberof Absolventa</span>
-<span class='cm'> * @requires {@link Absolventa.Helpers}</span>
-<span class='cm'> */</span>
-<span class='p'>(</span><span class='kd'>function</span><span class='p'>()</span> <span class='p'>{</span>
-    <span class='s2'>&quot;use strict&quot;</span><span class='p'>;</span>
-    <span class='nx'>Absolventa</span><span class='p'>.</span><span class='nx'>Urlify</span> <span class='o'>=</span> <span class='p'>(</span><span class='kd'>function</span><span class='p'>()</span> <span class='p'>{</span>
-        <span class='kd'>var</span> <span class='nx'>init</span><span class='p'>;</span>
+<div class="highlight"><pre><code class="javascript"><span class="cm">/**</span>
+<span class="cm"> * @namespace Absolventa</span>
+<span class="cm"> */</span>
+<span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">Absolventa</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">Absolventa</span> <span class="o">||</span> <span class="p">{};</span>
+<span class="p">}());</span>
 
-        <span class='cm'>/**</span>
-<span class='cm'>         * @function init</span>
-<span class='cm'>         * @memberof! Absolventa.Urlify</span>
-<span class='cm'>         * @param {string} foo</span>
-<span class='cm'>         * @example</span>
-<span class='cm'>         * Absolventa.Urlify.init(&#39;hello world&#39;)</span>
-<span class='cm'>         */</span>
-        <span class='nx'>init</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>foo</span><span class='p'>)</span> <span class='p'>{</span>
-          <span class='c1'>// Magick!</span>
-        <span class='p'>};</span>
+<span class="cm">/**</span>
+<span class="cm"> * @namespace Urlify</span>
+<span class="cm"> * @memberof Absolventa</span>
+<span class="cm"> * @requires {@link Absolventa.Helpers}</span>
+<span class="cm"> */</span>
+<span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="s2">&quot;use strict&quot;</span><span class="p">;</span>
+    <span class="nx">Absolventa</span><span class="p">.</span><span class="nx">Urlify</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">init</span><span class="p">;</span>
 
-        <span class='k'>return</span> <span class='p'>{</span>
-          <span class='nx'>init</span> <span class='o'>:</span> <span class='nx'>init</span>
-        <span class='p'>};</span>
-    <span class='p'>}());</span>
-<span class='p'>}());</span>
+        <span class="cm">/**</span>
+<span class="cm">         * @function init</span>
+<span class="cm">         * @memberof! Absolventa.Urlify</span>
+<span class="cm">         * @param {string} foo</span>
+<span class="cm">         * @example</span>
+<span class="cm">         * Absolventa.Urlify.init(&#39;hello world&#39;)</span>
+<span class="cm">         */</span>
+        <span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
+          <span class="c1">// Magick!</span>
+        <span class="p">};</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+          <span class="nx">init</span> <span class="o">:</span> <span class="nx">init</span>
+        <span class="p">};</span>
+    <span class="p">}());</span>
+<span class="p">}());</span>
 </code></pre></div>
-<p>Et voilá! All inner functions must be declared with a <code>@memberof!</code> and a <code>@function &lt;name&gt;</code> tag. Note that it defines namespaces where we would refer to it as modules, but it’s just for the sake of documentation … and it’s a namespace after all.</p>
+
+<p>Et voilá! All inner functions must be declared with a <code>@memberof!</code> and a
+<code>@function &lt;name&gt;</code> tag. Note that it defines namespaces where we would refer to
+it as modules, but it’s just for the sake of documentation … and it’s a
+namespace after all.</p>
 
 </div>
 
