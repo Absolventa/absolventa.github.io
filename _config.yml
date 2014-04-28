@@ -5,6 +5,7 @@ description: The blog of the ABSOLVENTA Dev Team
 permalink: /:year/:month/:day/:title/
 paginate: 10
 pygments: true
+markdown: kramdown
 
 exclude: ['README.md', 'Gemfile.lock', 'Gemfile', 'Rakefile', 'CNAME']
 
