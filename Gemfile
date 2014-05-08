@@ -4,3 +4,4 @@ ruby "2.0.0"
 gem 'jekyll'
 gem 'kramdown'
 gem 'activesupport', require: false
+gem 'jekyll-sitemap'
