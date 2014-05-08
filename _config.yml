@@ -4,7 +4,7 @@ description: The blog of the ABSOLVENTA Dev Team
 
 permalink: /:year/:month/:day/:title/
 paginate: 10
-pygments: true
+highlighter: pygments
 markdown: kramdown
 
 gems:
