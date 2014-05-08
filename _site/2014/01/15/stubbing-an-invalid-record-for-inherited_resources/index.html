@@ -115,8 +115,7 @@ a vanilla controller:</p>
       <span class="n">expect</span> <span class="p">{</span> <span class="n">post</span> <span class="ss">:create</span> <span class="p">}</span><span class="o">.</span><span class="n">not_to</span> <span class="n">change</span> <span class="p">{</span> <span class="no">MyModel</span><span class="o">.</span><span class="n">count</span> <span class="p">}</span>
     <span class="k">end</span>
   <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></div>
+<span class="k">end</span></code></pre></div>
 
 <p>However, it isn’t that easy with <a href="https://github.com/josevalim/inherited_resources">inherited_recources</a>.
 (or more accurately with <a href="https://github.com/plataformatec/responders">responders</a> which is used
@@ -141,8 +140,7 @@ behind the scenes). Inherited Resources considers a record invalid when it has <
 <span class="no">RSpec</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
   <span class="c1"># ...</span>
   <span class="n">config</span><span class="o">.</span><span class="n">include</span> <span class="no">AdvancedValidityStubbing</span>
-<span class="k">end</span>
-</code></pre></div>
+<span class="k">end</span></code></pre></div>
 
 <p>The modified controller spec may look like this:</p>
 
@@ -158,8 +156,7 @@ behind the scenes). Inherited Resources considers a record invalid when it has <
       <span class="n">expect</span> <span class="p">{</span> <span class="n">post</span> <span class="ss">:create</span> <span class="p">}</span><span class="o">.</span><span class="n">not_to</span> <span class="n">change</span> <span class="p">{</span> <span class="no">MyModel</span><span class="o">.</span><span class="n">count</span> <span class="p">}</span>
     <span class="k">end</span>
   <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></div>
+<span class="k">end</span></code></pre></div>
 
 
 </div>
