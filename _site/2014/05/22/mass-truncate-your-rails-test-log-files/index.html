@@ -6,13 +6,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vim Berlin Usergroup @ ABSOLVENTA | Devnull</title>
+  <title>Bulk-Truncate Your Rails Apps' test.logs | Devnull</title>
   <meta name="author" content="ABSOLVENTA" />
-  <meta lang="en" name="keywords" xml:lang="en" content="vim, social" />
+  <meta lang="en" name="keywords" xml:lang="en" content="rails, logging, cmdline" />
   
-  <meta lang="en" name="description" xml:lang="en" content="Vim is the goto editor for about half our team. Inviting the friendly people of <a href='//vimberlin.de'>Vim Berlin</a> over was only natural. It wasn’t overly crowded, but cancelling wasn't an option without being laughed at by the Emacs folks who met the same day." />
+  <meta lang="en" name="description" xml:lang="en" content="Constantly running your Rails test suite can grow your test.log pretty fast. Here are two commands to keep their disk usage in check." />
   
-  <link rel="canonical" href="http://devnull.absolventa.de/2014/04/04/vim-berlin-usergroup-absolventa/" />
+  <link rel="canonical" href="http://devnull.absolventa.de/2014/05/22/mass-truncate-your-rails-test-log-files/" />
 
   <!-- <link href="//fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css"> -->
   <!-- <link href='http://fonts.googleapis.com/css?family=Gudea' rel='stylesheet' type='text/css'> -->
@@ -71,15 +71,17 @@
     </div>
 
     <div class="eleven columns content">
-      <h1 class="title">Vim Berlin Usergroup @ ABSOLVENTA</h1>
+      <h1 class="title">Bulk-Truncate Your Rails Apps' test.logs</h1>
 
 <p class="meta">
-  Posted on April 04, 2014 by Carsten Zimmermann
+  Posted on May 22, 2014 by Carsten Zimmermann
   <ul class="tags">
   
-    <li><a href='/tag/vim'>vim</a></li>
+    <li><a href='/tag/rails'>rails</a></li>
   
-    <li><a href='/tag/social'>social</a></li>
+    <li><a href='/tag/logging'>logging</a></li>
+  
+    <li><a href='/tag/cmdline'>cmdline</a></li>
   
 </ul>
 <div style="clear:both"></div>
@@ -87,18 +89,18 @@
 </p>
 
 <div id="post">
-  <p>Robin, Markus and I are all avid <a href="http://vim.org">Vim</a> users. We invited Berlin’s user group over
-to hold their first meeting in 2014 in our kitchen slash leisure zone. It wasn’t overly crowded,
-but as pointed out by <a href="//tasche.me">Bodo</a>, canceling it wasn’t an option: the Emacs user group
-Berlin had a meeting on the same day and we would have been laughed at.</p>
+  <p>Every test run for your Rails application generates a ton of log output in <code>log/test.log</code> and it can
+grow quite big over time. If you’re only sporting an SSD, diskspace is precious and you may want
+to truncate your test.log again. Here’s how you do it for all your locally checked-out Rails apps:</p>
 
-<p>Although there were no prepared talks, we had a good time: We talked about the progress being made
-on <a href="//neovim.org">Neovim</a>, discussed a highly customised and plugin-rich <code>.vimrc</code> vs. vanilla Vim
-and had a look at Christian’s vim config.</p>
+<p>Assuming you have your Rails apps in a directory called, say, <code>rails-projects</code>, cd into that directory.
+<code>du -hc */**/test.log</code> shows you how much diskspace your test logfiles are eating.</p>
 
-<p>A nice and cosy evening that, yet again, got everyone a few more plugins to try out.</p>
+<p>You can truncate them with <code>find . -name test.log -exec cp -v /dev/null {} \;</code>. If you’re on a Linux system,
+using <code>truncate</code> should also work, but copying <code>/dev/null</code> works everywhere.</p>
 
-<p><img src="/images/vimberlin-2013-2.jpg" alt="Vim Usergroup @ ABSOLVENTA" /></p>
+<p>Your development.log-files probably won’t grow as fast, but you can of course put them on a diet
+in the same fashion.</p>
 
 </div>
 
@@ -125,7 +127,7 @@ var disqus_shortname = 'absolventa-devnull'; // required: replace example with y
   <ul class="posts">
     
     <li>
-      <span>22 May 2014 &raquo;</span> <a href="/2014/05/22/mass-truncate-your-rails-test-log-files/">Bulk-Truncate Your Rails Apps' test.logs</a>
+      <span>04 Apr 2014 &raquo;</span> <a href="/2014/04/04/vim-berlin-usergroup-absolventa/">Vim Berlin Usergroup @ ABSOLVENTA</a>
     </li>
     
     <li>

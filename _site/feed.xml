@@ -7,6 +7,26 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Bulk-Truncate Your Rails Apps' test.logs</title>
+				<description>&lt;p&gt;Every test run for your Rails application generates a ton of log output in &lt;code&gt;log/test.log&lt;/code&gt; and it can
+grow quite big over time. If you’re only sporting an SSD, diskspace is precious and you may want
+to truncate your test.log again. Here’s how you do it for all your locally checked-out Rails apps:&lt;/p&gt;
+
+&lt;p&gt;Assuming you have your Rails apps in a directory called, say, &lt;code&gt;rails-projects&lt;/code&gt;, cd into that directory.
+&lt;code&gt;du -hc */**/test.log&lt;/code&gt; shows you how much diskspace your test logfiles are eating.&lt;/p&gt;
+
+&lt;p&gt;You can truncate them with &lt;code&gt;find . -name test.log -exec cp -v /dev/null {} \;&lt;/code&gt;. If you’re on a Linux system,
+using &lt;code&gt;truncate&lt;/code&gt; should also work, but copying &lt;code&gt;/dev/null&lt;/code&gt; works everywhere.&lt;/p&gt;
+
+&lt;p&gt;Your development.log-files probably won’t grow as fast, but you can of course put them on a diet
+in the same fashion.&lt;/p&gt;
+</description>
+				<pubDate>Thu, 22 May 2014 14:42:00 +0200</pubDate>
+				<link>http://devnull.absolventa.de/2014/05/22/mass-truncate-your-rails-test-log-files/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2014/05/22/mass-truncate-your-rails-test-log-files/</guid>
+			</item>
+		
+			<item>
 				<title>Vim Berlin Usergroup @ ABSOLVENTA</title>
 				<description>&lt;p&gt;Robin, Markus and I are all avid &lt;a href=&quot;http://vim.org&quot;&gt;Vim&lt;/a&gt; users. We invited Berlin’s user group over
 to hold their first meeting in 2014 in our kitchen slash leisure zone. It wasn’t overly crowded,
