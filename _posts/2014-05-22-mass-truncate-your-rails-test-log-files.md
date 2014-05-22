@@ -21,5 +21,8 @@ Assuming you have your Rails apps in a directory called, say, `rails-projects`, 
 You can truncate them with `find . -name test.log -exec cp -v /dev/null {} \;`. If you're on a Linux system,
 using `truncate` should also work, but copying `/dev/null` works everywhere.
 
+There is also `rake log:clear` which has the nice »side-effect« of clearing _all_ your *.log files,
+but takes longer to invoke as it will load your Rails environment first.
+
 Your development.log-files probably won't grow as fast, but you can of course put them on a diet
 in the same fashion.

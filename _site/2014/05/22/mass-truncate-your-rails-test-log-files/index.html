@@ -99,6 +99,9 @@ to truncate your test.log again. Here’s how you do it for all your locally che
 <p>You can truncate them with <code>find . -name test.log -exec cp -v /dev/null {} \;</code>. If you’re on a Linux system,
 using <code>truncate</code> should also work, but copying <code>/dev/null</code> works everywhere.</p>
 
+<p>There is also <code>rake log:clear</code> which has the nice »side-effect« of clearing <em>all</em> your *.log files,
+but takes longer to invoke as it will load your Rails environment first.</p>
+
 <p>Your development.log-files probably won’t grow as fast, but you can of course put them on a diet
 in the same fashion.</p>
 
