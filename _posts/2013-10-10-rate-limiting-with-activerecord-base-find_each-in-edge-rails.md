@@ -3,6 +3,7 @@ layout: post
 title: "Rate Limiting Work On ActiveRecord::Base With .find_each In Edge Rails"
 date: 2013-10-10 17:04
 author: Carsten Zimmermann
+googleplus: "https://plus.google.com/u/0/101728608052847168461"
 comments: true
 tags:
   - ruby
@@ -13,7 +14,7 @@ tags:
 ---
 
 I was working with several maintenance tasks that query external webservices
-for a collection of ActiveRecord objects. In order to avoid hitting the 
+for a collection of ActiveRecord objects. In order to avoid hitting the
 webservices' rate limit, we pause every other iteration for a fraction of
 a second before we continue.
 

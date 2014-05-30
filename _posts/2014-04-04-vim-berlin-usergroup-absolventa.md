@@ -3,6 +3,7 @@ layout: post
 title: "Vim Berlin Usergroup @ ABSOLVENTA"
 date: 2014-04-04 17:56
 author: Carsten Zimmermann
+googleplus: "https://plus.google.com/u/0/101728608052847168461"
 comments: true
 tags:
   - vim

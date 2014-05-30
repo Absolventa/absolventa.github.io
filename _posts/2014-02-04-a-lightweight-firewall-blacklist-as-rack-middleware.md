@@ -3,6 +3,7 @@ layout: post
 title: "A Lightweight Firewall/Blacklist as Rack-Middleware"
 date: 2014-02-04 17:03
 author: Carsten Zimmermann
+googleplus: "https://plus.google.com/u/0/101728608052847168461"
 comments: true
 tags:
   - ruby
