@@ -460,7 +460,7 @@ to the Event Girl app.&lt;/p&gt;
 			<item>
 				<title>Rate Limiting Work On ActiveRecord::Base With .find_each In Edge Rails</title>
 				<description>&lt;p&gt;I was working with several maintenance tasks that query external webservices
-for a collection of ActiveRecord objects. In order to avoid hitting the 
+for a collection of ActiveRecord objects. In order to avoid hitting the
 webservices’ rate limit, we pause every other iteration for a fraction of
 a second before we continue.&lt;/p&gt;
 
