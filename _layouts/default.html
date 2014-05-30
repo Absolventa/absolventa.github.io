@@ -7,7 +7,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ page.title }} | {{ site.theme.name }}</title>
+  {% if page.author %}
+  <meta name="author" content="{{ page.author }}" />
+  {% else %}
   <meta name="author" content="ABSOLVENTA" />
+  {% endif %}
   {% if page.tags %}<meta lang="en" name="keywords" xml:lang="en" content="{{ page.tags | join: ', ' }}" />{% endif %}
   {% if page.description %}
   <meta lang="en" name="description" xml:lang="en" content="{{ page.description }}" />
