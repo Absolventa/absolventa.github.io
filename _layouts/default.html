@@ -12,6 +12,10 @@
   {% else %}
   <meta name="author" content="ABSOLVENTA" />
   {% endif %}
+  {% if page.googleplus %}
+  <link rel="author" href="{{ page.googleplus }}" />
+  {% endif %}
+
   {% if page.tags %}<meta lang="en" name="keywords" xml:lang="en" content="{{ page.tags | join: ', ' }}" />{% endif %}
   {% if page.description %}
   <meta lang="en" name="description" xml:lang="en" content="{{ page.description }}" />
