@@ -21,14 +21,14 @@ Everything flows<br>
 
 <p/>
 
-We've been busying ourselves with the final touches of our
+We've been busying ourselves with the final touches on our
 <a href="https://www.absolventa.de/karriereguide/tipps/das-neue-absolventa" lang="de" title="The New ABSOLVENTA (German)">Grand ABSOLVENTA Relaunch</a>
 recently. It's been done in the record time of only seven months and we dare say: we're quite proud of it.
 
 While a full visual overhaul was certainly due, the initial spark for a
 relaunch came from a backend perspective: ABSOLVENTA's Rails codebase
 dates back to 2007 and as with every bigger piece of software, it has its
-Dark Corners™ and has accumulated a nice heap of [technical debt](https://en.wikipedia.org/wiki/Technical_debt) over the years.
+Dark Corners™. It has unquestionably accumulated a nice heap of [technical debt](https://en.wikipedia.org/wiki/Technical_debt) over the years.
 
 After the initial planning phase, we kicked it off in December 2013 with a few
 but significant changes and additions to our tooling: we finally moved to
@@ -41,10 +41,10 @@ and then piece them together again like you would with a set of Lego&copy;
 bricks. Or simply delete them … which we did _a lot_.
 
 At last, we launched in the evening of July 14th, everyone still high on emotion
-after the Germany's winning the Worldcup the night before. Naturally and following an old ritual, the occasion was celebrated with a round of home made White Russians:
+after Germany's winning the Worldcup the night before. Naturally and following an old ritual, the occasion was celebrated with a round of home made White Russians:
 
 ![git push production](/images/relaunch-2014-white-russian.jpg)
 
 Everything went smoothly and so our faint anxiety and residual doubts that going on a team event with _the entire development team_ only three days after a **major** relaunch might not be the brightest idea quickly vanished in a puff of smoke.
 
-We had a great time spending a whole day on the river Spree on the outskirts of Berlin and in hindsight, this was a true conclusion of a goal that has driven us for the first half of the year but only marks another start: improving our codebase will of course continue. Fighting technical debt is a perpetual thing. Panta rei – everything flows. OMG a pun!
+We had a great time spending a whole day on the river Spree on the outskirts of Berlin and in hindsight, this was a true conclusion of a goal that has driven us for the first half of the year but only marks another start: improving our codebase will of course continue. Fighting technical debt is a perpetual thing. Panta rei – everything flows. Like we did on the river. OMG a pun!
