@@ -7,6 +7,52 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Ruby on Waves: Πάντα ῥεῖ</title>
+				<description>&lt;blockquote&gt;
+Everything flows&lt;br /&gt;
+&lt;small&gt;&amp;mdash; Heraclitus&lt;/small&gt;
+&lt;/blockquote&gt;
+
+&lt;p /&gt;
+
+&lt;p&gt;We’ve been busying ourselves with the final touches on our
+&lt;a href=&quot;https://www.absolventa.de/karriereguide/tipps/das-neue-absolventa&quot; lang=&quot;de&quot; title=&quot;The New ABSOLVENTA (German)&quot;&gt;Grand ABSOLVENTA Relaunch&lt;/a&gt;
+recently. It’s been done in the record time of only seven months and we dare say: we’re quite proud of it.&lt;/p&gt;
+
+&lt;p&gt;While a full visual overhaul was certainly due, the initial spark for a
+relaunch came from a backend perspective: ABSOLVENTA’s Rails codebase
+dates back to 2007 and as with every bigger piece of software, it has its
+Dark Corners™. It has unquestionably accumulated a nice heap of &lt;a href=&quot;https://en.wikipedia.org/wiki/Technical_debt&quot;&gt;technical debt&lt;/a&gt; over the years.&lt;/p&gt;
+
+&lt;p&gt;After the initial planning phase, we kicked it off in December 2013 with a few
+but significant changes and additions to our tooling: we finally moved to
+Github completely (that alone felt awesome!) and added Travis CI +
+&lt;a href=&quot;https://codeclimate.com/&quot;&gt;Code Climate&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The latter was a key element to achieve what we set out for: finding our weak
+spots. We wanted to dissect them one by one, streamline the processes involved
+and then piece them together again like you would with a set of Lego©
+bricks. Or simply delete them … which we did &lt;em&gt;a lot&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;At last, we launched in the evening of July 14th, everyone still high on emotion
+after Germany’s winning the Worldcup the night before. Naturally and following an old ritual, the occasion was celebrated with a round of home made White Russians:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/relaunch-2014-white-russian.jpg&quot; alt=&quot;git push production&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Everything went smoothly and so our faint anxiety and residual doubts that going on a team event with &lt;em&gt;the entire development team&lt;/em&gt; only three days after a &lt;strong&gt;major&lt;/strong&gt; relaunch might not be the brightest idea quickly vanished in a puff of smoke.&lt;/p&gt;
+
+&lt;p&gt;We had a great time spending a whole day on the river Spree on the outskirts of Berlin and in hindsight, this was a true conclusion of a goal that has driven us for the first half of the year but only marks another start: improving our codebase will of course continue. Fighting technical debt is a perpetual thing. Panta rei – everything flows. Like we did on the river. OMG a pun!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/team-paddeln-2014-boat1.jpg&quot; alt=&quot;Markus, Daniel and Franzi&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/team-paddeln-2014-boat0.jpg&quot; alt=&quot;Robin, Alex, Nina and Carsten&quot; /&gt;&lt;/p&gt;
+</description>
+				<pubDate>Wed, 06 Aug 2014 13:23:00 +0200</pubDate>
+				<link>http://devnull.absolventa.de/2014/08/06/ruby-on-waves/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2014/08/06/ruby-on-waves/</guid>
+			</item>
+		
+			<item>
 				<title>Bulk-Truncate Your Rails Apps' test.logs</title>
 				<description>&lt;p&gt;Every test run for your Rails application generates a ton of log output in &lt;code&gt;log/test.log&lt;/code&gt; and it can
 grow quite big over time. If you’re only sporting an SSD, diskspace is precious and you may want
@@ -455,52 +501,6 @@ to the Event Girl app.&lt;/p&gt;
 				<pubDate>Mon, 28 Oct 2013 15:34:00 +0100</pubDate>
 				<link>http://devnull.absolventa.de/2013/10/28/watching-a-certificate-revocation-list-using-event-girl/</link>
 				<guid isPermaLink="true">http://devnull.absolventa.de/2013/10/28/watching-a-certificate-revocation-list-using-event-girl/</guid>
-			</item>
-		
-			<item>
-				<title>Rate Limiting Work On ActiveRecord::Base With .find_each In Edge Rails</title>
-				<description>&lt;p&gt;I was working with several maintenance tasks that query external webservices
-for a collection of ActiveRecord objects. In order to avoid hitting the
-webservices’ rate limit, we pause every other iteration for a fraction of
-a second before we continue.&lt;/p&gt;
-
-&lt;p&gt;The code looks something like this:&lt;/p&gt;
-
-&lt;script src=&quot;https://gist.github.com/6920157.js?file=old_code.rb&quot;&gt; &lt;/script&gt;
-
-&lt;p&gt;I didn’t like that the information of our rate limit guard clauses was so scattered: there
-were bits before the block and others in the block. I had the urge to refactor it
-into a more concise form using a Ruby block itself.&lt;/p&gt;
-
-&lt;p&gt;My idea was to create a method that takes the rate limit, the sleep time and an
-enumeration and then yield the elements of the enum to a block.&lt;/p&gt;
-
-&lt;p&gt;I wrapped that method into a module and out came this:&lt;/p&gt;
-
-&lt;script src=&quot;https://gist.github.com/6920157.js?file=rate_limiter.rb&quot;&gt; &lt;/script&gt;
-
-&lt;p&gt;This is how the specs look like:&lt;/p&gt;
-
-&lt;script src=&quot;https://gist.github.com/6920157.js?file=rate_limiter_spec.rb&quot;&gt; &lt;/script&gt;
-
-&lt;p&gt;Unfortunately and unlike other enumerable methods, the batch finder &lt;code&gt;ActiveRecord::Base.find_each&lt;/code&gt;
-does not return an Enumerator when called without a block. Not in Rails 3.2 and not in
-Rails 4.0.&lt;/p&gt;
-
-&lt;p&gt;Luckily, it has been solved in Edge Rails (see
-&lt;a href=&quot;https://github.com/rails/rails/commit/840c552047a660d0a66883fb9c0cb144d5e728fb&quot;&gt;840c552&lt;/a&gt;)
-and I quickly created a Rails 4.1.0.beta app to go for the following code:&lt;/p&gt;
-
-&lt;script src=&quot;https://gist.github.com/6920157.js?file=external_service.rb&quot;&gt; &lt;/script&gt;
-
-&lt;p&gt;&lt;code&gt;ActiveRecord::Base.find_each&lt;/code&gt; now returns a proper &lt;code&gt;Enumerator&lt;/code&gt; that can be passed
-into the rate limiter. If you want to learn more about Enumerators in Ruby (or if you’d
-like to refresh your memory), I can recommend this excellent &lt;a href=&quot;http://devblog.avdi.org/2013/09/10/rubytapas-freebie-enumerator/&quot;&gt;Ruby Tapas&lt;/a&gt; episode by &lt;a href=&quot;https://twitter.com/avdi&quot;&gt;Avdi Grimm&lt;/a&gt;.&lt;/p&gt;
-
-</description>
-				<pubDate>Thu, 10 Oct 2013 17:04:00 +0200</pubDate>
-				<link>http://devnull.absolventa.de/2013/10/10/rate-limiting-with-activerecord-base-find_each-in-edge-rails/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2013/10/10/rate-limiting-with-activerecord-base-find_each-in-edge-rails/</guid>
 			</item>
 		
 	</channel>
