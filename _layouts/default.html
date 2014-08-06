@@ -16,11 +16,23 @@
   <link rel="author" href="{{ page.googleplus }}" />
   {% endif %}
 
+  <meta property="og:site_name" content="{{ site.name }} – {{ site.description }}" />
+  <meta property="og:title" content="{{ page.title }}" />
+  <meta property="og:url" content="{{ site.url }}{{ page.url | replace:'index.html','' }}" />
+
+  {% if page.image %}
+  <meta property="og:image" content="{{ page.image }}" />
+  {% else %}
+  <meta property="og:image" content="{{ site.url }}/images/og-absolventacat.png" />
+  {% endif %}
+
   {% if page.tags %}<meta lang="en" name="keywords" xml:lang="en" content="{{ page.tags | join: ', ' }}" />{% endif %}
   {% if page.description %}
   <meta lang="en" name="description" xml:lang="en" content="{{ page.description }}" />
+  <meta property="og:description" content="{{ page.description }}" />
   {% elsif page.teaser %}
   <meta lang="en" name="description" xml:lang="en" content="{{ page.teaser }}" />
+  <meta property="og:description" content="{{ page.teaser }}" />
   {% endif %}
   <link rel="canonical" href="{{ site.url }}{{ page.url | replace:'index.html','' }}" />
 
