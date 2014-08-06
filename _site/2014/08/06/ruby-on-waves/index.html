@@ -6,7 +6,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bulk-Truncate Your Rails Apps' test.logs | Devnull</title>
+  <title>Ruby on Waves: Πάντα ῥεῖ | Devnull</title>
   
   <meta name="author" content="Carsten Zimmermann" />
   
@@ -14,11 +14,11 @@
   <link rel="author" href="https://plus.google.com/u/0/101728608052847168461" />
   
 
-  <meta lang="en" name="keywords" xml:lang="en" content="rails, logging, cmdline" />
+  <meta lang="en" name="keywords" xml:lang="en" content="relaunch, milestone, technical debt, refactoring, fun" />
   
-  <meta lang="en" name="description" xml:lang="en" content="Constantly running your Rails test suite can grow your test.log pretty fast. Here are two commands to keep their disk usage in check." />
+  <meta lang="en" name="description" xml:lang="en" content="A technical retrospect of our recently accomplished and most successful relaunch. Also, we took the liberty of unplugging ourselves and embarked on a team event. Quite Literally." />
   
-  <link rel="canonical" href="http://devnull.absolventa.de/2014/05/22/mass-truncate-your-rails-test-log-files/" />
+  <link rel="canonical" href="http://devnull.absolventa.de/2014/08/06/ruby-on-waves/" />
 
   <!-- <link href="//fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css"> -->
   <!-- <link href='http://fonts.googleapis.com/css?family=Gudea' rel='stylesheet' type='text/css'> -->
@@ -77,17 +77,21 @@
     </div>
 
     <div class="eleven columns content">
-      <h1 class="title">Bulk-Truncate Your Rails Apps' test.logs</h1>
+      <h1 class="title">Ruby on Waves: Πάντα ῥεῖ</h1>
 
 <p class="meta">
-  Posted on May 22, 2014 by Carsten Zimmermann
+  Posted on August 06, 2014 by Carsten Zimmermann
   <ul class="tags">
   
-    <li><a href='/tag/rails'>rails</a></li>
+    <li><a href='/tag/relaunch'>relaunch</a></li>
   
-    <li><a href='/tag/logging'>logging</a></li>
+    <li><a href='/tag/milestone'>milestone</a></li>
   
-    <li><a href='/tag/cmdline'>cmdline</a></li>
+    <li><a href='/tag/technical debt'>technical debt</a></li>
+  
+    <li><a href='/tag/refactoring'>refactoring</a></li>
+  
+    <li><a href='/tag/fun'>fun</a></li>
   
 </ul>
 <div style="clear:both"></div>
@@ -95,21 +99,44 @@
 </p>
 
 <div id="post">
-  <p>Every test run for your Rails application generates a ton of log output in <code>log/test.log</code> and it can
-grow quite big over time. If you’re only sporting an SSD, diskspace is precious and you may want
-to truncate your test.log again. Here’s how you do it for all your locally checked-out Rails apps:</p>
+  <blockquote>
+Everything flows<br />
+<small>&mdash; Heraclitus</small>
+</blockquote>
 
-<p>Assuming you have your Rails apps in a directory called, say, <code>rails-projects</code>, cd into that directory.
-<code>du -hc */**/test.log</code> shows you how much diskspace your test logfiles are eating.</p>
+<p />
 
-<p>You can truncate them with <code>find . -name test.log -exec cp -v /dev/null {} \;</code>. If you’re on a Linux system,
-using <code>truncate</code> should also work, but copying <code>/dev/null</code> works everywhere.</p>
+<p>We’ve been busying ourselves with the final touches on our
+<a href="https://www.absolventa.de/karriereguide/tipps/das-neue-absolventa" lang="de" title="The New ABSOLVENTA (German)">Grand ABSOLVENTA Relaunch</a>
+recently. It’s been done in the record time of only seven months and we dare say: we’re quite proud of it.</p>
 
-<p>There is also <code>rake log:clear</code> which has the nice »side-effect« of clearing <em>all</em> your *.log files,
-but takes longer to invoke as it will load your Rails environment first.</p>
+<p>While a full visual overhaul was certainly due, the initial spark for a
+relaunch came from a backend perspective: ABSOLVENTA’s Rails codebase
+dates back to 2007 and as with every bigger piece of software, it has its
+Dark Corners™. It has unquestionably accumulated a nice heap of <a href="https://en.wikipedia.org/wiki/Technical_debt">technical debt</a> over the years.</p>
 
-<p>Your development.log-files probably won’t grow as fast, but you can of course put them on a diet
-in the same fashion.</p>
+<p>After the initial planning phase, we kicked it off in December 2013 with a few
+but significant changes and additions to our tooling: we finally moved to
+Github completely (that alone felt awesome!) and added Travis CI +
+<a href="https://codeclimate.com/">Code Climate</a>.</p>
+
+<p>The latter was a key element to achieve what we set out for: finding our weak
+spots. We wanted to dissect them one by one, streamline the processes involved
+and then piece them together again like you would with a set of Lego©
+bricks. Or simply delete them … which we did <em>a lot</em>.</p>
+
+<p>At last, we launched in the evening of July 14th, everyone still high on emotion
+after Germany’s winning the Worldcup the night before. Naturally and following an old ritual, the occasion was celebrated with a round of home made White Russians:</p>
+
+<p><img src="/images/relaunch-2014-white-russian.jpg" alt="git push production" /></p>
+
+<p>Everything went smoothly and so our faint anxiety and residual doubts that going on a team event with <em>the entire development team</em> only three days after a <strong>major</strong> relaunch might not be the brightest idea quickly vanished in a puff of smoke.</p>
+
+<p>We had a great time spending a whole day on the river Spree on the outskirts of Berlin and in hindsight, this was a true conclusion of a goal that has driven us for the first half of the year but only marks another start: improving our codebase will of course continue. Fighting technical debt is a perpetual thing. Panta rei – everything flows. Like we did on the river. OMG a pun!</p>
+
+<p><img src="/images/team-paddeln-2014-boat1.jpg" alt="Markus, Daniel and Franzi" /></p>
+
+<p><img src="/images/team-paddeln-2014-boat0.jpg" alt="Robin, Alex, Nina and Carsten" /></p>
 
 </div>
 
@@ -136,7 +163,7 @@ var disqus_shortname = 'absolventa-devnull'; // required: replace example with y
   <ul class="posts">
     
     <li>
-      <span>06 Aug 2014 &raquo;</span> <a href="/2014/08/06/ruby-on-waves/">Ruby on Waves: Πάντα ῥεῖ</a>
+      <span>22 May 2014 &raquo;</span> <a href="/2014/05/22/mass-truncate-your-rails-test-log-files/">Bulk-Truncate Your Rails Apps' test.logs</a>
     </li>
     
     <li>
