@@ -48,3 +48,7 @@ after Germany's winning the Worldcup the night before. Naturally and following a
 Everything went smoothly and so our faint anxiety and residual doubts that going on a team event with _the entire development team_ only three days after a **major** relaunch might not be the brightest idea quickly vanished in a puff of smoke.
 
 We had a great time spending a whole day on the river Spree on the outskirts of Berlin and in hindsight, this was a true conclusion of a goal that has driven us for the first half of the year but only marks another start: improving our codebase will of course continue. Fighting technical debt is a perpetual thing. Panta rei – everything flows. Like we did on the river. OMG a pun!
+
+![Markus, Daniel and Franzi](/images/team-paddeln-2014-boat1.jpg)
+
+![Robin, Alex, Nina and Carsten](/images/team-paddeln-2014-boat0.jpg)
