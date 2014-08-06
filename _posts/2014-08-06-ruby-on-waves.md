@@ -12,6 +12,7 @@ tags:
   - technical debt
   - refactoring
   - fun
+image: http://devnull.absolventa.de/images/og-team-paddeln-et-perlt.jpg
 ---
 
 <blockquote>
