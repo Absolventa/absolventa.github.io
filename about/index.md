@@ -4,7 +4,7 @@ title: What is ABSOLVENTA?
 description: "Jobs for students, graduates and young professionals: What is ABSOLVENTA?"
 ---
 
-# What is ABSOLVENTA?
+# {{ page.title }}
 
 ## The Platform
 
