@@ -129,7 +129,7 @@ serialized as strings, and Hashes will have their keys stringified.</p>
 
 <p>Only we had to realize the hard way that an external library was dumping high
 level objects into the (cookie-based) session that couldn’t easily and
-transparently deserialized again.</p>
+transparently be deserialized again.</p>
 
 <p>Unfortunately, there is no real rollback option: Setting the serializer back to
 <code>:marshal</code> will get you parser errors, when <code>Marshal.load</code> is fed with JSON

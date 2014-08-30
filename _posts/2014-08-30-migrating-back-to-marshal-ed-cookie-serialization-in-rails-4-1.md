@@ -32,7 +32,7 @@ states:
 
 Only we had to realize the hard way that an external library was dumping high
 level objects into the (cookie-based) session that couldn't easily and
-transparently deserialized again.
+transparently be deserialized again.
 
 Unfortunately, there is no real rollback option: Setting the serializer back to
 `:marshal` will get you parser errors, when `Marshal.load` is fed with JSON
