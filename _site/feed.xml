@@ -7,6 +7,57 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Back to Marshal'ed Cookie-Serialization</title>
+				<description>&lt;p&gt;Upgrading to Rails v4.1, it felt like a good idea to switch to the new default
+serialization format: JSON. Upgrading from the Marshal’ed serialization to JSON
+was as simple as setting Rails’ cookies serializer to &lt;code&gt;:hybrid&lt;/code&gt;. Easy enough and
+»better go with the new Rails default«, I thought.&lt;/p&gt;
+
+&lt;p&gt;We were warned about the implications.
+&lt;a href=&quot;http://edgeguides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-4-0-to-rails-4-1&quot;&gt;The Rails Upgrade Guide&lt;/a&gt;
+states:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;When using the :json or :hybrid serializer, you should beware that not all Ruby
+objects can be serialized as JSON. For example, Date and Time objects will be
+serialized as strings, and Hashes will have their keys stringified.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Only we had to realize the hard way that an external library was dumping high
+level objects into the (cookie-based) session that couldn’t easily and
+transparently deserialized again.&lt;/p&gt;
+
+&lt;p&gt;Unfortunately, there is no real rollback option: Setting the serializer back to
+&lt;code&gt;:marshal&lt;/code&gt; will get you parser errors, when &lt;code&gt;Marshal.load&lt;/code&gt; is fed with JSON
+data.&lt;/p&gt;
+
+&lt;p&gt;Since our application started generating JSON-serialized session data after our
+change was rolled out, I came up with the following »rolling rollback« strategy:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;ruby&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# app/controllers/application_controller.rb&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;rescue_from&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;TypeError&amp;#39;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;starts_with?&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;incompatible marshal file format&amp;#39;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;store&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;application&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;session_store&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;application&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;session&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ActionDispatch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Request&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Session&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;store&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;reset_session&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;raise&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A simple &lt;code&gt;reset_session&lt;/code&gt; won’t do as that already tries to access the (invalid)
+session object. The rescue hook will regenerate a new Marshal-serialized session
+for all those who have already received JSON data, but will of course terminate
+their existing sessions (login data, shopping cart … you name it).&lt;/p&gt;
+
+</description>
+				<pubDate>Sat, 30 Aug 2014 12:58:00 +0200</pubDate>
+				<link>http://devnull.absolventa.de/2014/08/30/migrating-back-to-marshal-ed-cookie-serialization-in-rails-4-1/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2014/08/30/migrating-back-to-marshal-ed-cookie-serialization-in-rails-4-1/</guid>
+			</item>
+		
+			<item>
 				<title>Ruby on Waves: Πάντα ῥεῖ</title>
 				<description>&lt;blockquote&gt;
 Everything flows&lt;br /&gt;
@@ -446,61 +497,6 @@ out backoffice data aggregation performance – q.e.d!&lt;/p&gt;
 				<pubDate>Mon, 11 Nov 2013 09:00:00 +0100</pubDate>
 				<link>http://devnull.absolventa.de/2013/11/11/aggregate-and-conquer/</link>
 				<guid isPermaLink="true">http://devnull.absolventa.de/2013/11/11/aggregate-and-conquer/</guid>
-			</item>
-		
-			<item>
-				<title>Watching A Certificate Revocation List Using Event Girl</title>
-				<description>&lt;p&gt;ABSOLVENTA uses WPA2-Enterprise to control acccess to the company’s wifi
-network.  Authentication is done using x509 certificates issued by our local,
-self-signed Certificate Authority (CA). We use a FreeRadius server on a
-&lt;a href=&quot;https://www.freebsd.org&quot;&gt;FreeBSD&lt;/a&gt; machine to check for the validity of the
-presented certificate.&lt;/p&gt;
-
-&lt;p&gt;I wrote a simple &lt;abbr title=&quot;Command Line Interface&quot;&gt;CLI&lt;/abbr&gt; to faciliate
-the certificate management and to automatically configure the Radius server,
-including certificate revocation. The next-update field of the generated
-&lt;a href=&quot;http://en.wikipedia.org/wiki/Certificate_revocation_list&quot;&gt;certificate revocation
-list&lt;/a&gt; (CRL) file is
-set to +100 days whenever a certificate is revoked, assuming there will always
-be at least an intern who leaves the company within three months’ time.&lt;/p&gt;
-
-&lt;p&gt;Yesterday morning, I was denied access to our wifi network. Working from an ethernet-less
-Macbook Air I had to wire myself somewhere to debug the problem. The Radius server
-was alive and kicking but looking at the logs it was evident that it couldn’t
-verify certificates anymore as its CRL was no longer valid.&lt;/p&gt;
-
-&lt;p&gt;Regenerating a new CRL was easy enough, but it was clear that my initial
-assumption of »100 days is a safe enough bet« was false. I didn’t want to
-increase the lifetime of the CRL as an overly old CRL kind of defeats its
-purpose.  I wrote a simple Ruby CRL parser named
-&lt;a href=&quot;https://github.com/Absolventa/crl_watchdog&quot;&gt;crl_watchdog&lt;/a&gt; and a shell script
-as an early warning system:&lt;/p&gt;
-
-&lt;script src=&quot;https://gist.github.com/7196906.js&quot;&gt; &lt;/script&gt;
-
-&lt;p&gt;The file resides in &lt;code&gt;/etc/periodic/daily&lt;/code&gt; which is FreeBSD’s equivalent of
-&lt;code&gt;/etc/cron.daily&lt;/code&gt; on most Linux distributions.&lt;/p&gt;
-
-&lt;p&gt;You’ll notice the various &lt;a href=&quot;https://github.com/Absolventa/event_girl&quot;&gt;Event Girl&lt;/a&gt;
-statements: The shell script makes use of the
-&lt;a href=&quot;https://github.com/Absolventa/event_girl_client&quot;&gt;event_girl_client&lt;/a&gt; CLI. Event Girl
-is the outcome of the &lt;a href=&quot;http://railsgirlssummerofcode.org&quot;&gt;Rails Girls Summer of Code&lt;/a&gt;
-team &lt;a href=&quot;http://highwaytorails.tumblr.com&quot;&gt;Highway to Rails&lt;/a&gt; we’ve been hosting
-from July 1st to September 30th and it’s awesome.&lt;/p&gt;
-
-&lt;p&gt;The Event Girl app has two event expectations: one »backward« expectation that
-will inform us when the daily script doesn’t run for whatever reason and a
-»forward« one which will send an email instantly when the CRL will expire
-within the next 14 days (as notified in line 20).&lt;/p&gt;
-
-&lt;p&gt;Using Event Girl, I can not only make sure not to run into an outdated CRL again,
-but also feel at ease that the CRL actually remains being monitored. Also, I
-don’t have to bother about sending mails from the server and can leave that
-to the Event Girl app.&lt;/p&gt;
-</description>
-				<pubDate>Mon, 28 Oct 2013 15:34:00 +0100</pubDate>
-				<link>http://devnull.absolventa.de/2013/10/28/watching-a-certificate-revocation-list-using-event-girl/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2013/10/28/watching-a-certificate-revocation-list-using-event-girl/</guid>
 			</item>
 		
 	</channel>
