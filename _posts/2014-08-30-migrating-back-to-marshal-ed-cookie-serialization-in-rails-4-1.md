@@ -5,7 +5,7 @@ date: 2014-08-30 12:58
 author: Carsten Zimmermann
 googleplus: "https://plus.google.com/u/0/101728608052847168461"
 comments: true
-teaser: "Upgrading to Rails v4.1, it felt like a good idea to switch to the new default serialization format: JSON. Except, later it didn't. Rails offers a migration path from Marshal to JSON, but not vice versa. This article offers a (somewhat hacky) solution to rollback from JSON to Marshal."
+teaser: "Upgrading to Rails v4.1, it felt like a good idea to switch to the new default cookie serialization format: JSON. Except later it didn't. Rails offers a migration path from Marshal to JSON, but not vice versa. This article offers a (somewhat hacky) solution to rollback from JSON to Marshal."
 tags:
   - ruby
   - rails
@@ -35,7 +35,7 @@ level objects into the (cookie-based) session that couldn't easily and
 transparently be deserialized again.
 
 Unfortunately, there is no real rollback option: Setting the serializer back to
-`:marshal` will get you parser errors, when `Marshal.load` is fed with JSON
+`:marshal` will get you parser errors when `Marshal.load` is fed with JSON
 data.
 
 Since our application started generating JSON-serialized session data after our

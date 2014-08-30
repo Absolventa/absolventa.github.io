@@ -28,7 +28,7 @@ level objects into the (cookie-based) session that couldn’t easily and
 transparently be deserialized again.&lt;/p&gt;
 
 &lt;p&gt;Unfortunately, there is no real rollback option: Setting the serializer back to
-&lt;code&gt;:marshal&lt;/code&gt; will get you parser errors, when &lt;code&gt;Marshal.load&lt;/code&gt; is fed with JSON
+&lt;code&gt;:marshal&lt;/code&gt; will get you parser errors when &lt;code&gt;Marshal.load&lt;/code&gt; is fed with JSON
 data.&lt;/p&gt;
 
 &lt;p&gt;Since our application started generating JSON-serialized session data after our

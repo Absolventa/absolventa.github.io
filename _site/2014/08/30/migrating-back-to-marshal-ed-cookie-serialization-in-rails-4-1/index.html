@@ -24,8 +24,8 @@
 
   <meta lang="en" name="keywords" xml:lang="en" content="ruby, rails, upgrade, rollback, session, marshal, json" />
   
-  <meta lang="en" name="description" xml:lang="en" content="Upgrading to Rails v4.1, it felt like a good idea to switch to the new default serialization format: JSON. Except, later it didn't. Rails offers a migration path from Marshal to JSON, but not vice versa. This article offers a (somewhat hacky) solution to rollback from JSON to Marshal." />
-  <meta property="og:description" content="Upgrading to Rails v4.1, it felt like a good idea to switch to the new default serialization format: JSON. Except, later it didn't. Rails offers a migration path from Marshal to JSON, but not vice versa. This article offers a (somewhat hacky) solution to rollback from JSON to Marshal." />
+  <meta lang="en" name="description" xml:lang="en" content="Upgrading to Rails v4.1, it felt like a good idea to switch to the new default cookie serialization format: JSON. Except later it didn't. Rails offers a migration path from Marshal to JSON, but not vice versa. This article offers a (somewhat hacky) solution to rollback from JSON to Marshal." />
+  <meta property="og:description" content="Upgrading to Rails v4.1, it felt like a good idea to switch to the new default cookie serialization format: JSON. Except later it didn't. Rails offers a migration path from Marshal to JSON, but not vice versa. This article offers a (somewhat hacky) solution to rollback from JSON to Marshal." />
   
   <link rel="canonical" href="http://devnull.absolventa.de/2014/08/30/migrating-back-to-marshal-ed-cookie-serialization-in-rails-4-1/" />
 
@@ -132,7 +132,7 @@ level objects into the (cookie-based) session that couldn’t easily and
 transparently be deserialized again.</p>
 
 <p>Unfortunately, there is no real rollback option: Setting the serializer back to
-<code>:marshal</code> will get you parser errors, when <code>Marshal.load</code> is fed with JSON
+<code>:marshal</code> will get you parser errors when <code>Marshal.load</code> is fed with JSON
 data.</p>
 
 <p>Since our application started generating JSON-serialized session data after our
