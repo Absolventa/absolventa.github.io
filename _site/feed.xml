@@ -7,6 +7,68 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Insert Rack Middleware during Tests</title>
+				<description>&lt;p&gt;We recently deployed a wee internal Rails Engine that logs raw API data
+in order to save the original payload that was pushed over the wire. That
+little piece of software, however, had a bug (which is &lt;em&gt;pretty&lt;/em&gt; uncommon for
+software, right?): The logged payload was always empty.&lt;/p&gt;
+
+&lt;p&gt;The Engine’s host application uses Rails’ &lt;code&gt;ActionDispatch::XmlParamsParser&lt;/code&gt;
+middleware. It would seem that it messed up the contents of &lt;code&gt;rack.input&lt;/code&gt;
+which in turn holds the POST data.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;rack.input&lt;/code&gt; is an IO-like object and it needs to be rewound after
+it has been read from. XmlParamsParser reads from it, but apparently doesn’t
+rewind it. It seams easy enough to fix, but how to testdrive it?&lt;/p&gt;
+
+&lt;p&gt;I didn’t want to statically include a rack.input-modifying middleware into the
+Engine’s dummy app. Instead I wanted add another context that tested against a
+version of the dummy infected with a mock middleware and have all other tests
+run without it.&lt;/p&gt;
+
+&lt;p&gt;Here’s how I did it. Enjoy!&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;ruby&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# spec/requests/rack_input_modifiable_spec.rb&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;Tracks data with rack.input modifying middleware in place&amp;#39;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;# Need to bind this to a constant in order to hook it in later.&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# It does nothing except putting the IO read marker to the end.&lt;/span&gt;
+  &lt;span class=&quot;no&quot;&gt;ReadsFromRackInput&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Struct&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:app&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;rack.input&amp;#39;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# moves to EOF&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;# Dummy::Application is already loaded at this stage. We can&amp;#39;t modify&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# the middleware stack as it&amp;#39;s frozen, so subclass it and infect:&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;app_with_middleware&lt;/span&gt;
+    &lt;span class=&quot;vi&quot;&gt;@app_with_middleware&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;application&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;middleware&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;insert_after&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;
+        &lt;span class=&quot;no&quot;&gt;ActionDispatch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ParamsParser&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ReadsFromRackInput&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;# `app´ is what RSpec tests against in request specs. Think `controller´&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# for controller specs. Overwrite it with our infected app.&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@app&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;app_with_middleware&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;# Tweaks to get the subclassed app to get all of its parent&amp;#39;s behaviour.&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;before&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;no&quot;&gt;Dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chdir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;root&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;allow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;receive&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:routes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;and_return&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Dummy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Application&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;routes&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;it_behaves_like&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;tracks raw data&amp;#39;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# i.e. the actual tests&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+</description>
+				<pubDate>Fri, 24 Oct 2014 16:23:00 +0200</pubDate>
+				<link>http://devnull.absolventa.de/2014/10/24/dynamically-insert-rack-middleware-during-test/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2014/10/24/dynamically-insert-rack-middleware-during-test/</guid>
+			</item>
+		
+			<item>
 				<title>Back to Marshal'ed Cookie-Serialization</title>
 				<description>&lt;p&gt;Upgrading to Rails v4.1, it felt like a good idea to switch to the new default
 serialization format: JSON. Upgrading from the Marshal’ed serialization to JSON
@@ -433,70 +495,6 @@ Carsten, Daniel and Robin (standing). Image credit: Mignon.&lt;/p&gt;
 				<pubDate>Wed, 18 Dec 2013 14:00:00 +0100</pubDate>
 				<link>http://devnull.absolventa.de/2013/12/18/binary-christmas-tree/</link>
 				<guid isPermaLink="true">http://devnull.absolventa.de/2013/12/18/binary-christmas-tree/</guid>
-			</item>
-		
-			<item>
-				<title>Aggregate And Conquer</title>
-				<description>&lt;p&gt;Collecting stats is awesome. Analytical brains love being fed with stats. So let’s
-fire these tiny queries at our database asking for favourite customer choices of recent
-years and – meanwhile – grab a coffee … or write a book or a whole new app until your answer is served.&lt;/p&gt;
-
-&lt;p&gt;Persisting events over years is no problem for modern database systems in general,
-but accessing them later could be. Of course, you can come over it anytime by
-pimping up your server or database setup. But often it’s not the best solution
-to scale a mid-size app artificially this way only because you want to save historical data.&lt;/p&gt;
-
-&lt;p&gt;In our case, we’re deeply interested in pageview statistics related to templates for
-model instances of a Rails app. For that use case we created a custom Rails Engine
-(»Kanyotoku«) that provides this service for some of our bigger apps.&lt;/p&gt;
-
-&lt;p&gt;And of course, when developing our tool, I directly ran into the problems as described above. To come over 
-this, I was inspired by a 
-&lt;a target=&quot;_blank&quot; href=&quot;http://www.railstips.org/blog/archives/2011/06/28/counters-everywhere/&quot;&gt;blog post&lt;/a&gt; 
-by John Nunemaker, one of the creators of Gaug.es, a 
-really awesome pageview tracking service. Even though most of his thoughts concern schemaless data, it
-was easy to adopt and modify these principles for a PostgreSQL system.&lt;/p&gt;
-
-&lt;h3 id=&quot;be-write-heavy-but-read-lazy&quot;&gt;Be write-heavy, but read-lazy&lt;/h3&gt;
-
-&lt;p&gt;One of his ideas was choosing appropriate resolutions, i.e. time frame resolutions for your 
-data. Let’s translate this principle as follows: Do we need to know how many pageviews occurred 
-in the last ten minutes exactly? Is this really relevant? &lt;/p&gt;
-
-&lt;p&gt;For our situation it was much more interesting to know the count of pageviews per month or 
-maybe per day. It is also interesting for us to count it per year or for 3 months,
-but any smaller timeframe is nigh irrelevant for all our purposes.&lt;/p&gt;
-
-&lt;p&gt;For that reason, we introduced daily and monthly reports that are saved and/or updated each time a
-pageview record is created. Of course this means we’re much more write-heavy than before.&lt;/p&gt;
-
-&lt;script src=&quot;https://gist.github.com/7409048.js?file=pageviews.rb&quot;&gt; &lt;/script&gt;
-
-&lt;p&gt;On each page visit, a pageview gets saved and written to the database and in addtion to 
-that a daily report is created or updated if it exists for that day. A monthly report is
-handled the same way.&lt;/p&gt;
-
-&lt;p&gt;All reports save the pageviews count of the related time frame as an integer column which is
-simply incremented if desired. As a result, we have done some pre-processing for 
-data analysis in the backend - we have aggregated tables that fit perfectly to our range needs. In 
-out backoffice data aggregation context, we can simply sum these integer values. If you’re interested in
-the pageviews of the last 5 years, you can collect your data like&lt;/p&gt;
-
-&lt;script src=&quot;https://gist.github.com/7409097.js?file=elephant.rb&quot;&gt; &lt;/script&gt;
-
-&lt;p&gt;Assumimg our elephant receives around 10,000 pageviews per year, it is great
-that we don’t have to load 50,000 pageview records. Summing up integer values of less than 5 * 12 = 60 reports
-should be an easy excercise for our database. &lt;/p&gt;
-
-&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;In out situation, being a little more write heavy has no
-measurable negative impact on request times in our frontend context, but it highly improves
-out backoffice data aggregation performance – q.e.d!&lt;/p&gt;
-</description>
-				<pubDate>Mon, 11 Nov 2013 09:00:00 +0100</pubDate>
-				<link>http://devnull.absolventa.de/2013/11/11/aggregate-and-conquer/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2013/11/11/aggregate-and-conquer/</guid>
 			</item>
 		
 	</channel>
