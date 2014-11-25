@@ -4,7 +4,8 @@ title: "Handle REXML::ParseExceptions with 'Schneiderlein'"
 date: 2014-11-25 12:00
 author: Robin Neumann
 googleplus: "https://plus.google.com/u/0/106424233859444481952"
-comments: true
+teaser: 'Malformed post data should not raise exceptions on the server side. We discuss a possibility how to catch exceptions raised by REXML with a simple middleware customization.'   
+comment: true
 tags:
   - middleware
   - API design
