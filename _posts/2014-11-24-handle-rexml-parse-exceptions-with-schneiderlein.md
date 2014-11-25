@@ -3,6 +3,7 @@ layout: post
 title: "Handle REXML::ParseExceptions with 'Schneiderlein'"
 date: 2014-11-25 12:00
 author: Robin Neumann
+googleplus: "https://plus.google.com/u/0/106424233859444481952"
 comments: true
 tags:
   - middleware
