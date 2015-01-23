@@ -23,3 +23,12 @@ theme:
   social:
     github: Absolventa
     twitter: ABSOLVENTA
+
+authors:
+  carp:
+    display_name: Carsten Zimmermann
+    googleplus: https://plus.google.com/u/0/101728608052847168461
+    gravatar: d7cb4a1c32b57046567d5009e366f0cf
+  rbn:
+    display_name: Robin Neumann
+    googleplus: https://plus.google.com/u/0/106424233859444481952
