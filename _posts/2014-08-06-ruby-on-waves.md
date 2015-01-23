@@ -2,8 +2,7 @@
 layout: post
 title: "Ruby on Waves: Πάντα ῥεῖ"
 date: 2014-08-06 13:23
-author: Carsten Zimmermann
-googleplus: "https://plus.google.com/u/0/101728608052847168461"
+author: carp
 comments: true
 teaser: "A technical retrospect of our recently accomplished and most successful relaunch. Also, we took the liberty of unplugging ourselves and embarked on a team event. Quite Literally."
 tags:

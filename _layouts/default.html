@@ -7,13 +7,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ page.title }} | {{ site.theme.name }}</title>
-  {% if page.author %}
-  <meta name="author" content="{{ page.author }}" />
+  {% assign author = site.authors[page.author] %}
+  {% if author %}
+  <meta name="author" content="{{ author.display_name }}" />
   {% else %}
   <meta name="author" content="ABSOLVENTA" />
   {% endif %}
-  {% if page.googleplus %}
-  <link rel="author" href="{{ page.googleplus }}" />
+  {% if author.googleplus %}
+  <link rel="author" href="{{ author.googleplus }}" />
   {% endif %}
 
   <meta property="og:site_name" content="{{ site.name }} – {{ site.description }}" />

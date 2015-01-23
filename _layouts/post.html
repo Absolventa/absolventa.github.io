@@ -1,12 +1,15 @@
 ---
 layout: default
 ---
+{% assign author = site.authors[page.author] %}
 
 <h1 class="title">{{ page.title }}</h1>
 
 <p class="meta">
-  Posted on {{ page.date | date: "%B %d, %Y" }} by {{ page.author }}
+  Posted on {{ page.date | date: "%B %d, %Y" }} by {{ author.display_name }}
+  <img src="http://www.gravatar.com/avatar/{{author.gravatar}}.png?s=80&d=mm" class="author-avatar">
   {% include tags.html %}
+  
 </p>
 
 <div id="post">

@@ -2,8 +2,7 @@
 layout: post
 title: 'Insert Rack Middleware during Tests'
 date: 2014-10-24 16:23
-author: Carsten Zimmermann
-googleplus: 'https://plus.google.com/u/0/101728608052847168461'
+author: carp
 comments: true
 teaser: "Test-driving the behaviour of a Rails Engine with and without the host app including a certain middleware is tricky. Two simple hacks in your rspec request spec make it happen."
 tags:

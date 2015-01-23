@@ -2,7 +2,7 @@
 layout: post
 title: "Binary Christmas Tree"
 date: 2013-12-18 14:00
-author: ABSOLVENTA Dev-Team
+author: dev
 comments: true
 tags:
   - fun

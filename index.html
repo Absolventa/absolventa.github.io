@@ -5,6 +5,7 @@ description: "The Findings of Berlin-based ABSOLVENTA's Dev-Team ♦ Ruby ♦ Ra
 ---
 
 {% for post in paginator.posts %}
+  {% assign author = site.authors[post.author] %}
 
 	<article class="post">
 
@@ -18,7 +19,8 @@ description: "The Findings of Berlin-based ABSOLVENTA's Dev-Team ♦ Ruby ♦ Ra
 		{% endif %}
 
     <p class="meta">
-      Posted on {{ post.date | date: "%B %d, %Y" }} by {{ post.author }}
+      Posted on {{ post.date | date: "%B %d, %Y" }} by {{ author.display_name }}
+      <img src="http://www.gravatar.com/avatar/{{author.gravatar}}.png?s=50&d=mm" class="author-avatar">
     </p>
     <div class="post-content">
       {% if post.teaser %}

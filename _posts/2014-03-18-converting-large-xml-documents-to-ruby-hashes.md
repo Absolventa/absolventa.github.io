@@ -2,7 +2,7 @@
 layout: post
 title: "Converting large XML documents to Ruby Hashes"
 date: 2014-03-18 10:00
-author: Robin Neumann
+author: rbn
 comments: true
 tags:
   - xml
