@@ -2,7 +2,7 @@
 layout: post
 title: Aggregate And Conquer
 date: 2013-11-11 09:00
-author: Robin Neumann
+author: rbn
 comments: true
 tags:
   - activerecord
@@ -24,20 +24,20 @@ In our case, we’re deeply interested in pageview statistics related to templat
 model instances of a Rails app. For that use case we created a custom Rails Engine
 (»Kanyotoku«) that provides this service for some of our bigger apps.
 
-And of course, when developing our tool, I directly ran into the problems as described above. To come over 
-this, I was inspired by a 
-<a target="_blank" href="http://www.railstips.org/blog/archives/2011/06/28/counters-everywhere/">blog post</a> 
-by John Nunemaker, one of the creators of Gaug.es, a 
+And of course, when developing our tool, I directly ran into the problems as described above. To come over
+this, I was inspired by a
+<a target="_blank" href="http://www.railstips.org/blog/archives/2011/06/28/counters-everywhere/">blog post</a>
+by John Nunemaker, one of the creators of Gaug.es, a
 really awesome pageview tracking service. Even though most of his thoughts concern schemaless data, it
 was easy to adopt and modify these principles for a PostgreSQL system.
 
 ### Be write-heavy, but read-lazy
 
-One of his ideas was choosing appropriate resolutions, i.e. time frame resolutions for your 
-data. Let’s translate this principle as follows: Do we need to know how many pageviews occurred 
-in the last ten minutes exactly? Is this really relevant? 
+One of his ideas was choosing appropriate resolutions, i.e. time frame resolutions for your
+data. Let’s translate this principle as follows: Do we need to know how many pageviews occurred
+in the last ten minutes exactly? Is this really relevant?
 
-For our situation it was much more interesting to know the count of pageviews per month or 
+For our situation it was much more interesting to know the count of pageviews per month or
 maybe per day. It is also interesting for us to count it per year or for 3 months,
 but any smaller timeframe is nigh irrelevant for all our purposes.
 
@@ -46,13 +46,13 @@ pageview record is created. Of course this means we’re much more write-heavy t
 
 {% gist 7409048pageviews.rb %}
 
-On each page visit, a pageview gets saved and written to the database and in addtion to 
+On each page visit, a pageview gets saved and written to the database and in addtion to
 that a daily report is created or updated if it exists for that day. A monthly report is
 handled the same way.
 
 All reports save the pageviews count of the related time frame as an integer column which is
-simply incremented if desired. As a result, we have done some pre-processing for 
-data analysis in the backend - we have aggregated tables that fit perfectly to our range needs. In 
+simply incremented if desired. As a result, we have done some pre-processing for
+data analysis in the backend - we have aggregated tables that fit perfectly to our range needs. In
 out backoffice data aggregation context, we can simply sum these integer values. If you’re interested in
 the pageviews of the last 5 years, you can collect your data like
 
@@ -60,7 +60,7 @@ the pageviews of the last 5 years, you can collect your data like
 
 Assumimg our elephant receives around 10,000 pageviews per year, it is great
 that we don’t have to load 50,000 pageview records. Summing up integer values of less than 5 * 12 = 60 reports
-should be an easy excercise for our database. 
+should be an easy excercise for our database.
 
 ## Conclusion
 

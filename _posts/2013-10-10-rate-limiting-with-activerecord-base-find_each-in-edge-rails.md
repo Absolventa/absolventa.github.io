@@ -2,7 +2,7 @@
 layout: post
 title: "Rate Limiting Work On ActiveRecord::Base With .find_each In Edge Rails"
 date: 2013-10-10 17:04
-author: Carsten Zimmermann
+author: carp
 googleplus: "https://plus.google.com/u/0/101728608052847168461"
 comments: true
 tags:

@@ -2,7 +2,7 @@
 layout: post
 title: "Watching A Certificate Revocation List Using Event Girl"
 date: 2013-10-28 15:34
-author: Carsten Zimmermann
+author: carp
 googleplus: "https://plus.google.com/u/0/101728608052847168461"
 comments: true
 tags:
