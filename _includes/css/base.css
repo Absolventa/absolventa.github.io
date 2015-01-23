@@ -336,3 +336,8 @@ nav ul {
   list-style: none;
   font-weight: 300;
 }
+
+img.author-avatar {
+  border-radius: 50%;
+  float: right;
+}
