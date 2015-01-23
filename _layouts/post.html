@@ -1,11 +1,12 @@
 ---
 layout: default
 ---
+{% assign author = site.authors[page.author] %}
 
 <h1 class="title">{{ page.title }}</h1>
 
 <p class="meta">
-  Posted on {{ page.date | date: "%B %d, %Y" }} by {{ page.author }}
+  Posted on {{ page.date | date: "%B %d, %Y" }} by {{ author.display_name }}
   {% include tags.html %}
 </p>
 
