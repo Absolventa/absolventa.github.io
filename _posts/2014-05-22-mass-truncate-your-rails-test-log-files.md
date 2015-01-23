@@ -3,7 +3,6 @@ layout: post
 title: "Bulk-Truncate Your Rails Apps' test.logs"
 date: 2014-05-22 14:42
 author: carp
-googleplus: "https://plus.google.com/u/0/101728608052847168461"
 comments: true
 tags:
   - rails

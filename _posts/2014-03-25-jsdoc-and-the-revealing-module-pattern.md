@@ -3,7 +3,6 @@ layout: post
 title: "JSDoc and the Revealing Module Pattern"
 date: 2014-03-25 16:35
 author: carp
-googleplus: "https://plus.google.com/u/0/101728608052847168461"
 comments: true
 tags:
   - javascript

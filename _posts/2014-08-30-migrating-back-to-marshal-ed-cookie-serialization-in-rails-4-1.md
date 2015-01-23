@@ -3,7 +3,6 @@ layout: post
 title: "Back to Marshal'ed Cookie-Serialization"
 date: 2014-08-30 12:58
 author: carp
-googleplus: "https://plus.google.com/u/0/101728608052847168461"
 comments: true
 teaser: "Upgrading to Rails v4.1, it felt like a good idea to switch to the new default cookie serialization format: JSON. Except later it didn't. Rails offers a migration path from Marshal to JSON, but not vice versa. This article offers a (somewhat hacky) solution to rollback from JSON to Marshal."
 tags:
