@@ -1,414 +1,209 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  
-  
+  <url>
+    <loc>http://devnull.absolventa.de/2014/11/25/handle-rexml-parse-exceptions-with-schneiderlein/</loc>
+    <lastmod>2014-11-25T12:00:00+01:00</lastmod>
+  </url>
   <url>
     <loc>http://devnull.absolventa.de/2014/10/24/dynamically-insert-rack-middleware-during-test/</loc>
     <lastmod>2014-10-24T16:23:00+02:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2014/08/30/migrating-back-to-marshal-ed-cookie-serialization-in-rails-4-1/</loc>
     <lastmod>2014-08-30T12:58:00+02:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2014/08/06/ruby-on-waves/</loc>
     <lastmod>2014-08-06T13:23:00+02:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2014/05/22/mass-truncate-your-rails-test-log-files/</loc>
     <lastmod>2014-05-22T14:42:00+02:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2014/04/04/vim-berlin-usergroup-absolventa/</loc>
     <lastmod>2014-04-04T17:56:00+02:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2014/03/25/jsdoc-and-the-revealing-module-pattern/</loc>
     <lastmod>2014-03-25T16:35:00+01:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2014/03/18/converting-large-xml-documents-to-ruby-hashes/</loc>
     <lastmod>2014-03-18T10:00:00+01:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2014/02/04/a-lightweight-firewall-blacklist-as-rack-middleware/</loc>
     <lastmod>2014-02-04T17:03:00+01:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2014/01/15/stubbing-an-invalid-record-for-inherited_resources/</loc>
     <lastmod>2014-01-15T17:58:00+01:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2013/12/18/binary-christmas-tree/</loc>
     <lastmod>2013-12-18T14:00:00+01:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2013/11/11/aggregate-and-conquer/</loc>
     <lastmod>2013-11-11T09:00:00+01:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2013/10/28/watching-a-certificate-revocation-list-using-event-girl/</loc>
     <lastmod>2013-10-28T15:34:00+01:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/2013/10/10/rate-limiting-with-activerecord-base-find_each-in-edge-rails/</loc>
     <lastmod>2013-10-10T17:04:00+02:00</lastmod>
-    <priority>0.8</priority>
   </url>
-  
-  
   <url>
     <loc>http://devnull.absolventa.de/archives/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/about/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/team/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/ruby/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/enumerator/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/activerecord/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/enumerable/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/edgerails/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/event-girl/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/openssl/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/devops/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/wifi/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/postgresql/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/rails/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/statistics/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/fun/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/christmas/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/hipstergram/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/rspec/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/mocking/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/stubbing/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/inherited_resources/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/rack/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/middleware/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/blacklist/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/xml/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/nokogiri/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/libxml2/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/active_support/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/javascript/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/module/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/jsdoc/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/vim/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/social/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/logging/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/cmdline/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/relaunch/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/milestone/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/technical%20debt/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/refactoring/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/upgrade/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/rollback/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/session/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/marshal/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/json/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://devnull.absolventa.de/tag/test/</loc>
-    <lastmod>2014-10-24T17:06:55+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
-  
+  <url>
+    <loc>http://devnull.absolventa.de/tag/API%20design/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/XML/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/ActionPack/</loc>
+  </url>
 </urlset>
