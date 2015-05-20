@@ -16,7 +16,7 @@ tags:
 ---
 
 Ideally, your Rails app just has `config.force_ssl = true` configured for its
-production environment but when you have TLS- and non-TLS contexts in
+production environment. However, if you have TLS- and non-TLS contexts in
 your app, things become tricky to test on your local development machine.
 
 For [Dev/Prod Parity](http://12factor.net/dev-prod-parity), I want to have the
@@ -28,7 +28,7 @@ but it's verbose and involves too many manual steps.
 
 I've written a shell script to automate the happy path of the Nginx setup,
 namely installing Nginx, creating a self-signed SSL-certificate, writing the
-reverse-proxy config directive and optionally starting the Nginx webserver
+reverse-proxy config directives and optionally starting the Nginx webserver
 right away. The latter requires `sudo` superpowers since binding to the SSL
 default port 443 requires root privileges. Furthermore, it makes a few
 assumptions:
@@ -38,7 +38,7 @@ assumptions:
 3. Your Rails app is running on localhost:3000
 
 You can download the script from [Absolventa's Github repo](https://raw.githubusercontent.com/Absolventa/dotfiles/master/nginx-ssl-setup.sh).
-Run it on your machine with `bash nginx-ssl-setup.sh` and follow the instructions on the screen.
+Run it on your machine with `bash nginx-ssl-setup.sh` and follow the instructions on your terminal.
 If you stray from the Happy Path™, feel free to send a PR our way!
 
 
