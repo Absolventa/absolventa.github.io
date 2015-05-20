@@ -3,7 +3,7 @@ layout: post
 title: Instant Local Nginx SSL/TLS Proxy
 date: 2015-05-20 17:00
 author: carp
-teaser:
+teaser: Enabling SSL/TLS for your Rails development environment can be a pain. I reduced it by automating the setup of a local Nginx SSL-reverse proxy. Works with Mac and Homebrew.
 comment: true
 tags:
   - TLS
