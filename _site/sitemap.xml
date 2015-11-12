@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://devnull.absolventa.de/2015/11/12/lazy-logic-efficiently-reduce-an-array-to-a-boolean/</loc>
+    <lastmod>2015-11-12T15:04:00+01:00</lastmod>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/2015/05/20/use-nginx-to-enable-ssl-tls-for-your-rails-development/</loc>
+    <lastmod>2015-05-20T17:00:00+02:00</lastmod>
+  </url>
+  <url>
     <loc>http://devnull.absolventa.de/2014/11/25/handle-rexml-parse-exceptions-with-schneiderlein/</loc>
     <lastmod>2014-11-25T12:00:00+01:00</lastmod>
   </url>
@@ -205,5 +213,29 @@
   </url>
   <url>
     <loc>http://devnull.absolventa.de/tag/ActionPack/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/TLS/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/SSL/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/webrick/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/development/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/homebrew/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/mac/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/lambda/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/reduce/</loc>
   </url>
 </urlset>
