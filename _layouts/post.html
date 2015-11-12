@@ -6,8 +6,8 @@ layout: default
 <h1 class="title">{{ page.title }}</h1>
 
 <p class="meta">
-  Posted on {{ page.date | date: "%B %d, %Y" }} by {{ author.display_name }}
-  <img src="http://www.gravatar.com/avatar/{{author.gravatar}}.png?s=80&d=mm" class="author-avatar">
+Posted on {{ page.date | date: "%B %d, %Y" }} by <a href="{{author.twitter}}" target="_blank">{{ author.display_name }}</a>
+<img src="http://www.gravatar.com/avatar/{{author.gravatar}}.png?s=80&d=mm" class="author-avatar" title="{{author.display_name}}">
   {% include tags.html %}
   
 </p>
