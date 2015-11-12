@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Lazy Logic: Efficiently Reduce An Array To A Boolean"
-title: "Lazy Logic: Efficiently Reduce An Array To A Boolean"
 date: 2015-11-12 15:04
 author: carp
 teaser: Ruby is smart when it comes to evaluating boolean expressions. Curiosity about how to best reduce an Enumerable to a boolan value led us to Enumerable#all?(&:call) (lambdas! <3) and a short story about how to exploit Ruby's way of boolean evaluation.
@@ -36,8 +35,9 @@ that I wasn't aware of:
 => false
 {% endhighlight %}
 
-Reducing using a logical `AND` can be done with the `Enumerable#all?`, for me, reading
-a predicate method is far less cognitive load than passed Procs / Symbols.
+Reduce using a logical `AND` can be done with the `Enumerable#all?` and for me,
+reading a predicate method is far less cognitive load than passed Procs /
+Symbols.
 
 What we wanted to know is how clever `Enumerable#all?` is in terms of lazy
 boolean evaluation. Will it stop iterating when the result is already clear?
