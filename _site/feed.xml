@@ -78,7 +78,7 @@ remember that this corresponds to the prefix of length &lt;em&gt;i&lt;/em&gt; of
 &lt;p&gt;When the &lt;em&gt;i&lt;/em&gt;-ith character of the first word &lt;em&gt;S&lt;/em&gt; exactly matches the &lt;em&gt;j&lt;/em&gt;-th character of the second word &lt;em&gt;T&lt;/em&gt; we have
 the optimal case. No &amp;quot;operation&amp;quot; is required, the global costs are the same as for the distance of the (i-1)-th and the (j-1)-th 
 distances of the words, that is in that case. So we take the matrix entry &lt;em&gt;(i-1, j-1)&lt;/em&gt; and put it into &lt;em&gt;(i, j)&lt;/em&gt; as well.
-Otherwise the characters do not match. We have to some elementary operation. But which one? Here&amp;#39;s the answer:&lt;/p&gt;
+Otherwise the characters do not match. We have execute one of the elementary operations. But which one? Here&amp;#39;s the answer:&lt;/p&gt;
 
 &lt;p&gt;$$ D_{i, j} = \min \big [ \text{insertion costs}, \text{deletion costs}, \text{substitution costs} \big ] + 1 $$&lt;/p&gt;
 

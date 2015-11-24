@@ -85,7 +85,7 @@ remember that this corresponds to the prefix of length *i* of the word *εcat* a
 When the *i*-ith character of the first word *S* exactly matches the *j*-th character of the second word *T* we have
 the optimal case. No "operation" is required, the global costs are the same as for the distance of the (i-1)-th and the (j-1)-th 
 distances of the words, that is in that case. So we take the matrix entry *(i-1, j-1)* and put it into *(i, j)* as well.
-Otherwise the characters do not match. We have to some elementary operation. But which one? Here's the answer:
+Otherwise the characters do not match. We have execute one of the elementary operations. But which one? Here's the answer:
 
 $$ D_{i, j} = \min \big [ \text{insertion costs}, \text{deletion costs}, \text{substitution costs} \big ] + 1 $$
 
