@@ -34,7 +34,7 @@ that are needed to turn an arbitrary string *S* into another string, say *T*. He
  
 Mathematically it works with a very elegant trick of computing
 the Levenshtein distances of trivial substrings first (which is very easy) 
-and then successive computing distances of more complex substrings by
+and then successively computing distances of more complex substrings by
 only using previously evaluated values. 
 
 The mathematical formalism is well-explained at [wikipedia](https://en.wikipedia.org/wiki/Levenshtein_distance) and other resources

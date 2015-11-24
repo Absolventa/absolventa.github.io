@@ -33,7 +33,7 @@ that are needed to turn an arbitrary string &lt;em&gt;S&lt;/em&gt; into another 
 
 &lt;p&gt;Mathematically it works with a very elegant trick of computing
 the Levenshtein distances of trivial substrings first (which is very easy) 
-and then successive computing distances of more complex substrings by
+and then successively computing distances of more complex substrings by
 only using previously evaluated values. &lt;/p&gt;
 
 &lt;p&gt;The mathematical formalism is well-explained at &lt;a href=&quot;https://en.wikipedia.org/wiki/Levenshtein_distance&quot;&gt;wikipedia&lt;/a&gt; and other resources
