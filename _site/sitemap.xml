@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://devnull.absolventa.de/2015/11/24/exploring-levenshtein-algorithm-with-ruby/</loc>
+    <lastmod>2015-11-24T09:00:00+01:00</lastmod>
+  </url>
+  <url>
     <loc>http://devnull.absolventa.de/2015/11/12/lazy-logic-efficiently-reduce-an-array-to-a-boolean/</loc>
     <lastmod>2015-11-12T15:04:00+01:00</lastmod>
   </url>
@@ -72,9 +76,6 @@
   </url>
   <url>
     <loc>http://devnull.absolventa.de/about/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/team/</loc>
   </url>
   <url>
     <loc>http://devnull.absolventa.de/tag/ruby/</loc>
@@ -237,5 +238,14 @@
   </url>
   <url>
     <loc>http://devnull.absolventa.de/tag/reduce/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/levenshtein%20distance/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/algorithms/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/page2/</loc>
   </url>
 </urlset>

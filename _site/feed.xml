@@ -7,11 +7,291 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Exploring the Levenshtein algorithm with Ruby</title>
+				<description>&lt;p&gt;Today I&amp;#39;d like to introduce you to an algorithm I stumbled over already tiwce
+and that I really like because of its simple idea to address the non-trivial
+problem to &lt;em&gt;quantify&lt;/em&gt; the similarity of two strings: The Levenshtein algorithm.&lt;/p&gt;
+
+&lt;p&gt;The algorithm determines the so-called Levenshtein distance of two strings
+which is a natural number. It&amp;#39;s an example of the mathematical technique of 
+&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Dynamic_programming&quot;&gt;Dynamic Programming&lt;/a&gt;&lt;/em&gt; 
+and was invented by the Russian mathematician &lt;a href=&quot;http://www.keldysh.ru/departments/dpt_10/lev.html&quot;&gt;Vladimir Levenshtein&lt;/a&gt; already 
+in 1965. The algorithm is used by some major companies (e.g. Yahoo!) in 
+production environments until today.&lt;/p&gt;
+
+&lt;h3&gt;How it works&lt;/h3&gt;
+
+&lt;p&gt;The core idea is to measure similarity by the minimal number of &lt;em&gt;elementary transformations&lt;/em&gt;
+that are needed to turn an arbitrary string &lt;em&gt;S&lt;/em&gt; into another string, say &lt;em&gt;T&lt;/em&gt;. Here, 
+&lt;em&gt;elementary transformations&lt;/em&gt; are defined as precisely three operations:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;a simple insertion of a single character to the string&lt;/li&gt;
+&lt;li&gt;a deletion of a single character of the string&lt;/li&gt;
+&lt;li&gt;a substitution of a single character by another&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Mathematically it works with a very elegant trick of computing
+the Levenshtein distances of trivial substrings first (which is very easy) 
+and then successive computing distances of more complex substrings by
+only using previously evaluated values. &lt;/p&gt;
+
+&lt;p&gt;The mathematical formalism is well-explained at &lt;a href=&quot;https://en.wikipedia.org/wiki/Levenshtein_distance&quot;&gt;wikipedia&lt;/a&gt; and other resources
+and I&amp;#39;d like to focus on a walk-through example now. Let&amp;#39;s compute the Levenshtein distance of the words &lt;em&gt;cat&lt;/em&gt; and &lt;em&gt;cute&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Note that the empty word is denoted by &lt;em&gt;ε&lt;/em&gt;. Practically the algorithm is filling a table (a matrix) where the (i,j)-th entry will 
+contain the Levenshtein distance¹ of the prefix of length &lt;em&gt;i&lt;/em&gt; of the first word and the prefix of the prefix of length &lt;em&gt;j&lt;/em&gt; of the 
+second word. &lt;/p&gt;
+
+&lt;p&gt;We emphasize the (technical) convention that every word starts with the empty word, so &lt;em&gt;cat&lt;/em&gt; can be written as &lt;em&gt;εcat&lt;/em&gt;. 
+Therefore the first entry with indices (0,0) is the Levenshtein distance of the &lt;em&gt;0&lt;/em&gt;-prefix of &lt;em&gt;εcat&lt;/em&gt; and &lt;em&gt;εcute&lt;/em&gt;, which is the
+distance of the empty word &lt;em&gt;ε&lt;/em&gt; with itself - which is simply zero. Furthermore, to construct any word of length &lt;em&gt;i&lt;/em&gt; 
+starting with the empty word we simply need &lt;em&gt;i&lt;/em&gt; insertions. With this in mind it is 
+easy to write down the first row immediately: &lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;
+ &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This translates as: It takes one elementary transformation to turn &lt;em&gt;ε&lt;/em&gt; into &lt;em&gt;εc&lt;/em&gt; (an insertion), two transformations
+to turn &lt;em&gt;ε&lt;/em&gt; into &lt;em&gt;εca&lt;/em&gt; and so on. The first column can be obtained immediately with the same strategy:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt;
+ &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; 
+ &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; 
+ &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;→&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;four&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;insertions&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;are&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;needed&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;turn&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;into&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;cute&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Let&amp;#39;s combine them. Our recurrence matrix &lt;em&gt;D&lt;/em&gt; has now the form:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;
+ &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;All we have to do is to fill the question mark entries by using only the previously computed values. This
+is the point were we need to inspect the mathematical rules the algorithm postulates. Suppose we want to obtain the matrix entry (i, j) and
+remember that this corresponds to the prefix of length &lt;em&gt;i&lt;/em&gt; of the word &lt;em&gt;εcat&lt;/em&gt; and prefix of length &lt;em&gt;j&lt;/em&gt; of the word &lt;em&gt;εcute&lt;/em&gt;:&lt;/p&gt;
+
+&lt;p&gt;When the &lt;em&gt;i&lt;/em&gt;-ith character of the first word &lt;em&gt;S&lt;/em&gt; exactly matches the &lt;em&gt;j&lt;/em&gt;-th character of the second word &lt;em&gt;T&lt;/em&gt; we have
+the optimal case. No &amp;quot;operation&amp;quot; is required, the global costs are the same as for the distance of the (i-1)-th and the (j-1)-th 
+distances of the words, that is in that case. So we take the matrix entry &lt;em&gt;(i-1, j-1)&lt;/em&gt; and put it into &lt;em&gt;(i, j)&lt;/em&gt; as well.
+Otherwise the characters do not match. We have to some elementary operation. But which one? Here&amp;#39;s the answer:&lt;/p&gt;
+
+&lt;p&gt;$$ D_{i, j} = \min \big [ \text{insertion costs}, \text{deletion costs}, \text{substitution costs} \big ] + 1 $$&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;insertion costs&lt;/code&gt;, &lt;code&gt;deletion costs&lt;/code&gt; and &lt;code&gt;substitution costs&lt;/code&gt; are nothing else
+than values of neighbor matrix entries we already have computed! So have a look to the neighbors, 
+choose the one with mininal costs and add &lt;em&gt;+1&lt;/em&gt; to its costs, because we need exactly one more operation
+compared to that &amp;quot;minimal&amp;quot; neighbor. Notice that here we have chosen some kind of optimal &lt;em&gt;path&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;#39;s see how it works for our example matrix above. For the entry (1,1) we have the optimal case: 
+A &lt;em&gt;c&lt;/em&gt; is added for both sides (when starting with &lt;em&gt;ε&lt;/em&gt;) and since the same character is added on both sides 
+the Levenshtein distance stays zero because it was for the upper-left neighbor. And it matches the 
+intuition if you recapitulate that entry (1,1) means the distance between &lt;em&gt;εc&lt;/em&gt; and &lt;em&gt;εc&lt;/em&gt;, which still
+is the same string. &lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;
+ &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now the situation gets more interesting. Let&amp;#39;s focus on the second row, where two question
+marks are left. The more left question mark is the entry &lt;em&gt;(2, 1)&lt;/em&gt; and corresponds to the
+distance of &lt;em&gt;εca&lt;/em&gt; and &lt;em&gt;εc&lt;/em&gt;. The algorithm now postulates looking for the minimal distance
+relative to previously computed substrings. The already-computed neighbors have values &lt;em&gt;2&lt;/em&gt;,
+&lt;em&gt;1&lt;/em&gt; and &lt;em&gt;0&lt;/em&gt;. The mininal one is &lt;em&gt;0&lt;/em&gt;. We now take the minimal value (0) and add +1 to it to obtain
+the value for &lt;em&gt;(2, 1)&lt;/em&gt;. This procedure is repeated successively for each question mark left. If we
+consequently do this we obtain:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;
+ &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; 
+ &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;… and finally the matrix entry (m, n) where &lt;em&gt;m&lt;/em&gt; is the length of the first string and &lt;em&gt;n&lt;/em&gt; is the length of the second string
+is defined as the Levenshtein distance of the two strings. So we have determinded the Levenshtein distance of &lt;em&gt;cat&lt;/em&gt; and 
+&lt;em&gt;cute&lt;/em&gt;: &lt;em&gt;2&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Implementation&lt;/h3&gt;
+
+&lt;p&gt;When I reasoned if the algorithm would be good choice for our specific problem I immediately
+started hacking together some naive lines in my editor. I knew there were several stable implementations 
+out there and my solution most probably wouldn&amp;#39;t add any new feature nor would have significant performance improvements,
+but I wanted to go through the algorithm on my own step by step. So basically I started reimplenting
+it. But why reinvent the wheel? &lt;/p&gt;
+
+&lt;p&gt;As developers we&amp;#39;re used to the common folklore law of &lt;em&gt;You-simply-should-not-reinvent-the-wheel&lt;/em&gt;. This is 
+absolutely valid when it comes to the question what to use in production environments (think of
+cryptography!). But if you&amp;#39;re interested in extending your toolset of concepts the answer is different: Rebuilding the 
+algorithm on your own - independent of its difficulty - will make you learn something more than &lt;em&gt;Copy&amp;amp;Paste&lt;/em&gt;. It&amp;#39;s the
+same phenomenon that transcribing something from the blackboard in school by yourself will pay off way more than simply photocopying your neighbor&amp;#39;s notes 😉 .&lt;/p&gt;
+
+&lt;p&gt;By the way, there is no specific advantage in choosing Ruby here. You&amp;#39;re fine to use any turing complete programming 
+language that you like and do the same. Of course there already are plenty of Ruby variants of
+the Levenshtein algorithm, for example I found a very minimalistic implementation &lt;a href=&quot;http://rosettacode.org/wiki/Levenshtein_distance#Ruby&quot;&gt;here&lt;/a&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Levenshtein&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;distance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;downcase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;downcase&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;.b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# i == 0&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;.a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nw&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;# j == 0; nw is lev(i-1, j)&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;.b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nw&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nw&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nw&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Its pretty minified² but therefore hard to read when you want to learn how to
+apply the algorithm by youself. I felt the drive for giving it more structure (and therefore
+bloating it intentionally). The first object I focused on was
+the so-called &lt;em&gt;recurrence matrix&lt;/em&gt;, usually called &lt;em&gt;D&lt;/em&gt; symbolized by the &lt;code&gt;costs&lt;/code&gt; Array in the
+minimalistic version. This is the table we filled in the example above. For me it felt like an own container data type
+(in the fashion of a monad), a somewhat supercharged Array. So I defined an own class for it: &lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;RecurrenceMatrix&lt;/span&gt;
+
+    &lt;span class=&quot;kp&quot;&gt;attr_reader&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:store&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;[]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;store&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;[]=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;store&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;initialize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;vi&quot;&gt;@store&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+      &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;.m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;store&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;.n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;store&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The crucial point here is that the &lt;code&gt;RecurrenceMatrix&lt;/code&gt; automatically
+fills the entries that are initially known. This container class may look
+overengineered here, but note that one can explicitly say&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;RecurrenceMatrix&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;which I really like because it says without any comment what it is, what its purpose
+is and how to use it (&amp;quot;Matrix&amp;quot; in the class name implictly gives the hint to the 
+user to make use of the operator &lt;code&gt;:[]&lt;/code&gt;, at least this is what I would expect). &lt;/p&gt;
+
+&lt;p&gt;Then I thought about how the outer API of my fictional class &lt;code&gt;LevenshteinDistance&lt;/code&gt; could look like. The Levenshtein distance
+is a natural number³, so what I had in mind is&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;result = LevenshteinDistance.new(&amp;#39;cat&amp;#39;, &amp;#39;cute&amp;#39;).to_i
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;And the &lt;code&gt;to_i&lt;/code&gt; method glues the successive computations together
+and returns the last value computed. Here, &lt;code&gt;d&lt;/code&gt; is a recurrence matrix
+as reasoned above.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;LevenshteinDistance&lt;/span&gt;
+    
+    &lt;span class=&quot;err&quot;&gt;…&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;to_i&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;.n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;.m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+          &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;costs_for_step&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+      &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The only item missing is the computation of the costs for each matrix entry. Here&amp;#39;s what I 
+did based on the mathematical formulation:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;LevenshteinDistance&lt;/span&gt;
+    
+    &lt;span class=&quot;err&quot;&gt;…&lt;/span&gt;
+
+
+    &lt;span class=&quot;kp&quot;&gt;private&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;same_character_for_both_words_is_added?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;obtain_minimal_value_from_neighbors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+        &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+        &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;o&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;min&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;costs_for_step&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;same_character_for_both_words_is_added?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;obtain_mininal_value_from_neighbors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;One could take this one step more consequent and move all the computation logic inside the &lt;code&gt;RecurrenceMatrix&lt;/code&gt;.
+But alltogether the state above felt fine to me and made me ready for switching to use a more performant implementation relying on C instead :)&lt;/p&gt;
+
+&lt;p&gt;Note that my implementation works well for strings that aren&amp;#39;t long, say below 500 characters. During my heuristically flavoured 
+(and therefore non-scientific) benchmark on my local machine it took 1.28 seconds to compute the 
+Levenshtein distance of strings of length 1000 and ~30 seconds to compute the Levenshtein distance of 
+strings of length 10000. Theoretically the algorithm itself is of complexity &lt;em&gt;O(mn)&lt;/em&gt; where &lt;em&gt;m&lt;/em&gt; and &lt;em&gt;n&lt;/em&gt; are the sizes 
+of the input strings. So in conclusion, to compare really large strings you may want to use a Ruby gem 
+that relies on native C code extensions or similar like&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/dbalatero/levenshtein-ffi&quot;&gt;levenshtein-ffi&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/GlobalNamesArchitecture/damerau-levenshtein&quot;&gt;damerau-levenshtein&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Further reading&lt;/h3&gt;
+
+&lt;p&gt;I hope you feel encouraged now playing with algorithms or other concepts from academia that are unknown to you! &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/Absolventa/levenshtein_rb/blob/master/lib/levenshtein_rb/levenshtein_distance.rb&quot;&gt;source code&lt;/a&gt; 
+of the implementation discussed here&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Levenshtein_distance&quot;&gt;Levenshtein algorithm at wikipedia&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://julesjacobs.github.io/2015/06/17/disqus-levenshtein-simple-and-fast.html&quot;&gt;A very interesting blogpost&lt;/a&gt; that takes things one step further
+and includes thoughts about optimizations and the Levenshtein algorithm seen from an autmata theory perspective (including a Python implementation)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://web.stanford.edu/class/cs124/lec/med.pdf&quot;&gt;A presentation that&lt;/a&gt; summarizes more related variants and optimization ideas &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;¹) I implictly defined the &lt;em&gt;cost&lt;/em&gt; of each operation as +1 as it is &amp;quot;per default&amp;quot;. This can be modified
+of course, but this is not in the scope of this write-up. Just keep in mind
+that this is a feature that can be adjusted.&lt;/p&gt;
+
+&lt;p&gt;²) … which is totally okay because it was intended as a short concise implementation there!&lt;/p&gt;
+
+&lt;p&gt;³) It&amp;#39;s completely off the topic, but an interesting philosophical question indeed: The discussion if zero is treated &lt;a href=&quot;http://math.stackexchange.com/questions/283/is-0-a-natural-number&quot;&gt;as a natural number or not&lt;/a&gt; 😉&lt;/p&gt;
+</description>
+				<pubDate>Tue, 24 Nov 2015 09:00:00 +0100</pubDate>
+				<link>http://devnull.absolventa.de/2015/11/24/exploring-levenshtein-algorithm-with-ruby/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2015/11/24/exploring-levenshtein-algorithm-with-ruby/</guid>
+			</item>
+		
+			<item>
 				<title>Lazy Logic: Efficiently Reduce An Array To A Boolean</title>
-				<description>&lt;p&gt;Robin and I have been playing around with reducing a list using the &lt;code&gt;to_proc&lt;/code&gt;‘ed
+				<description>&lt;p&gt;Robin and I have been playing around with reducing a list using the &lt;code&gt;to_proc&lt;/code&gt;&amp;#39;ed
 version of the logical &lt;code&gt;AND&lt;/code&gt; operator. It started out whether something like
-&lt;code&gt;my_list.reduce(:&#39;&amp;amp;&amp;amp;&#39;)&lt;/code&gt; would make it through the Ruby interpreter
-(spoiler alert: it doesn’t, it returns &lt;em&gt;NoMethodError: undefined method ‘&amp;amp;&amp;amp;’ for true:TrueClass&lt;/em&gt; instead).&lt;/p&gt;
+&lt;code&gt;my_list.reduce(:&amp;#39;&amp;amp;&amp;amp;&amp;#39;)&lt;/code&gt; would make it through the Ruby interpreter
+(spoiler alert: it doesn&amp;#39;t, it returns &lt;em&gt;NoMethodError: undefined method &amp;#39;&amp;amp;&amp;amp;&amp;#39; for true:TrueClass&lt;/em&gt; instead).&lt;/p&gt;
 
 &lt;p&gt;Since we were dealing with a list of booleans, the next best thing is:&lt;/p&gt;
 
@@ -21,22 +301,23 @@ version of the logical &lt;code&gt;AND&lt;/code&gt; operator. It started out whe
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reduce&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;By the way, there’s an alternative way of calling reduce/inject with an initial
+&lt;p&gt;By the way, there&amp;#39;s an alternative way of calling reduce/inject with an initial
 value and a block in the form of &lt;code&gt;my_list.reduce(false) { |memo, obj| memo &amp;amp;&amp;amp; obj }&lt;/code&gt;
-that I wasn’t aware of:&lt;/p&gt;
+that I wasn&amp;#39;t aware of:&lt;/p&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reduce&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;false&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;Reducing using a logical &lt;code&gt;AND&lt;/code&gt; can be done with the &lt;code&gt;Enumerable#all?&lt;/code&gt;, for me, reading
-a predicate method is far less cognitive load than passed Procs / Symbols.&lt;/p&gt;
+&lt;p&gt;Reduce using a logical &lt;code&gt;AND&lt;/code&gt; can be done with the &lt;code&gt;Enumerable#all?&lt;/code&gt; and for me,
+reading a predicate method is far less cognitive load than passed Procs /
+Symbols.&lt;/p&gt;
 
 &lt;p&gt;What we wanted to know is how clever &lt;code&gt;Enumerable#all?&lt;/code&gt; is in terms of lazy
 boolean evaluation. Will it stop iterating when the result is already clear?&lt;/p&gt;
 
 &lt;p&gt;Quick recap: if you &lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt; three expressions and the first two already evaluate
 to false, Ruby instantly breaks the evaluation: there is no way that an already
-falsy statement will return &lt;code&gt;true&lt;/code&gt; when &lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt;‘ed. A good way to take
+falsy statement will return &lt;code&gt;true&lt;/code&gt; when &lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt;&amp;#39;ed. A good way to take
 advantage of this smart feature is putting the cheap calculations first and the
 more expensive ones on the right side of the expression.&lt;/p&gt;
 
@@ -48,14 +329,14 @@ more expensive ones on the right side of the expression.&lt;/p&gt;
 
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;all?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ƛ&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ƛ&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;call&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;We didn’t see the exception, meaning that &lt;code&gt;Enumerable#all?&lt;/code&gt; indeed stopped after
+&lt;p&gt;We didn&amp;#39;t see the exception, meaning that &lt;code&gt;Enumerable#all?&lt;/code&gt; indeed stopped after
 evaluating the first two elements. Good!&lt;/p&gt;
 
 &lt;p&gt;The use of lambdas as elements instead of eagerly evaluated objects was for our
 quick test, but it also allows taking the concept of evaluating the most
 expensive expressions last (see recap above) one step further:
 When an array is instantiated, all elements will be evaluated. Having lambdas/procs
-as elements will defer their evaluation and we can iterate over “cheap” items
+as elements will defer their evaluation and we can iterate over &amp;quot;cheap&amp;quot; items
 when reducing them with logical operators.&lt;/p&gt;
 
 &lt;p&gt;Imagine this example:&lt;/p&gt;
@@ -84,11 +365,11 @@ your app, things become tricky to test on your local development machine.&lt;/p&
 &lt;p&gt;For &lt;a href=&quot;http://12factor.net/dev-prod-parity&quot;&gt;Dev/Prod Parity&lt;/a&gt;, I want to have the
 same SSL setup locally as on staging/production. Documentation for setting up
 a local Nginx instance &lt;a href=&quot;http://www.cyberciti.biz/faq/howto-linux-unix-setup-nginx-ssl-proxy/&quot;&gt;is readily available&lt;/a&gt;,
-but it’s verbose and involves too many manual steps.&lt;/p&gt;
+but it&amp;#39;s verbose and involves too many manual steps.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/images/2015-05-20-nginx-ssl-automate-all-the-things.jpg&quot; alt=&quot;Automate all the things!&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2015-05-20-nginx-ssl-automate-all-the-things.jpg&quot; alt=&quot;Automate all the things!&quot;&gt;&lt;/p&gt;
 
-&lt;p&gt;I’ve written a shell script to automate the happy path of the Nginx setup,
+&lt;p&gt;I&amp;#39;ve written a shell script to automate the happy path of the Nginx setup,
 namely installing Nginx, creating a self-signed SSL-certificate, writing the
 reverse-proxy config directives and optionally starting the Nginx webserver
 right away. The latter requires &lt;code&gt;sudo&lt;/code&gt; superpowers since binding to the SSL
@@ -96,15 +377,14 @@ default port 443 requires root privileges. Furthermore, it makes a few
 assumptions:&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;You’re using Mac and Homebrew&lt;/li&gt;
-  &lt;li&gt;You don’t have Nginx installed or don’t care about config files being overwritten&lt;/li&gt;
-  &lt;li&gt;Your Rails app is running on localhost:3000&lt;/li&gt;
+&lt;li&gt;You&amp;#39;re using Mac and Homebrew&lt;/li&gt;
+&lt;li&gt;You don&amp;#39;t have Nginx installed or don&amp;#39;t care about config files being overwritten&lt;/li&gt;
+&lt;li&gt;Your Rails app is running on localhost:3000&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;You can download the script from &lt;a href=&quot;https://raw.githubusercontent.com/Absolventa/dotfiles/master/nginx-ssl-setup.sh&quot;&gt;Absolventa’s Github repo&lt;/a&gt;.
+&lt;p&gt;You can download the script from &lt;a href=&quot;https://raw.githubusercontent.com/Absolventa/dotfiles/master/nginx-ssl-setup.sh&quot;&gt;Absolventa&amp;#39;s Github repo&lt;/a&gt;.
 Run it on your machine with &lt;code&gt;bash nginx-ssl-setup.sh&lt;/code&gt; and follow the instructions on your terminal.
 If you stray from the Happy Path™, feel free to send a PR our way!&lt;/p&gt;
-
 </description>
 				<pubDate>Wed, 20 May 2015 17:00:00 +0200</pubDate>
 				<link>http://devnull.absolventa.de/2015/05/20/use-nginx-to-enable-ssl-tls-for-your-rails-development/</link>
@@ -121,10 +401,10 @@ with HTTP status code 500 by the request catching Rails application.&lt;/p&gt;
 
 &lt;p&gt;From the perspective of API design this is not best practice for several
 reasons: First of all, the customer does not get any information about what
-went wrong and what to do next, so that’s somehow the opposite of a solid
+went wrong and what to do next, so that&amp;#39;s somehow the opposite of a solid
 hypermedia approach.&lt;/p&gt;
 
-&lt;p&gt;Second, it’s not correct behavior to reflect the &lt;em&gt;global&lt;/em&gt; situation. Formally
+&lt;p&gt;Second, it&amp;#39;s not correct behavior to reflect the &lt;em&gt;global&lt;/em&gt; situation. Formally
 the HTTP status code is correct, since the regular application cyclce is broken
 on the server side. But initially it was caused by problems contained in the
 post data - and it needs to be fixed on the client side. Consequently it would
@@ -160,7 +440,7 @@ our problem is the invocation of &lt;code&gt;Hash.from_xml&lt;/code&gt;, L10 bel
 &lt;a href=&quot;http://robots.thoughtbot.com/catching-json-parse-errors-with-custom-middleware&quot;&gt;blog post by thoughtbot&lt;/a&gt; that
 highly inspired our variant of solving the problem: A custom Rack middleware that is invoked before &lt;code&gt;ActionDispatch::XmlParamsParser&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;In contrast to the solution presented in blog post mentioned we don’t want to respond directly on middleware layer. Instead we save
+&lt;p&gt;In contrast to the solution presented in blog post mentioned we don&amp;#39;t want to respond directly on middleware layer. Instead we save
 the excetion information in an additional environment variable, which we can be read on the controller layer afterwards
 to a proper response:&lt;/p&gt;
 
@@ -208,7 +488,6 @@ in the responsible controller then:&lt;/p&gt;
     &lt;span class=&quot;n&quot;&gt;respond_with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;schneiderlein&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;errors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;422&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;schneiderlein&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;errors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;any?&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 </description>
 				<pubDate>Tue, 25 Nov 2014 12:00:00 +0100</pubDate>
 				<link>http://devnull.absolventa.de/2014/11/25/handle-rexml-parse-exceptions-with-schneiderlein/</link>
@@ -222,20 +501,20 @@ in order to save the original payload that was pushed over the wire. That
 little piece of software, however, had a bug (which is &lt;em&gt;pretty&lt;/em&gt; uncommon for
 software, right?): The logged payload was always empty.&lt;/p&gt;
 
-&lt;p&gt;The Engine’s host application uses Rails’ &lt;code&gt;ActionDispatch::XmlParamsParser&lt;/code&gt;
+&lt;p&gt;The Engine&amp;#39;s host application uses Rails&amp;#39; &lt;code&gt;ActionDispatch::XmlParamsParser&lt;/code&gt;
 middleware. It would seem that it messed up the contents of &lt;code&gt;rack.input&lt;/code&gt;
 which in turn holds the POST data.&lt;/p&gt;
 
 &lt;p&gt;&lt;code&gt;rack.input&lt;/code&gt; is an IO-like object and it needs to be rewound after
-it has been read from. XmlParamsParser reads from it, but apparently doesn’t
+it has been read from. XmlParamsParser reads from it, but apparently doesn&amp;#39;t
 rewind it. It seams easy enough to fix, but how to testdrive it?&lt;/p&gt;
 
-&lt;p&gt;I didn’t want to statically include a rack.input-modifying middleware into the
-Engine’s dummy app. Instead I wanted add another context that tested against a
+&lt;p&gt;I didn&amp;#39;t want to statically include a rack.input-modifying middleware into the
+Engine&amp;#39;s dummy app. Instead I wanted add another context that tested against a
 version of the dummy infected with a mock middleware and have all other tests
 run without it.&lt;/p&gt;
 
-&lt;p&gt;Here’s how I did it. Enjoy!&lt;/p&gt;
+&lt;p&gt;Here&amp;#39;s how I did it. Enjoy!&lt;/p&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# spec/requests/rack_input_modifiable_spec.rb&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;Tracks data with rack.input modifying middleware in place&amp;#39;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
@@ -270,7 +549,6 @@ run without it.&lt;/p&gt;
 
   &lt;span class=&quot;n&quot;&gt;it_behaves_like&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;tracks raw data&amp;#39;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# i.e. the actual tests&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 </description>
 				<pubDate>Fri, 24 Oct 2014 16:23:00 +0200</pubDate>
 				<link>http://devnull.absolventa.de/2014/10/24/dynamically-insert-rack-middleware-during-test/</link>
@@ -280,8 +558,8 @@ run without it.&lt;/p&gt;
 			<item>
 				<title>Back to Marshal'ed Cookie-Serialization</title>
 				<description>&lt;p&gt;Upgrading to Rails v4.1, it felt like a good idea to switch to the new default
-serialization format: JSON. Upgrading from the Marshal’ed serialization to JSON
-was as simple as setting Rails’ cookies serializer to &lt;code&gt;:hybrid&lt;/code&gt;. Easy enough and
+serialization format: JSON. Upgrading from the Marshal&amp;#39;ed serialization to JSON
+was as simple as setting Rails&amp;#39; cookies serializer to &lt;code&gt;:hybrid&lt;/code&gt;. Easy enough and
 »better go with the new Rails default«, I thought.&lt;/p&gt;
 
 &lt;p&gt;We were warned about the implications.
@@ -289,13 +567,13 @@ was as simple as setting Rails’ cookies serializer to &lt;code&gt;:hybrid&lt;/
 states:&lt;/p&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;When using the :json or :hybrid serializer, you should beware that not all Ruby
+&lt;p&gt;When using the :json or :hybrid serializer, you should beware that not all Ruby
 objects can be serialized as JSON. For example, Date and Time objects will be
 serialized as strings, and Hashes will have their keys stringified.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;Only we had to realize the hard way that an external library was dumping high
-level objects into the (cookie-based) session that couldn’t easily and
+level objects into the (cookie-based) session that couldn&amp;#39;t easily and
 transparently be deserialized again.&lt;/p&gt;
 
 &lt;p&gt;Unfortunately, there is no real rollback option: Setting the serializer back to
@@ -317,11 +595,10 @@ change was rolled out, I came up with the following »rolling rollback« strateg
   &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;A simple &lt;code&gt;reset_session&lt;/code&gt; won’t do as that already tries to access the (invalid)
+&lt;p&gt;A simple &lt;code&gt;reset_session&lt;/code&gt; won&amp;#39;t do as that already tries to access the (invalid)
 session object. The rescue hook will regenerate a new Marshal-serialized session
 for all those who have already received JSON data, but will of course terminate
 their existing sessions (login data, shopping cart … you name it).&lt;/p&gt;
-
 </description>
 				<pubDate>Sat, 30 Aug 2014 12:58:00 +0200</pubDate>
 				<link>http://devnull.absolventa.de/2014/08/30/migrating-back-to-marshal-ed-cookie-serialization-in-rails-4-1/</link>
@@ -331,18 +608,18 @@ their existing sessions (login data, shopping cart … you name it).&lt;/p&gt;
 			<item>
 				<title>Ruby on Waves: Πάντα ῥεῖ</title>
 				<description>&lt;blockquote&gt;
-Everything flows&lt;br /&gt;
+Everything flows&lt;br&gt;
 &lt;small&gt;&amp;mdash; Heraclitus&lt;/small&gt;
 &lt;/blockquote&gt;
 
-&lt;p /&gt;
+&lt;p&gt;&lt;p/&gt;&lt;/p&gt;
 
-&lt;p&gt;We’ve been busying ourselves with the final touches on our
+&lt;p&gt;We&amp;#39;ve been busying ourselves with the final touches on our
 &lt;a href=&quot;https://www.absolventa.de/karriereguide/tipps/das-neue-absolventa&quot; lang=&quot;de&quot; title=&quot;The New ABSOLVENTA (German)&quot;&gt;Grand ABSOLVENTA Relaunch&lt;/a&gt;
-recently. It’s been done in the record time of only seven months and we dare say: we’re quite proud of it.&lt;/p&gt;
+recently. It&amp;#39;s been done in the record time of only seven months and we dare say: we&amp;#39;re quite proud of it.&lt;/p&gt;
 
 &lt;p&gt;While a full visual overhaul was certainly due, the initial spark for a
-relaunch came from a backend perspective: ABSOLVENTA’s Rails codebase
+relaunch came from a backend perspective: ABSOLVENTA&amp;#39;s Rails codebase
 dates back to 2007 and as with every bigger piece of software, it has its
 Dark Corners™. It has unquestionably accumulated a nice heap of &lt;a href=&quot;https://en.wikipedia.org/wiki/Technical_debt&quot;&gt;technical debt&lt;/a&gt; over the years.&lt;/p&gt;
 
@@ -353,21 +630,21 @@ Github completely (that alone felt awesome!) and added Travis CI +
 
 &lt;p&gt;The latter was a key element to achieve what we set out for: finding our weak
 spots. We wanted to dissect them one by one, streamline the processes involved
-and then piece them together again like you would with a set of Lego©
+and then piece them together again like you would with a set of Lego&amp;copy;
 bricks. Or simply delete them … which we did &lt;em&gt;a lot&lt;/em&gt;.&lt;/p&gt;
 
 &lt;p&gt;At last, we launched in the evening of July 14th, everyone still high on emotion
-after Germany’s winning the Worldcup the night before. Naturally and following an old ritual, the occasion was celebrated with a round of home made White Russians:&lt;/p&gt;
+after Germany&amp;#39;s winning the Worldcup the night before. Naturally and following an old ritual, the occasion was celebrated with a round of home made White Russians:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/images/relaunch-2014-white-russian.jpg&quot; alt=&quot;git push production&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/relaunch-2014-white-russian.jpg&quot; alt=&quot;git push production&quot;&gt;&lt;/p&gt;
 
 &lt;p&gt;Everything went smoothly and so our faint anxiety and residual doubts that going on a team event with &lt;em&gt;the entire development team&lt;/em&gt; only three days after a &lt;strong&gt;major&lt;/strong&gt; relaunch might not be the brightest idea quickly vanished in a puff of smoke.&lt;/p&gt;
 
 &lt;p&gt;We had a great time spending a whole day on the river Spree on the outskirts of Berlin and in hindsight, this was a true conclusion of a goal that has driven us for the first half of the year but only marks another start: improving our codebase will of course continue. Fighting technical debt is a perpetual thing. Panta rei – everything flows. Like we did on the river. OMG a pun!&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/images/team-paddeln-2014-boat1.jpg&quot; alt=&quot;Markus, Daniel and Franzi&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/team-paddeln-2014-boat1.jpg&quot; alt=&quot;Markus, Daniel and Franzi&quot;&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/images/team-paddeln-2014-boat0.jpg&quot; alt=&quot;Robin, Alex, Nina and Carsten&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/team-paddeln-2014-boat0.jpg&quot; alt=&quot;Robin, Alex, Nina and Carsten&quot;&gt;&lt;/p&gt;
 </description>
 				<pubDate>Wed, 06 Aug 2014 13:23:00 +0200</pubDate>
 				<link>http://devnull.absolventa.de/2014/08/06/ruby-on-waves/</link>
@@ -377,19 +654,19 @@ after Germany’s winning the Worldcup the night before. Naturally and following
 			<item>
 				<title>Bulk-Truncate Your Rails Apps' test.logs</title>
 				<description>&lt;p&gt;Every test run for your Rails application generates a ton of log output in &lt;code&gt;log/test.log&lt;/code&gt; and it can
-grow quite big over time. If you’re only sporting an SSD, diskspace is precious and you may want
-to truncate your test.log again. Here’s how you do it for all your locally checked-out Rails apps:&lt;/p&gt;
+grow quite big over time. If you&amp;#39;re only sporting an SSD, diskspace is precious and you may want
+to truncate your test.log again. Here&amp;#39;s how you do it for all your locally checked-out Rails apps:&lt;/p&gt;
 
 &lt;p&gt;Assuming you have your Rails apps in a directory called, say, &lt;code&gt;rails-projects&lt;/code&gt;, cd into that directory.
 &lt;code&gt;du -hc */**/test.log&lt;/code&gt; shows you how much diskspace your test logfiles are eating.&lt;/p&gt;
 
-&lt;p&gt;You can truncate them with &lt;code&gt;find . -name test.log -exec cp -v /dev/null {} \;&lt;/code&gt;. If you’re on a Linux system,
+&lt;p&gt;You can truncate them with &lt;code&gt;find . -name test.log -exec cp -v /dev/null {} \;&lt;/code&gt;. If you&amp;#39;re on a Linux system,
 using &lt;code&gt;truncate&lt;/code&gt; should also work, but copying &lt;code&gt;/dev/null&lt;/code&gt; works everywhere.&lt;/p&gt;
 
 &lt;p&gt;There is also &lt;code&gt;rake log:clear&lt;/code&gt; which has the nice »side-effect« of clearing &lt;em&gt;all&lt;/em&gt; your *.log files,
 but takes longer to invoke as it will load your Rails environment first.&lt;/p&gt;
 
-&lt;p&gt;Your development.log-files probably won’t grow as fast, but you can of course put them on a diet
+&lt;p&gt;Your development.log-files probably won&amp;#39;t grow as fast, but you can of course put them on a diet
 in the same fashion.&lt;/p&gt;
 </description>
 				<pubDate>Thu, 22 May 2014 14:42:00 +0200</pubDate>
@@ -399,18 +676,18 @@ in the same fashion.&lt;/p&gt;
 		
 			<item>
 				<title>Vim Berlin Usergroup @ ABSOLVENTA</title>
-				<description>&lt;p&gt;Robin, Markus and I are all avid &lt;a href=&quot;http://vim.org&quot;&gt;Vim&lt;/a&gt; users. We invited Berlin’s user group over
-to hold their first meeting in 2014 in our kitchen slash leisure zone. It wasn’t overly crowded,
-but as pointed out by &lt;a href=&quot;//tasche.me&quot;&gt;Bodo&lt;/a&gt;, canceling it wasn’t an option: the Emacs user group
+				<description>&lt;p&gt;Robin, Markus and I are all avid &lt;a href=&quot;http://vim.org&quot;&gt;Vim&lt;/a&gt; users. We invited Berlin&amp;#39;s user group over
+to hold their first meeting in 2014 in our kitchen slash leisure zone. It wasn&amp;#39;t overly crowded,
+but as pointed out by &lt;a href=&quot;//tasche.me&quot;&gt;Bodo&lt;/a&gt;, canceling it wasn&amp;#39;t an option: the Emacs user group
 Berlin had a meeting on the same day and we would have been laughed at.&lt;/p&gt;
 
 &lt;p&gt;Although there were no prepared talks, we had a good time: We talked about the progress being made
 on &lt;a href=&quot;//neovim.org&quot;&gt;Neovim&lt;/a&gt;, discussed a highly customised and plugin-rich &lt;code&gt;.vimrc&lt;/code&gt; vs. vanilla Vim
-and had a look at Christian’s vim config.&lt;/p&gt;
+and had a look at Christian&amp;#39;s vim config.&lt;/p&gt;
 
 &lt;p&gt;A nice and cosy evening that, yet again, got everyone a few more plugins to try out.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/images/vimberlin-2013-2.jpg&quot; alt=&quot;Vim Usergroup @ ABSOLVENTA&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/vimberlin-2013-2.jpg&quot; alt=&quot;Vim Usergroup @ ABSOLVENTA&quot;&gt;&lt;/p&gt;
 </description>
 				<pubDate>Fri, 04 Apr 2014 17:56:00 +0200</pubDate>
 				<link>http://devnull.absolventa.de/2014/04/04/vim-berlin-usergroup-absolventa/</link>
@@ -421,13 +698,13 @@ and had a look at Christian’s vim config.&lt;/p&gt;
 				<title>JSDoc and the Revealing Module Pattern</title>
 				<description>&lt;p&gt;Before the grand &lt;a href=&quot;http://en.wikipedia.org/wiki/Beta_version#Beta&quot;&gt;v1.0.0&lt;/a&gt; of an internal asset pipeline gem  with lots of extracted javascript from our various Rails apps, I wanted to see what our API documentation looked like in colourful HTML.&lt;/p&gt;
 
-&lt;p&gt;Much to my surprise, &lt;a href=&quot;http://usejsdoc.org/&quot;&gt;JSDoc&lt;/a&gt; didn’t show a thing when I
+&lt;p&gt;Much to my surprise, &lt;a href=&quot;http://usejsdoc.org/&quot;&gt;JSDoc&lt;/a&gt; didn&amp;#39;t show a thing when I
 ran it over our .js files: We use the &lt;a href=&quot;http://www.klauskomenda.com/code/javascript-%20programming-patterns/#revealing&quot;&gt;Revealing Module
 Pattern&lt;/a&gt;
 with self-executing code to define our Javascript and JSDoc had some trouble
 parsing it.&lt;/p&gt;
 
-&lt;p&gt;Documentation on how to fix this was scarce - everyone seemed to have a slightly different use case – so here’s what we came up with after some trial and error runs with various JSDoc keywords.&lt;/p&gt;
+&lt;p&gt;Documentation on how to fix this was scarce - everyone seemed to have a slightly different use case – so here&amp;#39;s what we came up with after some trial and error runs with various JSDoc keywords.&lt;/p&gt;
 
 &lt;p&gt;Our Javascript looks like this:&lt;/p&gt;
 
@@ -455,7 +732,7 @@ parsing it.&lt;/p&gt;
     &lt;span class=&quot;p&quot;&gt;}());&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}());&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;JSDoc wouldn’t recognize &lt;code&gt;Urlify&lt;/code&gt; as part of the &lt;code&gt;Absolventa&lt;/code&gt; namespace, nor would it find
+&lt;p&gt;JSDoc wouldn&amp;#39;t recognize &lt;code&gt;Urlify&lt;/code&gt; as part of the &lt;code&gt;Absolventa&lt;/code&gt; namespace, nor would it find
 the &lt;code&gt;Absolventa.Urlify.init()&lt;/code&gt; static method.&lt;/p&gt;
 
 &lt;p&gt;Behold the necessary JSDoc tags to tie it all together:&lt;/p&gt;
@@ -496,71 +773,12 @@ the &lt;code&gt;Absolventa.Urlify.init()&lt;/code&gt; static method.&lt;/p&gt;
 
 &lt;p&gt;Et voilá! All inner functions must be declared with a &lt;code&gt;@memberof!&lt;/code&gt; and a
 &lt;code&gt;@function &amp;lt;name&amp;gt;&lt;/code&gt; tag. Note that it defines namespaces where we would refer to
-it as modules, but it’s just for the sake of documentation … and it’s a
+it as modules, but it&amp;#39;s just for the sake of documentation … and it&amp;#39;s a
 namespace after all.&lt;/p&gt;
 </description>
 				<pubDate>Tue, 25 Mar 2014 16:35:00 +0100</pubDate>
 				<link>http://devnull.absolventa.de/2014/03/25/jsdoc-and-the-revealing-module-pattern/</link>
 				<guid isPermaLink="true">http://devnull.absolventa.de/2014/03/25/jsdoc-and-the-revealing-module-pattern/</guid>
-			</item>
-		
-			<item>
-				<title>Converting large XML documents to Ruby Hashes</title>
-				<description>&lt;p&gt;A lot of web services out there are dealing with XML documents. To connect a SOAP-based web
-service to one of our Rails Applications, we need to translate XML documents to Ruby Hashes.&lt;/p&gt;
-
-&lt;p&gt;First of all - we already had a solution implemented. For that we parsed the XML with
-&lt;code&gt;Nokogiri&lt;/code&gt; and used a custom method to iterate over the node-structure
-Nokogiri detected. The method we used is a slightly modified version of these discussed
-&lt;a href=&quot;http://stackoverflow.com/questions/1230741/convert-a-nokogiri-document-to-a-ruby-hash&quot;&gt;in this stackoverflow article&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Encouraged to improve our code quality I dropped our custom XML-Hash-converting method
-in favor of a method provided by &lt;code&gt;ActiveSupport&lt;/code&gt; that looks temptingly elegant at the
-first glance:&lt;/p&gt;
-
-&lt;p&gt;Once you picked up some xml in a string, say &lt;code&gt;content&lt;/code&gt;, just call &lt;code&gt;Hash.from_xml content&lt;/code&gt;
-to get a proper Hash for further processing. And of course you’re free to call it on
-&lt;code&gt;HashWithIndifferentAccess&lt;/code&gt; if you need to.&lt;/p&gt;
-
-&lt;p&gt;Unfortunately this strategy is not stable enough to handle large amounts of xml data.
-Given plenty of xml stuff saved in &lt;code&gt;large.xml&lt;/code&gt;, we can watch this method fail with
-a &lt;code&gt;RuntimeError&lt;/code&gt;:&lt;/p&gt;
-
-&lt;script src=&quot;https://gist.github.com/9550517.js&quot;&gt; &lt;/script&gt;
-
-&lt;p&gt;As far I can trace it out, this a known problem with &lt;code&gt;REXML&lt;/code&gt;, that is used behind
-the scenes by this method. I tried to came over it by using the famous C-library &lt;code&gt;libxml2&lt;/code&gt;,
-that originally was developed for the GNOME project. Happily I noticed that
-there’s a wrapping gem for it called &lt;code&gt;libxml-ruby&lt;/code&gt;, to which we at ABSOLVENTA &lt;a href=&quot;https://github.com/xml4r/libxml-ruby/commit/0e96dacd14f6e430750ed58bc26a668bd5415e1f&quot;&gt;already contributed to&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;All I need was a tiny algorithm for applying &lt;code&gt;libxml&lt;/code&gt;’s methods. Having hacked a few
-experimental lines into my editor, I noticed that there already &lt;em&gt;is&lt;/em&gt; a Ruby gem for this job.
-And it works for me using it in single Ruby script like this:&lt;/p&gt;
-
-&lt;script src=&quot;https://gist.github.com/9550623.js&quot;&gt; &lt;/script&gt;
-
-&lt;p&gt;In particular it worked with my evil dark-matter-xml docs!&lt;/p&gt;
-
-&lt;p&gt;A programmer’s world would be so easy without all the &lt;em&gt;if’s&lt;/em&gt; in this world.
-Here it means: The solution above works &lt;em&gt;if I use it seperated from any other gems&lt;/em&gt;.
-I can’t get it to work in a living Rails environment together with e.g. Nokogiri.
-For some reason, Nokogiri ships (at least internally) with its own version of &lt;strong&gt;libxml2&lt;/strong&gt;.
-In my case this led to errors when trying to load Nokogiri and libxml-ruby together.
-I strongly believe that this can be resolved, but I haven’t found the right way to
-puzzle them together yet… (Feel free to drop me a note if you know how it’s possible!)&lt;/p&gt;
-
-&lt;h3 id=&quot;finally&quot;&gt;Finally…&lt;/h3&gt;
-
-&lt;p&gt;The intention for all research above was getting replacing the complex
-&lt;code&gt;xml_node_to_hash&lt;/code&gt;-method in favor of a better tested solution maybe
-encapsulated in a gem or module.&lt;/p&gt;
-
-&lt;p&gt;No need to mention that it survived all my tackles to get rid of it.
-And finally we’re friends.&lt;/p&gt;
-</description>
-				<pubDate>Tue, 18 Mar 2014 10:00:00 +0100</pubDate>
-				<link>http://devnull.absolventa.de/2014/03/18/converting-large-xml-documents-to-ruby-hashes/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2014/03/18/converting-large-xml-documents-to-ruby-hashes/</guid>
 			</item>
 		
 	</channel>
