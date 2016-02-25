@@ -4,11 +4,13 @@ description: The blog of the ABSOLVENTA Dev Team
 
 permalink: /:year/:month/:day/:title/
 paginate: 10
-highlighter: pygments
+highlighter: rouge
 markdown: kramdown
 
 gems:
   - jekyll-sitemap
+  - jekyll-paginate
+  - jekyll-gist
 
 exclude: ['README.md', 'Gemfile.lock', 'Gemfile', 'Rakefile', 'CNAME']
 
