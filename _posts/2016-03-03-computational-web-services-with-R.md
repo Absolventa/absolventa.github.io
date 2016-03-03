@@ -69,14 +69,13 @@ possible!
 
 If you're running Ubuntu you can install it from the universe sources via
 
-{% highlight bash %}
+```bash
 $ sudo apt-get install r-base r-recommended 
-{% endhighlight %}
-
+```
 Afterwards there will be a binary named `R` ready for you at th command line. 
 Called without arguments it will open a R console for you. You can exit it by invoking the quit function `q()`
 
-{% highlight bash %}
+```bash
 $ R
 > s <- "Hello"
 > s
@@ -84,7 +83,7 @@ $ R
 > q()
 Save workspace image? [y/n/c]: n
 $
-{% endhighlight %}
+```
 
 ### (2/5) Installation of `rApache`
 
@@ -92,11 +91,11 @@ My example setup uses an Apache2 web server. In addition to the Apache web serve
 we need an extension called [rApache](rapache.net). The installation for Ubuntu works
 this way:
 
-{% highlight bash %}
+```bash
 $ sudo add-apt-repository ppa:opencpu/rapache
 $ sudo apt-get update
 $ sudo apt-get install libapache2-mod-r-base
-{% endhighlight %}
+```
 
 ### (3/5) Installation of `Rook` library
 
@@ -104,15 +103,15 @@ $ sudo apt-get install libapache2-mod-r-base
 basically is a network of ftp and web servers delivering R libraries to your machine. To
 install the library 'Rook' from the `CRAN` package sources, open a `R` console and type
 
-{% highlight R %}
+```R
 > install.packages('Rook')
-{% endhighlight %}
+```
 
 Afterwards you can load the package when needed via
 
-{% highlight R %}
+```R
 > library('Rook')
-{% endhighlight %}
+```
 
 You can find detailed information of `Rook` [here in the documentation file](https://cran.r-project.org/web/packages/Rook/Rook.pdf). 
 
@@ -139,15 +138,15 @@ Let's concentrate on Reference Classes, or short refclasses, which are introduce
 is complexity under the hood, let's simply think of it of a way of defining class-like structures in R. We can define
 a new refclass by
 
-{% highlight R %}
+```R
 Monkey <- setRefClass("Monkey")
-{% endhighlight %}
+```
 
 Afterwards one can create instances ("objects") of a refclass by 
 
-{% highlight R %}
+```R
 leila <- Monkey$new() 
-{% endhighlight %}
+```
 
 `leila` is now a 'Reference class object of class "Monkey"'. 
 
@@ -156,7 +155,7 @@ We have to implement our application logic as a function that returns the desire
 Then we need to "attach" this function to a refclass. After this 
 we can construct "instances" of our application that can be used somewhere else. 
 
-{% highlight R %}
+```R
 hello_world <- function(env){
   body <- '<h1>Hello World!</h1>'
   
@@ -175,19 +174,18 @@ application_factory <- setRefClass(
     call = hello_world
   )
 )
-{% endhighlight %}
+```
 
 Having this above we cann create an instance of the refclass `HelloWord` and invoke the function `call`:
 
-{% highlight R %}
-
+```R
 # generate a fresh application
 app <- application_factory() 
 
 # Now invoke the application with an empty environment
 env <- list() # … just an empty Array
 app$call(env) # will return a list with status, header and body
-{% endhighlight %}
+```
 
 If the whole refclass thing confuses you here's the good message: 
 You don't need to state this as explicit as done above. It's enough
@@ -197,7 +195,7 @@ status, header and body you can bind our application to a server by calling
 `Rook::Server$call(hello_rook)`. The rest is maintained by Rook internally
 then¹. Here's a running example:
 
-{% highlight R %}
+```R
 library('Rook')
 
 hello_rook <- function(env){
@@ -222,7 +220,7 @@ hello_rook <- function(env){
 }
 
 Rook::Server$call(hello_rook)
-{% endhighlight %}
+```
 
 ### (5/5) Point your Apache server to your R app
 
@@ -232,14 +230,14 @@ tell your Apache where to look for the script. Head for
 your Apache config file (mine is located in `/etc/apache2/`). 
 Add the following snippet to use `rApache` to run your Rook script:
 
-{% highlight bash %}
+```
 LoadModule R_module           /apache/module/path/mod_R.so
 
 <Location /hello_rook>
     SetHandler r-handler
     RFileHandler /home/robin/hello_rook/hello_rook.R
 </Location>
-{% endhighlight %}
+```
 
 If you visit `http://YOUR_HOST_APACHE_WAS_BOUND_TO/hello_rook`
 you can inspect your sample JSON output!
