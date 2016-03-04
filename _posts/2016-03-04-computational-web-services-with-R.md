@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Computational web services with R programming language"
-date: 2016-03-03 22:00
+date: 2016-03-04 05:30
 author: rbn
 teaser: "The R programming language is a swiss knife for mathematical problems. We examine a way of using these capabilities in a web development environment, concentrating on the setup of a simple web application completely written in R using the library Rook."
 comments: true
