@@ -7,6 +7,98 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Including a Module. With Parameters!</title>
+				<description>&lt;p&gt;The Ruby &lt;code class=&quot;highlighter-rouge&quot;&gt;include&lt;/code&gt; statement only allows for one type of argument: the module
+constant(s) to include. Oftentimes I wish it would be possible to pass
+arguments that the included module receives as optional parameters to its
+&lt;code class=&quot;highlighter-rouge&quot;&gt;included&lt;/code&gt; callback like so:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# Note: This would be nice … but this code doesn&#39;t compile&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;MyMixin&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;included&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;base&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;here_be_more_args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# Have access to the additional args passed&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# in the include statement below&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MyClass&lt;/span&gt;
+  &lt;span class=&quot;kp&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyMixin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:param1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:param2&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# ...&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://ruby-doc.org/core-2.3.0/Module.html#method-i-included&quot;&gt;Module#included&lt;/a&gt;
+is the method that gets called when the module is included somewhere. Unlike in
+my would-be-nice example, it only receives one argument: the constant of the
+including class.&lt;/p&gt;
+
+&lt;p&gt;Additional arguments to &lt;code class=&quot;highlighter-rouge&quot;&gt;include&lt;/code&gt; are expected to be modules, allowing you to
+include more than one module on one line.&lt;/p&gt;
+
+&lt;p&gt;A way to parameterize the behaviour of included modules is to add a &lt;strong&gt;singleton&lt;/strong&gt;
+method in the included class and then have that class method accept parameters to
+do whatever (e.g. set class-wide variables or dynamically define methods).&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;MyMixin&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;included&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;base&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;base&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;define_singleton_method&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:define_greeter&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;method_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+      &lt;span class=&quot;c1&quot;&gt;# A dynamically defined method that dynamically defines another&lt;/span&gt;
+      &lt;span class=&quot;c1&quot;&gt;# method. What a crazy world!&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;define_method&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;method_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MyClass1&lt;/span&gt;
+  &lt;span class=&quot;kp&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyMixin&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;define_greeter&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:morning&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;Good morning, sir/madam&#39;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MyClass2&lt;/span&gt;
+  &lt;span class=&quot;kp&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyMixin&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;define_greeter&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:afternoon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;Good Afternoon! Would you like some tea?&#39;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;no&quot;&gt;MyClass1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;morning&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;# =&amp;gt; &#39;Good morning, sir/madam!&#39;&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;MyClass2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;afternoon&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# =&amp;gt; &#39;Good Afternoon! Would you like some tea?&#39;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;This is obviously a contrived example, but what I dislike about it is the two
+lines of meta programming that serve the same purpose: dynamically adding
+something to the including class. Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;define_greeter&lt;/code&gt; class method is
+probably not needed anywhere else in the class and this is against my sense of
+aesthetics.&lt;/p&gt;
+
+&lt;p&gt;Now, how about &lt;strong&gt;dynamically creating a module&lt;/strong&gt; and than including that one?
+Like … a module factory? How do we even start? It’s actually quite easy: the
+&lt;code class=&quot;highlighter-rouge&quot;&gt;include&lt;/code&gt; statement only accepts arguments of type &lt;code class=&quot;highlighter-rouge&quot;&gt;Module&lt;/code&gt;. So all we have to
+make sure that whatever we pass to &lt;code class=&quot;highlighter-rouge&quot;&gt;include&lt;/code&gt; returns a proper Ruby &lt;code class=&quot;highlighter-rouge&quot;&gt;Module&lt;/code&gt;.
+I give you this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ModuleFactory&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# Yes, it&#39;s a class&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;greeter_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;greeter_output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# overriding the constructor&lt;/span&gt;
+    &lt;span class=&quot;no&quot;&gt;Module&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;define_method&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;greeter_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;greeter_output&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# Important: We don&#39;t return an instance of ModuleFactory here. The&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# (implicit) return value is the anonymous module.&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MyClass&lt;/span&gt;
+  &lt;span class=&quot;kp&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ModuleFactory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:evening&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;Good evening!&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;no&quot;&gt;MyClass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;evening&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# =&amp;gt; &#39;Good evening!&#39;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Voila! &lt;code class=&quot;highlighter-rouge&quot;&gt;ModuleFactory.new(…)&lt;/code&gt; returns a module which can be included, thus
+combining the include statement with the dynamic meta-programming. The provided
+examples are all a bit abstract but I will provide a more concrete (Rails 5!)
+example in a follow-up post.&lt;/p&gt;
+</description>
+				<pubDate>Fri, 11 Mar 2016 16:34:00 +0100</pubDate>
+				<link>http://devnull.absolventa.de/2016/03/11/include-a-module-with-parameters/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2016/03/11/include-a-module-with-parameters/</guid>
+			</item>
+		
+			<item>
 				<title>Computational web services with R programming language</title>
 				<description>&lt;p&gt;If you encounter computational problems of certain complexity, the &lt;a href=&quot;https://www.r-project.org/&quot;&gt;R programming language&lt;/a&gt;
 is most probably a good tool of choice to satisfy your needs. The main tasks R was developed for
@@ -960,29 +1052,6 @@ after Germany’s winning the Worldcup the night before. Naturally and following
 				<pubDate>Wed, 06 Aug 2014 13:23:00 +0200</pubDate>
 				<link>http://devnull.absolventa.de/2014/08/06/ruby-on-waves/</link>
 				<guid isPermaLink="true">http://devnull.absolventa.de/2014/08/06/ruby-on-waves/</guid>
-			</item>
-		
-			<item>
-				<title>Bulk-Truncate Your Rails Apps' test.logs</title>
-				<description>&lt;p&gt;Every test run for your Rails application generates a ton of log output in &lt;code class=&quot;highlighter-rouge&quot;&gt;log/test.log&lt;/code&gt; and it can
-grow quite big over time. If you’re only sporting an SSD, diskspace is precious and you may want
-to truncate your test.log again. Here’s how you do it for all your locally checked-out Rails apps:&lt;/p&gt;
-
-&lt;p&gt;Assuming you have your Rails apps in a directory called, say, &lt;code class=&quot;highlighter-rouge&quot;&gt;rails-projects&lt;/code&gt;, cd into that directory.
-&lt;code class=&quot;highlighter-rouge&quot;&gt;du -hc */**/test.log&lt;/code&gt; shows you how much diskspace your test logfiles are eating.&lt;/p&gt;
-
-&lt;p&gt;You can truncate them with &lt;code class=&quot;highlighter-rouge&quot;&gt;find . -name test.log -exec cp -v /dev/null {} \;&lt;/code&gt;. If you’re on a Linux system,
-using &lt;code class=&quot;highlighter-rouge&quot;&gt;truncate&lt;/code&gt; should also work, but copying &lt;code class=&quot;highlighter-rouge&quot;&gt;/dev/null&lt;/code&gt; works everywhere.&lt;/p&gt;
-
-&lt;p&gt;There is also &lt;code class=&quot;highlighter-rouge&quot;&gt;rake log:clear&lt;/code&gt; which has the nice »side-effect« of clearing &lt;em&gt;all&lt;/em&gt; your *.log files,
-but takes longer to invoke as it will load your Rails environment first.&lt;/p&gt;
-
-&lt;p&gt;Your development.log-files probably won’t grow as fast, but you can of course put them on a diet
-in the same fashion.&lt;/p&gt;
-</description>
-				<pubDate>Thu, 22 May 2014 14:42:00 +0200</pubDate>
-				<link>http://devnull.absolventa.de/2014/05/22/mass-truncate-your-rails-test-log-files/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2014/05/22/mass-truncate-your-rails-test-log-files/</guid>
 			</item>
 		
 	</channel>
