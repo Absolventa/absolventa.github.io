@@ -4,7 +4,7 @@ title: "Including a Module. With Parameters!"
 teaser: "The Ruby include statement only allows for one type of argument: the module constant(s) to include. I've found myself in a situation where I wished I could make the include statement more dynamic, like passing extra arguments that influence the module to be included. This article describes how to use a module factory to achieve exactly that."
 date: 2016-03-11 16:34
 author: carp
-comments: false
+comments: true
 tags:
   - ruby
   - meta-programming
