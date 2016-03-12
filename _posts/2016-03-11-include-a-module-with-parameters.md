@@ -60,11 +60,11 @@ end
 
 class MyClass2
   include MyMixin
-  define_greeter :afternoon, 'Good Afternoon! Would you like some tea?'
+  define_greeter :afternoon, 'Good afternoon! Would you like some tea?'
 end
 
 MyClass1.new.morning   # => 'Good morning, sir/madam!'
-MyClass2.new.afternoon # => 'Good Afternoon! Would you like some tea?'
+MyClass2.new.afternoon # => 'Good afternoon! Would you like some tea?'
 {% endhighlight %}
 
 This is obviously a contrived example, but what I dislike about it is the two
@@ -73,7 +73,7 @@ something to the including class. Also, the `define_greeter` class method is
 probably not needed anywhere else in the class and this is against my sense of
 aesthetics.
 
-Now, how about **dynamically creating a module** and than including that one?
+Now, how about **dynamically creating a module** and then including that one?
 Like … a module factory? How do we even start? It's actually quite easy: the
 `include` statement only accepts arguments of type `Module`. So all we have to
 make sure that whatever we pass to `include` returns a proper Ruby `Module`.
