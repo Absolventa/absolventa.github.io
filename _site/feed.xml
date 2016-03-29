@@ -7,6 +7,46 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Adhoc Exports on Heroku's Console</title>
+				<description>&lt;p&gt;Ever had that &lt;em&gt;»can you give me a list of … real quick?«&lt;/em&gt; request coming in?
+Most of the time, delivering that list only involves firing a simple Arel query
+on the &lt;code class=&quot;highlighter-rouge&quot;&gt;rails console&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;Array#join&lt;/code&gt; the record’s relevant attributes with a
+mere &lt;code class=&quot;highlighter-rouge&quot;&gt;;&lt;/code&gt; and hand it over as a CSV file.&lt;/p&gt;
+
+&lt;p&gt;The annoying part is capturing the output: For a large resultset, it can very
+well exceed your terminal’s output buffer size. Even if it does fits,
+copy/pasting everything with your mouse is tedious at best.&lt;/p&gt;
+
+&lt;p&gt;Writing to a CSV file on Heroku’s Rails console requires uploading it
+somewhere, S3 in our case, meaning you’ll have to deal with authentication keys
+and APIs that I don’t know by heart. Also not my idea of quickly running a
+simple export.&lt;/p&gt;
+
+&lt;p&gt;Creating a rake task that handles everything is certainly the proper way to go,
+but it means doing a &lt;code class=&quot;highlighter-rouge&quot;&gt;git commit&lt;/code&gt;, waiting for the stuff to deploy and potentially
+&lt;code class=&quot;highlighter-rouge&quot;&gt;git revert&lt;/code&gt; the exporter again if it’s just throw-away code.&lt;/p&gt;
+
+&lt;p&gt;I want to stick with a simple Ruby one-liner and this is how I use the &lt;code class=&quot;highlighter-rouge&quot;&gt;rails
+runner&lt;/code&gt; command, invoked through the Heroku console, together with output
+redirection to create my CSV file freshly from production data:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;heroku run rails runner &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;s2&quot;&gt;&quot;puts MyModel.where(foo: &#39;bar&#39;).pluck(:id, :email).map { |data| data.join(&#39;;&#39;) }&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  -r production &amp;gt; my_adhoc_export.csv
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Now, a bit of an advise: running code on your production system is not a Good Idea™.
+If you have to run anything more complex than a simple query-command, wrap it into
+a rake task (or some such). The above example is meant for one-off tasks that output
+stuff to my local terminal. You have been warned :)&lt;/p&gt;
+</description>
+				<pubDate>Tue, 29 Mar 2016 11:54:00 +0200</pubDate>
+				<link>http://devnull.absolventa.de/2016/03/29/adhoc-data-dumps-and-exports-on-heroku/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2016/03/29/adhoc-data-dumps-and-exports-on-heroku/</guid>
+			</item>
+		
+			<item>
 				<title>Including a Module. With Parameters!</title>
 				<description>&lt;p&gt;The Ruby &lt;code class=&quot;highlighter-rouge&quot;&gt;include&lt;/code&gt; statement only allows for one type of argument: the module
 constant(s) to include. Oftentimes I wish it would be possible to pass
@@ -54,11 +94,11 @@ do whatever (e.g. set class-wide variables or dynamically define methods).&lt;/p
 
 &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MyClass2&lt;/span&gt;
   &lt;span class=&quot;kp&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyMixin&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;define_greeter&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:afternoon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;Good Afternoon! Would you like some tea?&#39;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;define_greeter&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:afternoon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;Good afternoon! Would you like some tea?&#39;&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
 
 &lt;span class=&quot;no&quot;&gt;MyClass1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;morning&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;# =&amp;gt; &#39;Good morning, sir/madam!&#39;&lt;/span&gt;
-&lt;span class=&quot;no&quot;&gt;MyClass2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;afternoon&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# =&amp;gt; &#39;Good Afternoon! Would you like some tea?&#39;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;span class=&quot;no&quot;&gt;MyClass2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;afternoon&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# =&amp;gt; &#39;Good afternoon! Would you like some tea?&#39;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;This is obviously a contrived example, but what I dislike about it is the two
 lines of meta programming that serve the same purpose: dynamically adding
@@ -66,7 +106,7 @@ something to the including class. Also, the &lt;code class=&quot;highlighter-rou
 probably not needed anywhere else in the class and this is against my sense of
 aesthetics.&lt;/p&gt;
 
-&lt;p&gt;Now, how about &lt;strong&gt;dynamically creating a module&lt;/strong&gt; and than including that one?
+&lt;p&gt;Now, how about &lt;strong&gt;dynamically creating a module&lt;/strong&gt; and then including that one?
 Like … a module factory? How do we even start? It’s actually quite easy: the
 &lt;code class=&quot;highlighter-rouge&quot;&gt;include&lt;/code&gt; statement only accepts arguments of type &lt;code class=&quot;highlighter-rouge&quot;&gt;Module&lt;/code&gt;. So all we have to
 make sure that whatever we pass to &lt;code class=&quot;highlighter-rouge&quot;&gt;include&lt;/code&gt; returns a proper Ruby &lt;code class=&quot;highlighter-rouge&quot;&gt;Module&lt;/code&gt;.
@@ -1006,52 +1046,6 @@ their existing sessions (login data, shopping cart … you name it).&lt;/p&gt;
 				<pubDate>Sat, 30 Aug 2014 12:58:00 +0200</pubDate>
 				<link>http://devnull.absolventa.de/2014/08/30/migrating-back-to-marshal-ed-cookie-serialization-in-rails-4-1/</link>
 				<guid isPermaLink="true">http://devnull.absolventa.de/2014/08/30/migrating-back-to-marshal-ed-cookie-serialization-in-rails-4-1/</guid>
-			</item>
-		
-			<item>
-				<title>Ruby on Waves: Πάντα ῥεῖ</title>
-				<description>&lt;blockquote&gt;
-Everything flows&lt;br /&gt;
-&lt;small&gt;&amp;mdash; Heraclitus&lt;/small&gt;
-&lt;/blockquote&gt;
-
-&lt;p /&gt;
-
-&lt;p&gt;We’ve been busying ourselves with the final touches on our
-&lt;a href=&quot;https://www.absolventa.de/karriereguide/tipps/das-neue-absolventa&quot; lang=&quot;de&quot; title=&quot;The New ABSOLVENTA (German)&quot;&gt;Grand ABSOLVENTA Relaunch&lt;/a&gt;
-recently. It’s been done in the record time of only seven months and we dare say: we’re quite proud of it.&lt;/p&gt;
-
-&lt;p&gt;While a full visual overhaul was certainly due, the initial spark for a
-relaunch came from a backend perspective: ABSOLVENTA’s Rails codebase
-dates back to 2007 and as with every bigger piece of software, it has its
-Dark Corners™. It has unquestionably accumulated a nice heap of &lt;a href=&quot;https://en.wikipedia.org/wiki/Technical_debt&quot;&gt;technical debt&lt;/a&gt; over the years.&lt;/p&gt;
-
-&lt;p&gt;After the initial planning phase, we kicked it off in December 2013 with a few
-but significant changes and additions to our tooling: we finally moved to
-Github completely (that alone felt awesome!) and added Travis CI +
-&lt;a href=&quot;https://codeclimate.com/&quot;&gt;Code Climate&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;The latter was a key element to achieve what we set out for: finding our weak
-spots. We wanted to dissect them one by one, streamline the processes involved
-and then piece them together again like you would with a set of Lego©
-bricks. Or simply delete them … which we did &lt;em&gt;a lot&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;At last, we launched in the evening of July 14th, everyone still high on emotion
-after Germany’s winning the Worldcup the night before. Naturally and following an old ritual, the occasion was celebrated with a round of home made White Russians:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/relaunch-2014-white-russian.jpg&quot; alt=&quot;git push production&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Everything went smoothly and so our faint anxiety and residual doubts that going on a team event with &lt;em&gt;the entire development team&lt;/em&gt; only three days after a &lt;strong&gt;major&lt;/strong&gt; relaunch might not be the brightest idea quickly vanished in a puff of smoke.&lt;/p&gt;
-
-&lt;p&gt;We had a great time spending a whole day on the river Spree on the outskirts of Berlin and in hindsight, this was a true conclusion of a goal that has driven us for the first half of the year but only marks another start: improving our codebase will of course continue. Fighting technical debt is a perpetual thing. Panta rei – everything flows. Like we did on the river. OMG a pun!&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/team-paddeln-2014-boat1.jpg&quot; alt=&quot;Markus, Daniel and Franzi&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/team-paddeln-2014-boat0.jpg&quot; alt=&quot;Robin, Alex, Nina and Carsten&quot; /&gt;&lt;/p&gt;
-</description>
-				<pubDate>Wed, 06 Aug 2014 13:23:00 +0200</pubDate>
-				<link>http://devnull.absolventa.de/2014/08/06/ruby-on-waves/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2014/08/06/ruby-on-waves/</guid>
 			</item>
 		
 	</channel>
