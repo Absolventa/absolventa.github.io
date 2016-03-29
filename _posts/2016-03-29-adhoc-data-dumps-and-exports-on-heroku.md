@@ -38,6 +38,14 @@ heroku run rails runner \
   -r production > my_adhoc_export.csv
 ```
 
+If you want to see what's going on while your export does its thing, use `tee(1)`:
+
+```shell
+heroku run rails runner \
+  "puts 'They are going to take me away haha!'"
+  -r production |tee funny_farm.txt
+```
+
 Now, a bit of an advise: running code on your production system is not a Good Idea™.
 If you have to run anything more complex than a simple query-command, wrap it into
 a rake task (or some such). The above example is meant for one-off tasks that output

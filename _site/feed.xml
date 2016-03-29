@@ -36,6 +36,14 @@ redirection to create my CSV file freshly from production data:&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
+&lt;p&gt;If you want to see what’s going on while your export does its thing, use &lt;code class=&quot;highlighter-rouge&quot;&gt;tee(1)&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;heroku run rails runner &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;s2&quot;&gt;&quot;puts &#39;They are going to take me away haha!&#39;&quot;&lt;/span&gt;
+  -r production |tee funny_farm.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
 &lt;p&gt;Now, a bit of an advise: running code on your production system is not a Good Idea™.
 If you have to run anything more complex than a simple query-command, wrap it into
 a rake task (or some such). The above example is meant for one-off tasks that output
