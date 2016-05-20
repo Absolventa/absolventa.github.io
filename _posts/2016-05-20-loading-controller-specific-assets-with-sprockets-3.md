@@ -2,7 +2,7 @@
 layout: post
 title: "Loading Controller-specific Assets with Sprockets v3.0"
 teaser: "An upgrade-cascade lead to an »undefined method `find_asset' for nil:NilClass« on our little system to load controller-specific javascript. This article describes how we bent asset_path to our will to make it work again."
-date: 2016-05-20 16:43
+date: 2016-05-20
 author: carp
 comments: true
 tags:
