@@ -15,7 +15,7 @@ became a Yak-shaving nightmare: Upgrading two other gems that broke with v4.2.6
 brought in Sprockets v3.x. And that broke our little logic to include
 **controller-specific javascript**.
 
-We have seperate JS files following a naming convention that should be included
+We have separate JS files following a naming convention that should be included
 in the layout when they are present. The path is constructed as follows:
 
 
@@ -27,7 +27,7 @@ module ApplicationHelper
 end
 ```
 
-In the pre-update version, we included the Javascript as like this:
+In the pre-update version, we included the Javascript like this:
 
 ```haml
 # somewhere in our layout file:
@@ -47,7 +47,7 @@ JS include statement:
 ```ruby
 module ApplicationHelper
   def controller_specific_js
-    asset_path("modules/#{controller}")
+    asset_path("modules/#{controller_name}")
   end
 end
 ```
@@ -68,7 +68,7 @@ Behold the final version:
 ```ruby
 module ApplicationHelper
   def controller_specific_js
-    "modules/#{controller}"
+    "modules/#{controller_name}"
   end
 end
 ```
