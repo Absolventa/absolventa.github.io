@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://devnull.absolventa.de/2016/07/15/call-by-what-an-adventure-story-about-evaluation-strategies/</loc>
+    <lastmod>2016-07-15T00:00:00+02:00</lastmod>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/2016/05/20/loading-controller-specific-assets-with-sprockets-3/</loc>
+    <lastmod>2016-05-20T00:00:00+02:00</lastmod>
+  </url>
+  <url>
     <loc>http://devnull.absolventa.de/2016/03/29/adhoc-data-dumps-and-exports-on-heroku/</loc>
     <lastmod>2016-03-29T11:54:00+02:00</lastmod>
   </url>
@@ -92,9 +100,6 @@
   </url>
   <url>
     <loc>http://devnull.absolventa.de/about/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/team/</loc>
   </url>
   <url>
     <loc>http://devnull.absolventa.de/tag/ruby/</loc>
@@ -284,5 +289,20 @@
   </url>
   <url>
     <loc>http://devnull.absolventa.de/tag/heroku/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/assets/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/Ruby/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/C++/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/Theory%20of%20programming%20langugaes/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/Evaluation%20strategies/</loc>
   </url>
 </urlset>
