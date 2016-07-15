@@ -10,7 +10,7 @@ comments: true
 tags:
   - Ruby
   - C++
-  - Theory of programming langugaes
+  - Programming language theory
   - Evaluation strategies
 ---
 
