@@ -7,6 +7,324 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Call by what? An adventure story about evaluation strategies</title>
+				<description>&lt;h3 id=&quot;evaluation-of-methods&quot;&gt;Evaluation of methods&lt;/h3&gt;
+
+&lt;p&gt;When I learned C++ at university some time ago, the concept of references and pointers
+fascinated and confused me simultaneously. But for some reason I liked tinkering with it.&lt;/p&gt;
+
+&lt;p&gt;I was remembered to that time when I was recently confronted with so-called &lt;em&gt;evaluation strategies&lt;/em&gt;
+in a completely different context. Talking about programming languages, an &lt;em&gt;evaluation strategy&lt;/em&gt; is a 
+description on what happens to the arguments that have been passed to a function when the function 
+is executed.&lt;/p&gt;
+
+&lt;p&gt;When it comes to evaluation strategies, C++ has a pretty clear and simple answer to a theorist’s questions: 
+The programmer can explictly control if a function/method should use the 
+strategy &lt;em&gt;call-by-value&lt;/em&gt; or &lt;em&gt;call-by-reference&lt;/em&gt; for method evaluation. 
+This is possible because in C++ there is an explicit seperation between
+values (content of memory blocks) and references/pointers to them.&lt;/p&gt;
+
+&lt;h4 id=&quot;what-does-call-by-value-and-call-by-reference-mean&quot;&gt;What does call-by-value and call-by-reference mean?&lt;/h4&gt;
+
+&lt;p&gt;&lt;em&gt;Call by value&lt;/em&gt; and &lt;em&gt;call-by-reference&lt;/em&gt; are probably the most popular evaluation strategies
+used in major programming languages today.&lt;/p&gt;
+
+&lt;p&gt;Losely spoken, &lt;em&gt;call-by-value&lt;/em&gt; means that the argument that has been passed into
+a function gets copied before it is used during execution. The original expression 
+is not modified or touched and the function body gets its own copy to play with.&lt;/p&gt;
+
+&lt;p&gt;Let’s assume we own a picture of monkey. And now we meet a pirate, that loves drawing. 
+The pirate wants to draw a banana onto our picture. If the pirate likes &lt;em&gt;call-by-value&lt;/em&gt;, 
+he’ll copy the picture first, draw a banana onto his copy and hands back the copy with the banana.&lt;/p&gt;
+
+&lt;p&gt;On the other hand, &lt;em&gt;call-by-reference&lt;/em&gt; means that the expression that is passed to
+the function is not copied. It is directly used in the function body. That means, 
+the pirate would directly draw his banana onto the monkey picture that we own. 
+Our original picture has been modified.&lt;/p&gt;
+
+&lt;h4 id=&quot;eh-can-you-convert-these-thoughts-to-some-concrete-code-please&quot;&gt;Eh, can you convert these thoughts to some concrete code, please?&lt;/h4&gt;
+
+&lt;p&gt;let’s assume we have written a C++ snippet as follows:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;string&amp;gt;
+&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Picture&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;drawBananaOntoACopyOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Picture&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;A monkey with a banana&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Picture&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;A monkey&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;drawBananaOntoACopyOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The function &lt;em&gt;drawBananaOntoACopyOf&lt;/em&gt; will take an instance
+of an data structure called &lt;code class=&quot;highlighter-rouge&quot;&gt;Picture&lt;/code&gt;. When we would have written it this
+way, the value &lt;em&gt;p&lt;/em&gt; will be &lt;em&gt;copied&lt;/em&gt; to the function’s
+body data available during execution, when &lt;em&gt;drawBananaOntoACopy&lt;/em&gt; is invoked. Running
+the program will cause the following output:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;A monkey
+A monkey&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If we would conversly write&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;string&amp;gt;
+&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Picture&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;drawBananaDirectlyOnto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Picture&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;A monkey with a banana&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Picture&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;A monkey&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;drawBananaDirectlyOnto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;then, when &lt;em&gt;drawBananaDirectlyOnto&lt;/em&gt; is invoked, &lt;em&gt;p&lt;/em&gt; will be a &lt;em&gt;reference&lt;/em&gt; to an existing picture structure
+somewhere in the memory. The &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;amp;&lt;/code&gt;-sign indicates this to the compiler, it’s a syntactic method
+of C++ to control the evaluation strategy (&lt;em&gt;call-by-reference&lt;/em&gt; in the latter case).&lt;/p&gt;
+
+&lt;p&gt;The output would be:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;A monkey
+A monkey with a banana&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;hm-ok-seems-pretty-clear-wheres-the-joke&quot;&gt;Hm. Ok. Seems pretty clear. Where’s the joke?&lt;/h3&gt;
+
+&lt;p&gt;The situation is a bit more interesting for other programming languages, like
+Ruby. Eager readers can short circuit this reading &lt;a href=&quot;http://stackoverflow.com/questions/1872110/is-ruby-pass-by-reference-or-by-value&quot;&gt;and head over to a very enlightening discussion
+on stackoverflow&lt;/a&gt;, 
+but I’d like to recap the discussion and the final result in my own words.&lt;/p&gt;
+
+&lt;p&gt;First, unlike C++, Ruby has no built-in seperation between values and references. Everything
+we save to variables in Ruby is a &lt;em&gt;reference&lt;/em&gt; to an object. We only have access to the things 
+in the memory via these references.&lt;/p&gt;
+
+&lt;p&gt;But what happens if we pass these variables (holding references) into Ruby methods? What kind
+of evaluation strategy does Ruby use? Let’s examine.&lt;/p&gt;
+
+&lt;h4 id=&quot;meanwhile-in-the-laboratory&quot;&gt;Meanwhile in the laboratory&lt;/h4&gt;
+
+&lt;p&gt;Consider the following Ruby code:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;dabble&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;human&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;When dabbling, I dabble with the object_id &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;human&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;object_id&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;human&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;human&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;reverse&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# I am an important line. Why?&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;human&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;Richard Feynman&#39;&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;The input human is &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;human&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;It has the object_id &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;human&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;object_id&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Let&#39;s dabble!&quot;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;dabble&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;human&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;After dabbling the scientist is named &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;human&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Running this snippet results in the following output:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;The input human is Richard Feynman
+It has the object_id 70159717619940
+Let&lt;span class=&quot;s1&quot;&gt;&#39;s dabble!
+When dabbling, I dabble with the object_id 70159717619940
+After dabbling the scientist is named Richard Feynman&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;At the first hand, this may intuitively feel like Ruby is using &lt;em&gt;call-by-reference&lt;/em&gt;, since
+the &lt;code class=&quot;highlighter-rouge&quot;&gt;object_id&lt;/code&gt; inside the function body is the same as before, so it looks like
+there has no “copying” being performed. What we put in, is obviously &lt;em&gt;a reference&lt;/em&gt; similar
+to the references in the C++-examples.&lt;/p&gt;
+
+&lt;h4 id=&quot;analysis&quot;&gt;Analysis&lt;/h4&gt;
+
+&lt;p&gt;But this only true at the surface. Let’s remember the fact mentioned above: Ruby has no
+&lt;em&gt;values&lt;/em&gt; in the sense of C++, Ruby &lt;em&gt;only&lt;/em&gt; has (object) references. 
+The only way of modifying a reference is &lt;em&gt;assignment&lt;/em&gt;. Assignments either change existing references or 
+create new ones. Keeping that in mind, concentrate on this line in the Ruby code example:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;human&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;human&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;reverse&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Let’s assume that Ruby would have used &lt;em&gt;call-by-reference&lt;/em&gt;. Then, according to our “definition” above, 
+the argument &lt;code class=&quot;highlighter-rouge&quot;&gt;human&lt;/code&gt;, which is a reference, that has been passed to the method &lt;code class=&quot;highlighter-rouge&quot;&gt;dabble&lt;/code&gt;,
+has not been copied. It has directly been passed to the method body.&lt;/p&gt;
+
+&lt;p&gt;If so, the assignment &lt;code class=&quot;highlighter-rouge&quot;&gt;human = human.reverse&lt;/code&gt; within the method body would have modified 
+the (original) reference that has been created before method invocation. The expression
+&lt;code class=&quot;highlighter-rouge&quot;&gt;human.reverse&lt;/code&gt; would have created a new string (the reversed) with a new &lt;code class=&quot;highlighter-rouge&quot;&gt;object_id&lt;/code&gt; and
+the existing reference &lt;code class=&quot;highlighter-rouge&quot;&gt;human&lt;/code&gt; would now point to the new object, the reversed string, because
+it has been assigned.&lt;/p&gt;
+
+&lt;p&gt;But, as proven by the output, this is not the case. The original reference points to the same 
+thing and has not been changed. If Ruby would use &lt;em&gt;call-by-reference&lt;/em&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;human&lt;/code&gt; would point to the
+reversed string in a new memory block afterwards - but it doesn’t.&lt;/p&gt;
+
+&lt;p&gt;In the &lt;a href=&quot;http://stackoverflow.com/questions/1872110/is-ruby-pass-by-reference-or-by-value&quot;&gt;stackoverflow discussion&lt;/a&gt;
+I already mentioned are great explanation pictures - I’d like to pick up some thoughts of the answers here:&lt;/p&gt;
+
+&lt;p&gt;Check the variable situation when the method body of &lt;code class=&quot;highlighter-rouge&quot;&gt;dabble&lt;/code&gt; starts:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;var_human_outside_the_method -------→  &lt;span class=&quot;s2&quot;&gt;&quot;Richard Feynman&quot;&lt;/span&gt;
+                                               ↑ 
+var_human_inside_the_method  -------------------&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;When running the first line of &lt;code class=&quot;highlighter-rouge&quot;&gt;dabble&lt;/code&gt;, there are &lt;em&gt;two&lt;/em&gt; references 
+to the string “Richard Feynman”. One original and the copy held by &lt;code class=&quot;highlighter-rouge&quot;&gt;dabble&lt;/code&gt;.
+I intentionally chose them both to have the same name, which may is confusing.&lt;/p&gt;
+
+&lt;p&gt;Then, the assignment &lt;code class=&quot;highlighter-rouge&quot;&gt;human = human.reverse&lt;/code&gt; inside the &lt;code class=&quot;highlighter-rouge&quot;&gt;dabble&lt;/code&gt; method changes 
+the situation as follows:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;var_human_outside_the_method -------→  &lt;span class=&quot;s2&quot;&gt;&quot;Richard Feynman&quot;&lt;/span&gt; 
+                                                 
+var_human_inside_the_method  ------------------→ &lt;span class=&quot;s2&quot;&gt;&quot;namnyeF drahciR&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h4 id=&quot;a-bigger-picture&quot;&gt;A bigger picture&lt;/h4&gt;
+
+&lt;p&gt;As we have seen, one could argue that Ruby uses &lt;em&gt;call-by-value&lt;/em&gt; when applying the “canoncial”
+terminology used in computer science strictly. Up to now we only discussed
+two specific evaluaton strategies. But I’d like to underline that the world of 
+evaluation strategies is &lt;em&gt;not&lt;/em&gt; binary - it’s a bit more colored than only black and white. 
+There are some other approaches beside  &lt;em&gt;call-by-value&lt;/em&gt; and &lt;em&gt;call-by-reference&lt;/em&gt; and even the 
+latter trategies can be differentiated a bit more.&lt;/p&gt;
+
+&lt;p&gt;The wikipedia article on &lt;a href=&quot;https://en.wikipedia.org/wiki/Evaluation_strategy#Call_by_sharing&quot;&gt;evaluation strategies&lt;/a&gt;
+calls the variant of Ruby is using &lt;em&gt;call-by-sharing&lt;/em&gt;, which is an interesting point of view, since it is more
+suitable for languages that do “wrap” all values, i.e. Ruby with its object references.&lt;/p&gt;
+
+&lt;p&gt;The description found in that article reads as follows:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;The semantics of call by sharing differ from call by reference in that assignments 
+to function arguments within the function aren’t visible to the caller, (unlike by reference semantics), so e.g. 
+if a variable was passed, it is not possible to simulate an assignment on that variable in the caller’s scope&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;… and that’s exactly what happened in our Ruby script. The assignment &lt;code class=&quot;highlighter-rouge&quot;&gt;human = human.reverse&lt;/code&gt; was not visible
+to the “global” scope outside the method &lt;code class=&quot;highlighter-rouge&quot;&gt;dabble&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;further-related-reading&quot;&gt;Further (related) reading&lt;/h3&gt;
+
+&lt;p&gt;I ran into this discussion with myself while reading some chapters of the book &lt;a href=&quot;http://www.cis.upenn.edu/~bcpierce/tapl/&quot;&gt;Types and Programming Languages&lt;/a&gt;
+by Benjamin C. Pierce. It contains a discussion of &lt;em&gt;evaluation/reduction strategies&lt;/em&gt; of the so-called &lt;a href=&quot;https://www.youtube.com/watch?v=FITJMJjASUs&amp;amp;ab_channel=Confreaks&quot;&gt;&lt;em&gt;λ-calculus&lt;/em&gt;&lt;/a&gt;, which serves as a theoretical
+model of computation and can be seen as a great-grandfather of all today’s functional programming languages.&lt;/p&gt;
+
+&lt;p&gt;Playing with these concepts encouraged me recapitulating how non-theoretical languages, 
+like C++ or Ruby, accomodate this and how the “practical” evaluation strategies performed by Ruby or C++ 
+relate to the original definitions given in the context of formal systems like the λ-calculus.&lt;/p&gt;
+
+&lt;p&gt;If you want to dig deeper, more details of &lt;em&gt;call-by-value&lt;/em&gt; as evaluation/reduction strategy for the λ-calculus can be found 
+&lt;a href=&quot;http://homepages.inf.ed.ac.uk/gdp/publications/cbn_cbv_lambda.pdf&quot;&gt;in a paper by Gordon Plotkin&lt;/a&gt; from 1975 as well as, more convenient for non-computer-science-researchers, 
+in Chapter 5 of &lt;a href=&quot;http://www.cis.upenn.edu/~bcpierce/tapl/&quot;&gt;TAPL&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;As mentioned, I found the discussion related to &lt;a href=&quot;http://stackoverflow.com/questions/1872110/is-ruby-pass-by-reference-or-by-value&quot;&gt;this question on stackoverflow&lt;/a&gt;
+very educational, so if I left you confused about the topic, there’s a good chance that you’ll find illumination there.&lt;/p&gt;
+</description>
+				<pubDate>Fri, 15 Jul 2016 00:00:00 +0200</pubDate>
+				<link>http://devnull.absolventa.de/2016/07/15/call-by-what-an-adventure-story-about-evaluation-strategies/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2016/07/15/call-by-what-an-adventure-story-about-evaluation-strategies/</guid>
+			</item>
+		
+			<item>
+				<title>Loading Controller-specific Assets with Sprockets v3.0</title>
+				<description>&lt;p&gt;Going from Rails v4.2.4 to v4.2.6 – a mere &lt;em&gt;patchlevel&lt;/em&gt; update, mind you –
+became a Yak-shaving nightmare: Upgrading two other gems that broke with v4.2.6
+brought in Sprockets v3.x. And that broke our little logic to include
+&lt;strong&gt;controller-specific javascript&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;We have separate JS files following a naming convention that should be included
+in the layout when they are present. The path is constructed as follows:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;ApplicationHelper&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;controller_specific_js&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&quot;modules/&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;controller_name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In the pre-update version, we included the Javascript like this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# somewhere in our layout file:
+&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;application&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;assets&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;find_asset&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;controller_specific_js&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javascript_include_tag&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;controller_specific_js&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;find_asset&lt;/code&gt; was gone post-update and none of the discussed solutions in issue
+&lt;a href=&quot;https://github.com/rails/sprockets-rails/issues/311&quot;&gt;rails/rails#311&lt;/a&gt; were
+working for us. &lt;code class=&quot;highlighter-rouge&quot;&gt;assets_manifest[filename]&lt;/code&gt; was always empty and we didn’t
+want to pass &lt;code class=&quot;highlighter-rouge&quot;&gt;asset_path(filename)&lt;/code&gt; without really knowing if the asset exists.&lt;/p&gt;
+
+&lt;p&gt;However, we noticed that &lt;em&gt;existing&lt;/em&gt; assets had the literal &lt;code class=&quot;highlighter-rouge&quot;&gt;&quot;/assets/&quot;&lt;/code&gt; in
+their path only when found. We used that to determine whether or not to out the
+JS include statement:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;ApplicationHelper&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;controller_specific_js&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;asset_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;modules/&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;controller_name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# somewhere in our layout file:
+&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;controller_specific_js&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=~&lt;/span&gt; &lt;span class=&quot;sr&quot;&gt;/\/assets\//&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javascript_include_tag&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;controller_specific_js&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Kinda ugly, yes, but seemed to get the job done. Only it didn’t. Apparently
+&lt;code class=&quot;highlighter-rouge&quot;&gt;asset_path&lt;/code&gt; has some additional behind-the-scenes magic that, to add insult to
+injury, behaves differently in development than on staging/production of
+course: It requires an explicit filename extension to locate the asset.&lt;/p&gt;
+
+&lt;p&gt;Behold the final version:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;ApplicationHelper&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;controller_specific_js&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&quot;modules/&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;controller_name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# somewhere in our layout file:
+&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;asset_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;controller_specific_js&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;.js&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=~&lt;/span&gt; &lt;span class=&quot;sr&quot;&gt;/\/assets\//&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javascript_include_tag&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;controller_specific_js&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;YMMV, of course, but we hope it helps.&lt;/p&gt;
+</description>
+				<pubDate>Fri, 20 May 2016 00:00:00 +0200</pubDate>
+				<link>http://devnull.absolventa.de/2016/05/20/loading-controller-specific-assets-with-sprockets-3/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2016/05/20/loading-controller-specific-assets-with-sprockets-3/</guid>
+			</item>
+		
+			<item>
 				<title>Adhoc Exports on Heroku's Console</title>
 				<description>&lt;p&gt;Ever had that &lt;em&gt;»can you give me a list of … real quick?«&lt;/em&gt; request coming in?
 Most of the time, delivering that list only involves firing a simple Arel query
@@ -941,119 +1259,6 @@ in the responsible controller then:&lt;/p&gt;
 				<pubDate>Tue, 25 Nov 2014 12:00:00 +0100</pubDate>
 				<link>http://devnull.absolventa.de/2014/11/25/handle-rexml-parse-exceptions-with-schneiderlein/</link>
 				<guid isPermaLink="true">http://devnull.absolventa.de/2014/11/25/handle-rexml-parse-exceptions-with-schneiderlein/</guid>
-			</item>
-		
-			<item>
-				<title>Insert Rack Middleware during Tests</title>
-				<description>&lt;p&gt;We recently deployed a wee internal Rails Engine that logs raw API data
-in order to save the original payload that was pushed over the wire. That
-little piece of software, however, had a bug (which is &lt;em&gt;pretty&lt;/em&gt; uncommon for
-software, right?): The logged payload was always empty.&lt;/p&gt;
-
-&lt;p&gt;The Engine’s host application uses Rails’ &lt;code class=&quot;highlighter-rouge&quot;&gt;ActionDispatch::XmlParamsParser&lt;/code&gt;
-middleware. It would seem that it messed up the contents of &lt;code class=&quot;highlighter-rouge&quot;&gt;rack.input&lt;/code&gt;
-which in turn holds the POST data.&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;rack.input&lt;/code&gt; is an IO-like object and it needs to be rewound after
-it has been read from. XmlParamsParser reads from it, but apparently doesn’t
-rewind it. It seams easy enough to fix, but how to testdrive it?&lt;/p&gt;
-
-&lt;p&gt;I didn’t want to statically include a rack.input-modifying middleware into the
-Engine’s dummy app. Instead I wanted add another context that tested against a
-version of the dummy infected with a mock middleware and have all other tests
-run without it.&lt;/p&gt;
-
-&lt;p&gt;Here’s how I did it. Enjoy!&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# spec/requests/rack_input_modifiable_spec.rb&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;Tracks data with rack.input modifying middleware in place&#39;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-
-  &lt;span class=&quot;c1&quot;&gt;# Need to bind this to a constant in order to hook it in later.&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;# It does nothing except putting the IO read marker to the end.&lt;/span&gt;
-  &lt;span class=&quot;no&quot;&gt;ReadsFromRackInput&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Struct&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:app&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;rack.input&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;read&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# moves to EOF&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-  &lt;span class=&quot;c1&quot;&gt;# Dummy::Application is already loaded at this stage. We can&#39;t modify&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;# the middleware stack as it&#39;s frozen, so subclass it and infect:&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;app_with_middleware&lt;/span&gt;
-    &lt;span class=&quot;vi&quot;&gt;@app_with_middleware&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Class&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;application&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;middleware&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;insert_after&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;
-        &lt;span class=&quot;no&quot;&gt;ActionDispatch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ParamsParser&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ReadsFromRackInput&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-  &lt;span class=&quot;c1&quot;&gt;# `app´ is what RSpec tests against in request specs. Think `controller´&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;# for controller specs. Overwrite it with our infected app.&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@app&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;app_with_middleware&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-  &lt;span class=&quot;c1&quot;&gt;# Tweaks to get the subclassed app to get all of its parent&#39;s behaviour.&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;before&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;no&quot;&gt;Dir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;chdir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;root&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;allow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;receive&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:routes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;and_return&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Dummy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Application&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;routes&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-  &lt;span class=&quot;n&quot;&gt;it_behaves_like&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;tracks raw data&#39;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# i.e. the actual tests&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-</description>
-				<pubDate>Fri, 24 Oct 2014 16:23:00 +0200</pubDate>
-				<link>http://devnull.absolventa.de/2014/10/24/dynamically-insert-rack-middleware-during-test/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2014/10/24/dynamically-insert-rack-middleware-during-test/</guid>
-			</item>
-		
-			<item>
-				<title>Back to Marshal'ed Cookie-Serialization</title>
-				<description>&lt;p&gt;Upgrading to Rails v4.1, it felt like a good idea to switch to the new default
-serialization format: JSON. Upgrading from the Marshal’ed serialization to JSON
-was as simple as setting Rails’ cookies serializer to &lt;code class=&quot;highlighter-rouge&quot;&gt;:hybrid&lt;/code&gt;. Easy enough and
-»better go with the new Rails default«, I thought.&lt;/p&gt;
-
-&lt;p&gt;We were warned about the implications.
-&lt;a href=&quot;http://edgeguides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-4-0-to-rails-4-1&quot;&gt;The Rails Upgrade Guide&lt;/a&gt;
-states:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;When using the :json or :hybrid serializer, you should beware that not all Ruby
-objects can be serialized as JSON. For example, Date and Time objects will be
-serialized as strings, and Hashes will have their keys stringified.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;Only we had to realize the hard way that an external library was dumping high
-level objects into the (cookie-based) session that couldn’t easily and
-transparently be deserialized again.&lt;/p&gt;
-
-&lt;p&gt;Unfortunately, there is no real rollback option: Setting the serializer back to
-&lt;code class=&quot;highlighter-rouge&quot;&gt;:marshal&lt;/code&gt; will get you parser errors when &lt;code class=&quot;highlighter-rouge&quot;&gt;Marshal.load&lt;/code&gt; is fed with JSON
-data.&lt;/p&gt;
-
-&lt;p&gt;Since our application started generating JSON-serialized session data after our
-change was rolled out, I came up with the following »rolling rollback« strategy:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# app/controllers/application_controller.rb&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;rescue_from&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;TypeError&#39;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;starts_with?&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;incompatible marshal file format&#39;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;store&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;application&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;session_store&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;application&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;session&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ActionDispatch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Request&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Session&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;store&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;reset_session&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;raise&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;A simple &lt;code class=&quot;highlighter-rouge&quot;&gt;reset_session&lt;/code&gt; won’t do as that already tries to access the (invalid)
-session object. The rescue hook will regenerate a new Marshal-serialized session
-for all those who have already received JSON data, but will of course terminate
-their existing sessions (login data, shopping cart … you name it).&lt;/p&gt;
-
-</description>
-				<pubDate>Sat, 30 Aug 2014 12:58:00 +0200</pubDate>
-				<link>http://devnull.absolventa.de/2014/08/30/migrating-back-to-marshal-ed-cookie-serialization-in-rails-4-1/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2014/08/30/migrating-back-to-marshal-ed-cookie-serialization-in-rails-4-1/</guid>
 			</item>
 		
 	</channel>
