@@ -20,7 +20,7 @@ explicitely grants permission to see his or her name and contact info.
 
 ABSOLVENTA provides companies with tailored recruiting-tools for the targeted
 audience of young academics and conjointly deploys efficient employer-branding
-concepts. Founded in 2008, ABSOLVENTA GmbH currently employs about 40 people in
+concepts. Founded in 2007, ABSOLVENTA GmbH currently employs about 50 people in
 the heart of Berlin.
 
 ## Technology
