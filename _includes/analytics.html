@@ -1,4 +1,4 @@
-{% if site.theme.gauges_key %}
+{% if site.theme_settings.gauges_key %}
 <script type="text/javascript">
   var _gauges = _gauges || [];
   (function() {
@@ -6,18 +6,18 @@
    t.type  = 'text/javascript';
    t.async = true;
    t.id    = 'gauges-tracker';
-   t.setAttribute('data-site-id', '{{ site.theme.gauges_key }}');
+   t.setAttribute('data-site-id', '{{ site.theme_settings.gauges_key }}');
    t.src = '//secure.gaug.es/track.js';
    var s = document.getElementsByTagName('script')[0];
    s.parentNode.insertBefore(t, s);
    })();
 </script>
 {% endif %}
-{% if site.theme.google_analytics_key %}
+{% if site.theme_settings.google_analytics_key %}
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '{{ site.theme.google_analytics_key }}']);
+  _gaq.push(['_setAccount', '{{ site.theme_settings.google_analytics_key }}']);
   _gaq.push(['_trackPageview']);
 
   (function() {
