@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Dream of BEMifornication - or how we refactored our scss with linting"
+title: "Dream of BEMifornication – or how we refactored our scss with linting"
 date: 2016-10-07
 author: axlwaii
 comments: true
@@ -8,10 +8,16 @@ tags:
   - CSS
   - SCSS
   - refactoring
+teaser: "
+Writing code – any kind of code – means you'll eventually have to deal with
+refactoring it. CSS/SCSS is no exception. In this article, the author jumps
+into the mud and illustrates how we refactored an old SCSS codebase using
+lint while automating tedious refactoring tasks.
+"
 ---
 
 
-Writing a lot of code over the years also means to deal with refactoring at some point. Your skills improve over time and technologies envolve. Coming back to an old project often makes it hard to understand what the heck younger you was thinking when writing and structuring this code. At least that’s the way I sometimes feel. 
+Writing a lot of code over the years also means to deal with refactoring at some point. Your skills improve over time and technologies envolve. Coming back to an old project often makes it hard to understand what the heck younger you was thinking when writing and structuring this code. At least that’s the way I sometimes feel.
 
 For example when I started learning SASS I felt in love with nesting everything. Back then I tought nesting elements would be the best way to avoid css conflicts … I figured out that might just be true up to a certain level of nesting. [BEM](http://getbem.com/) came around and we started sticking to its convention, leaving previously written css code mostly untouched. Things started to get messy in our frontend codebase.
 
@@ -42,7 +48,7 @@ linters:
   Indentation:
     severity: warning
     width: 2
-    
+
   SelectorFormat:
     convention: hyphenated_BEM
 {% endhighlight %}
@@ -57,14 +63,14 @@ To use linting within your editor you need to install a [plugin](https://github.
 
 ## Jumping into the mud
 
-I highly recommend automating most of the linting tasks since it can save a lot of time and we want to focus on bemifaction. 
+I highly recommend automating most of the linting tasks since it can save a lot of time and we want to focus on bemifaction.
 
 Introducing [CSScomb](http://csscomb.com/). This is a fantastic tool for automatic linting. It formats your code very efficient and is easy to customize. You can create your configuration by going their website and using the config generator or download some configs [here](https://github.com/csscomb/csscomb.js/tree/dev/config).
-We used `csscomb.json` and tweaked the sort-order to match [Concentric-CSS order](https://github.com/brandon-rhodes/Concentric-CSS). 
- 
+We used `csscomb.json` and tweaked the sort-order to match [Concentric-CSS order](https://github.com/brandon-rhodes/Concentric-CSS).
+
 <script src="https://gist.github.com/axlwaii/e73bed248df2d3af1e489c74d8bbe9be.js"></script>
 
-I installed [vim-csscomb](https://github.com/csscomb/vim-csscomb) to use csscomb within my editor but there are plugins for all major editors arround. 
+I installed [vim-csscomb](https://github.com/csscomb/vim-csscomb) to use csscomb within my editor but there are plugins for all major editors arround.
 
 Let's start digging!
 
