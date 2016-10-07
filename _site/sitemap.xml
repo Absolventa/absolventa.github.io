@@ -1,318 +1,318 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>http://devnull.absolventa.de/2016/10/07/dream-of-bemifornication/</loc>
-    <lastmod>2016-10-07T00:00:00+02:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2016/07/15/call-by-what-an-adventure-story-about-evaluation-strategies/</loc>
-    <lastmod>2016-07-15T00:00:00+02:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2016/05/20/loading-controller-specific-assets-with-sprockets-3/</loc>
-    <lastmod>2016-05-20T00:00:00+02:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2016/03/29/adhoc-data-dumps-and-exports-on-heroku/</loc>
-    <lastmod>2016-03-29T11:54:00+02:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2016/03/11/include-a-module-with-parameters/</loc>
-    <lastmod>2016-03-11T16:34:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2016/03/04/computational-web-services-with-R/</loc>
-    <lastmod>2016-03-04T05:30:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2016/02/25/we-want-to-work-with-you-during-rgsoc-2016/</loc>
-    <lastmod>2016-02-25T14:43:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2015/11/24/exploring-levenshtein-algorithm-with-ruby/</loc>
-    <lastmod>2015-11-24T09:00:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2015/11/12/lazy-logic-efficiently-reduce-an-array-to-a-boolean/</loc>
-    <lastmod>2015-11-12T15:04:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2015/05/20/use-nginx-to-enable-ssl-tls-for-your-rails-development/</loc>
-    <lastmod>2015-05-20T17:00:00+02:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2014/11/25/handle-rexml-parse-exceptions-with-schneiderlein/</loc>
-    <lastmod>2014-11-25T12:00:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2014/10/24/dynamically-insert-rack-middleware-during-test/</loc>
-    <lastmod>2014-10-24T16:23:00+02:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2014/08/30/migrating-back-to-marshal-ed-cookie-serialization-in-rails-4-1/</loc>
-    <lastmod>2014-08-30T12:58:00+02:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2014/08/06/ruby-on-waves/</loc>
-    <lastmod>2014-08-06T13:23:00+02:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2014/05/22/mass-truncate-your-rails-test-log-files/</loc>
-    <lastmod>2014-05-22T14:42:00+02:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2014/04/04/vim-berlin-usergroup-absolventa/</loc>
-    <lastmod>2014-04-04T17:56:00+02:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2014/03/25/jsdoc-and-the-revealing-module-pattern/</loc>
-    <lastmod>2014-03-25T16:35:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2014/03/18/converting-large-xml-documents-to-ruby-hashes/</loc>
-    <lastmod>2014-03-18T10:00:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2014/02/04/a-lightweight-firewall-blacklist-as-rack-middleware/</loc>
-    <lastmod>2014-02-04T17:03:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2014/01/15/stubbing-an-invalid-record-for-inherited_resources/</loc>
-    <lastmod>2014-01-15T17:58:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2013/12/18/binary-christmas-tree/</loc>
-    <lastmod>2013-12-18T14:00:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2013/11/11/aggregate-and-conquer/</loc>
-    <lastmod>2013-11-11T09:00:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2013/10/28/watching-a-certificate-revocation-list-using-event-girl/</loc>
-    <lastmod>2013-10-28T15:34:00+01:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/2013/10/10/rate-limiting-with-activerecord-base-find_each-in-edge-rails/</loc>
-    <lastmod>2013-10-10T17:04:00+02:00</lastmod>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/archives/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/about/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/ruby/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/enumerator/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/activerecord/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/enumerable/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/edgerails/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/event-girl/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/openssl/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/devops/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/wifi/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/postgresql/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/rails/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/statistics/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/fun/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/christmas/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/hipstergram/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/rspec/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/mocking/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/stubbing/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/inherited_resources/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/rack/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/middleware/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/blacklist/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/xml/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/nokogiri/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/libxml2/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/active_support/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/javascript/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/module/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/jsdoc/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/vim/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/social/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/logging/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/cmdline/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/relaunch/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/milestone/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/technical%20debt/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/refactoring/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/upgrade/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/rollback/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/session/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/marshal/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/json/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/test/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/API%20design/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/XML/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/ActionPack/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/TLS/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/SSL/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/webrick/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/development/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/homebrew/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/mac/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/lambda/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/reduce/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/levenshtein%20distance/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/algorithms/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/rgsoc/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/R/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/Rook/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/web%20services/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/JSON/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/meta-programming/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/heroku/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/assets/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/Ruby/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/C++/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/Programming%20language%20theory/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/Evaluation%20strategies/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/CSS/</loc>
-  </url>
-  <url>
-    <loc>http://devnull.absolventa.de/tag/SCSS/</loc>
-  </url>
+<url>
+<loc>http://devnull.absolventa.de/2016/10/07/dream-of-bemifornication/</loc>
+<lastmod>2016-10-07T00:00:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2016/07/15/call-by-what-an-adventure-story-about-evaluation-strategies/</loc>
+<lastmod>2016-07-15T00:00:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2016/05/20/loading-controller-specific-assets-with-sprockets-3/</loc>
+<lastmod>2016-05-20T00:00:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2016/03/29/adhoc-data-dumps-and-exports-on-heroku/</loc>
+<lastmod>2016-03-29T11:54:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2016/03/11/include-a-module-with-parameters/</loc>
+<lastmod>2016-03-11T16:34:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2016/03/04/computational-web-services-with-R/</loc>
+<lastmod>2016-03-04T05:30:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2016/02/25/we-want-to-work-with-you-during-rgsoc-2016/</loc>
+<lastmod>2016-02-25T14:43:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2015/11/24/exploring-levenshtein-algorithm-with-ruby/</loc>
+<lastmod>2015-11-24T09:00:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2015/11/12/lazy-logic-efficiently-reduce-an-array-to-a-boolean/</loc>
+<lastmod>2015-11-12T15:04:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2015/05/20/use-nginx-to-enable-ssl-tls-for-your-rails-development/</loc>
+<lastmod>2015-05-20T17:00:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2014/11/25/handle-rexml-parse-exceptions-with-schneiderlein/</loc>
+<lastmod>2014-11-25T12:00:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2014/10/24/dynamically-insert-rack-middleware-during-test/</loc>
+<lastmod>2014-10-24T16:23:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2014/08/30/migrating-back-to-marshal-ed-cookie-serialization-in-rails-4-1/</loc>
+<lastmod>2014-08-30T12:58:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2014/08/06/ruby-on-waves/</loc>
+<lastmod>2014-08-06T13:23:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2014/05/22/mass-truncate-your-rails-test-log-files/</loc>
+<lastmod>2014-05-22T14:42:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2014/04/04/vim-berlin-usergroup-absolventa/</loc>
+<lastmod>2014-04-04T17:56:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2014/03/25/jsdoc-and-the-revealing-module-pattern/</loc>
+<lastmod>2014-03-25T16:35:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2014/03/18/converting-large-xml-documents-to-ruby-hashes/</loc>
+<lastmod>2014-03-18T10:00:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2014/02/04/a-lightweight-firewall-blacklist-as-rack-middleware/</loc>
+<lastmod>2014-02-04T17:03:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2014/01/15/stubbing-an-invalid-record-for-inherited_resources/</loc>
+<lastmod>2014-01-15T17:58:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2013/12/18/binary-christmas-tree/</loc>
+<lastmod>2013-12-18T14:00:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2013/11/11/aggregate-and-conquer/</loc>
+<lastmod>2013-11-11T09:00:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2013/10/28/watching-a-certificate-revocation-list-using-event-girl/</loc>
+<lastmod>2013-10-28T15:34:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2013/10/10/rate-limiting-with-activerecord-base-find_each-in-edge-rails/</loc>
+<lastmod>2013-10-10T17:04:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/archives/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/about/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/ruby/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/enumerator/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/activerecord/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/enumerable/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/edgerails/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/event-girl/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/openssl/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/devops/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/wifi/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/postgresql/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/rails/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/statistics/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/fun/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/christmas/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/hipstergram/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/rspec/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/mocking/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/stubbing/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/inherited_resources/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/rack/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/middleware/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/blacklist/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/xml/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/nokogiri/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/libxml2/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/active_support/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/javascript/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/module/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/jsdoc/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/vim/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/social/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/logging/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/cmdline/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/relaunch/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/milestone/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/technical%2520debt/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/refactoring/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/upgrade/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/rollback/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/session/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/marshal/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/json/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/test/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/API%2520design/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/XML/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/ActionPack/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/TLS/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/SSL/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/webrick/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/development/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/homebrew/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/mac/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/lambda/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/reduce/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/levenshtein%2520distance/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/algorithms/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/rgsoc/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/R/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/Rook/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/web%2520services/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/JSON/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/meta-programming/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/heroku/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/assets/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/Ruby/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/C++/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/Programming%2520language%2520theory/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/Evaluation%2520strategies/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/CSS/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/SCSS/</loc>
+</url>
 </urlset>
