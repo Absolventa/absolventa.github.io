@@ -82,12 +82,12 @@ Alex came up with a simple structure for our scss files:
 {% highlight css %}
 // BLOCK
 .example {
-    color: '#fff';
+    color: #fff;
 }
 
 // MODIFIER
 .example--red {
-    color: '#ff0';
+    color: #ff0;
 }
 
 // ELEMENT
