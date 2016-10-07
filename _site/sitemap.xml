@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://devnull.absolventa.de/2016/10/07/dream-of-bemifornication/</loc>
+    <lastmod>2016-10-07T00:00:00+02:00</lastmod>
+  </url>
+  <url>
     <loc>http://devnull.absolventa.de/2016/07/15/call-by-what-an-adventure-story-about-evaluation-strategies/</loc>
     <lastmod>2016-07-15T00:00:00+02:00</lastmod>
   </url>
@@ -304,5 +308,11 @@
   </url>
   <url>
     <loc>http://devnull.absolventa.de/tag/Evaluation%20strategies/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/CSS/</loc>
+  </url>
+  <url>
+    <loc>http://devnull.absolventa.de/tag/SCSS/</loc>
   </url>
 </urlset>
