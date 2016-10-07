@@ -21,7 +21,7 @@ Writing a lot of code over the years also means to deal with refactoring at some
 
 For example when I started learning SASS, I felt in love with nesting everything. Back then I tought nesting elements would be the best way to avoid css conflicts … I figured out that might just be true up to a certain level of nesting. When [BEM](http://getbem.com/) came around, we started sticking to its convention, leaving previously written css code mostly untouched. Things started to get messy in our frontend codebase.
 
-Lately my fellow co-worker Alex began to refactor our oldest project and we started talking about scss-lint. I was already using jslint in my editor but never really thought about linting my scss as well. We sat together and before long, we agreed that it is about time to start using it.
+Lately my fellow co-worker Alex began to refactor our oldest project and we started talking about [scss-lint](https://github.com/brigade/scss-lint/). I was already using [jslint](http://jslint.com/) in my editor but never really thought about linting my scss as well. We sat together and before long, we agreed that it is about time to start using it.
 
 ## So what is scsslint?
 
