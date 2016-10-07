@@ -71,7 +71,7 @@ Introducing [CSScomb](http://csscomb.com/). This is a fantastic tool for automat
 or download some configs [here](https://github.com/csscomb/csscomb.js/tree/dev/config).
 We used `csscomb.json` and tweaked the sort-order to match [Concentric-CSS order](https://github.com/brandon-rhodes/Concentric-CSS).
 
-{% gist "e73bed248df2d3af1e489c74d8bbe9be" %}
+{% gist e73bed248df2d3af1e489c74d8bbe9be %}
 
 I installed [vim-csscomb](https://github.com/csscomb/vim-csscomb) to use csscomb within my editor but there are plugins for all major editors arround.
 
