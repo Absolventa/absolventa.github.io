@@ -21,10 +21,17 @@
   <meta property="og:title" content="{{ page.title }}" />
   <meta property="og:url" content="{{ site.url }}{{ page.url | replace:'index.html','' }}" />
 
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@absolventa" />
+  <meta name="twitter:title" content="{{ page.title }}" />
+  <meta name="twitter:description" content="{{ page.description }}" />
+
   {% if page.image %}
   <meta property="og:image" content="{{ page.image }}" />
+  <meta name="twitter:image" content="{{ page.image }}" />
   {% else %}
   <meta property="og:image" content="{{ site.url }}/images/og-absolventacat.png" />
+  <meta name="twitter:image" content="{{ site.url }}/images/og-absolventacat.png" />
   {% endif %}
 
   {% if page.tags %}<meta lang="en" name="keywords" xml:lang="en" content="{{ page.tags | join: ', ' }}" />{% endif %}
