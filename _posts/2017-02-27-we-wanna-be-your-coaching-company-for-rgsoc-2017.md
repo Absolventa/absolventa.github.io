@@ -29,6 +29,10 @@ Joda](https://twitter.com/teamjoda2016).
 We're a bit late to the party compared to [last year's announcement](/2016/02/25/we-want-to-work-with-you-during-rgsoc-2016/)
 but here it goes: We totally want to do this again!
 
+<div class="alert">We already have a team of students and are looking forward to host
+<a href="https://teams.railsgirlssummerofcode.org/teams/339">Team berlin diamonds</a>
+this summer. Fingers crossed!</div>
+
 If you are Berlin-based and would like to apply for this year's RGSoC, we want to be your
 [»coaching company«](https://railsgirlssummerofcode.org/guide/coaching-company).
 What we can offer:
