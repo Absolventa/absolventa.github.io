@@ -25,9 +25,9 @@ I may have cranked  `brew cleanup postgresql` a tad bit too early 😱 and so I 
 with my 9.3 installation files already gone and only v9.6.1 available. Sadly, the
 old binaries are needed to access the old data format.
 
-The earliest PostgreSQL version Homebrew had still in stock was 9.4. I checked
+The earliest PostgreSQL version Homebrew still had in stock was 9.4. I checked
 [postgresql.org][download_overview] to see whether
-there were still old source or binary distribution tarballs available. Indeed, it
+there were old source or binary distribution tarballs available. Indeed, it
 had a link pointing advanced users to a [list of zip files containing binaries][download_binaries].
 
 With all tools prepared ([and some cross-referencing][upgrade_gist]) I could repair
@@ -40,7 +40,7 @@ mv /usr/local/var/postgres /usr/local/var/postgres93
 # Since my computer previously crashed, I had a stale pid file
 rm /usr/local/var/postgres93/postmaster.pid
 
-# Create a new data dir for the most recent pqsql version
+# Create a new data dir for the most recent pgsql version
 initdb --pgdata=/usr/local/var/postgres
 
 # Migrate data files, pointing old-bindir to the location of
