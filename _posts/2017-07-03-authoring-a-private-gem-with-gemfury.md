@@ -54,7 +54,7 @@ We'll get back to it later.
 In order to easily push to Gemfury.com, there a few more additions.
 First we have to include the gemfury Gem to our `lolwat.gemspec` file:
 
-```ruby 
+```ruby
 spec.add_development_dependency "gemfury"
 ```
 
@@ -148,7 +148,7 @@ releasing the version is as simple as:
 rake release
 ```
 
-It will create a git version tag, push everything to your git remote, 
+It will create a git version tag, push everything to your git remote,
 package the gemfile and upload the Gem file to Gemfury.
 
 The last step is to head over to your GitHub project page, select **releases**
