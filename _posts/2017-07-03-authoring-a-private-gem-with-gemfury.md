@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Authoring a Private Gem with Gemfury"
-date: 2017-06-30 15:55
+date: 2017-07-03 13:55
 author: carp
 comments: false
 tags:
@@ -149,7 +149,7 @@ package the gemfile and upload the gem file to Gemfury.
 The last step is to head over to your GitHub project page, select **releases**
 and **Draft a new Release** in the upper right corner.
 
-![GitHub Releases Overview](/images/2017-07-01-github-release-overview.png)
+![GitHub Releases Overview](/images/2017-07-03-github-release-overview.png)
 
 The ensuing form is pretty self-explanatory (check the explanations on
 the right side). For the release name, I just repeat the tag name (e.g. `v0.2.0`).
