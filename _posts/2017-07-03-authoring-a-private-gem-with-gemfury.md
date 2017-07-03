@@ -8,17 +8,22 @@ tags:
   - ruby
   - rails
   - workflow
-teaser: "
+teaser: "RubyGems are a great way to share code, but not all code is for
+the general public. This article illustrates a (semi-automatic) way and
+some workflow self-discipline to streamline private Gem authoring using
+the Gem hosting solution »Gemfury«.
 "
 ---
 
-We make an effort of extracting shared code into gems. While
+We make an effort of extracting shared code into Gems. While
 <abbr title="Free and Open Source">FOSS</abbr> code
 goes to RubyGems.org of course, our business-internal logic needs a
 private Gem server. We use [Gemfury](https://gemfury.com/) as our host
 but you can also roll your own with [bundler/gemstash](https://github.com/bundler/gemstash)
 or [Gem in a Box](https://github.com/geminabox/geminabox).
 This article focuses on my workflow with Gemfury.
+
+<small>Note: we are not affiliated with nor are we sponsored by said provider.</small>
 
 ## Gem Skeleton
 
@@ -34,7 +39,7 @@ into my editor, I can see that it already includes a setting for `allowed_push_h
 This prevents me from accidentally pushing proprietary code to RubyGems.org.
 
 Unfortunately, Gemfury.com doesn't support a RubyGems compliant API to actually
-push my released gem so there's no need to bother with changing the example host
+push my released Gem so there's no need to bother with changing the example host
 to something real.
 
 Instead, we'll add the following line to the project's `Rakefile`:
@@ -47,7 +52,7 @@ We'll get back to it later.
 
 ## Gemfury Support
 In order to easily push to Gemfury.com, there a few more additions.
-First we have to include the gemfury gem to our `lolwat.gemspec` file:
+First we have to include the gemfury Gem to our `lolwat.gemspec` file:
 
 ```ruby 
 spec.add_development_dependency "gemfury"
@@ -144,7 +149,7 @@ rake release
 ```
 
 It will create a git version tag, push everything to your git remote, 
-package the gemfile and upload the gem file to Gemfury.
+package the gemfile and upload the Gem file to Gemfury.
 
 The last step is to head over to your GitHub project page, select **releases**
 and **Draft a new Release** in the upper right corner.
