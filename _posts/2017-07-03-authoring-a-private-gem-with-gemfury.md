@@ -3,7 +3,7 @@ layout: post
 title: "Authoring a Private Gem with Gemfury"
 date: 2017-07-03 13:55
 author: carp
-comments: false
+comments: true
 tags:
   - ruby
   - rails
