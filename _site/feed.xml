@@ -7,6 +7,596 @@
 		<atom:link href="http://devnull.absolventa.de/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Custom negated matchers for RSpec</title>
+				<description>&lt;p&gt;Keeping RSpec examples as atomic and lean as possible is a good rule of thumb.
+Nevertheless, sometimes it makes sense to combine multiple expectations into
+one test case - for example when the evaluation of the expression you want to test
+is “expensive” in some sense.&lt;/p&gt;
+
+&lt;p&gt;Let us study the Ruby class &lt;code class=&quot;highlighter-rouge&quot;&gt;Pirate&lt;/code&gt; and add some specs for it:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Pirate&lt;/span&gt;
+  &lt;span class=&quot;kp&quot;&gt;attr_accessor&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:mood&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;initialize&lt;/span&gt;
+    &lt;span class=&quot;vi&quot;&gt;@mood&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;insult&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;other_pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;other_pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;When a pirate instance is insulting another pirate,
+this is affecting the fighter’s moods:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# =&amp;gt; 10&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# =&amp;gt; 10&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;insult&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# =&amp;gt; 11&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# =&amp;gt; 9&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Let us turn this into proper test cases with RSpec. One way of expressing this is
+writing down two seperate test cases:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;no&quot;&gt;RSpec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;it&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;expect&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;insult&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;change&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;it&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;expect&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;insult&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;change&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;But now let’s assume we really want to combine this into a single example
+where the expression &lt;code class=&quot;highlighter-rouge&quot;&gt;guybrush.insult(le_chuck)&lt;/code&gt; is only evaluated once.
+One way to combine the expectations is wrapping one test into another,
+like the &lt;a href=&quot;http://mathworld.wolfram.com/Composition.html&quot;&gt;composition of functions in mathematics&lt;/a&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;no&quot;&gt;RSpec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;it&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;affects the fighting pirate&#39;s moods&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;expect&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;expect&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;insult&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;change&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;change&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Unfortunately the probability is high that this strategy results in messy and
+unreadable test code as soon as you combine 3 or more expectations.&lt;/p&gt;
+
+&lt;p&gt;Better (imho) is using the neat method &lt;code class=&quot;highlighter-rouge&quot;&gt;and&lt;/code&gt; that RSpec provides:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;no&quot;&gt;RSpec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;it&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;affects the fighting pirate&#39;s moods&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;expect&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;insult&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;change&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;change&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This is really elegant, but problems arise once you want to include
+tests for the fact that the corresponding expression &lt;code class=&quot;highlighter-rouge&quot;&gt;guybrush.insult(le_chuck)&lt;/code&gt;
+does &lt;em&gt;not&lt;/em&gt; affect some other object.&lt;/p&gt;
+
+&lt;p&gt;This is a priori not possible with the plain &lt;code class=&quot;highlighter-rouge&quot;&gt;and&lt;/code&gt;-method
+above. But again RSpec has a really nice built-in solution for
+this problem: Definition of custom negated matchers! It’s pretty simple:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# This could live in your spec_helper.rb or wherever you configure RSpec&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;RSpec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Matchers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;define_negated_matcher&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:not_change&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:change&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Afterwards you can happily use the operator &lt;code class=&quot;highlighter-rouge&quot;&gt;not_change&lt;/code&gt;, the negated operator
+to &lt;code class=&quot;highlighter-rouge&quot;&gt;change&lt;/code&gt; as we have defined above:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;no&quot;&gt;RSpec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:otis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:carla&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Pirate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;it&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;affects the fighting pirate&#39;s moods&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;expect&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;insult&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;change&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;le_chuck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;change&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guybrush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;not_change&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;otis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;not_change&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carla&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mood&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Give credit where credit is due: I found this solution within a &lt;a href=&quot;https://stackoverflow.com/a/36724913/2159942&quot;&gt;StackOverflow answer&lt;/a&gt;. Thanks to
+the author!&lt;/p&gt;
+</description>
+				<pubDate>Thu, 31 Aug 2017 10:00:00 +0200</pubDate>
+				<link>http://devnull.absolventa.de/2017/08/31/custom_negated_matchers_with_rspec/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2017/08/31/custom_negated_matchers_with_rspec/</guid>
+			</item>
+		
+			<item>
+				<title>Authoring a Private Gem with Gemfury</title>
+				<description>&lt;p&gt;We make an effort of extracting shared code into Gems. While
+&lt;abbr title=&quot;Free and Open Source&quot;&gt;FOSS&lt;/abbr&gt; code
+goes to RubyGems.org of course, our business-internal logic needs a
+private Gem server. We use &lt;a href=&quot;https://gemfury.com/&quot;&gt;Gemfury&lt;/a&gt; as our host
+but you can also roll your own with &lt;a href=&quot;https://github.com/bundler/gemstash&quot;&gt;bundler/gemstash&lt;/a&gt;
+or &lt;a href=&quot;https://github.com/geminabox/geminabox&quot;&gt;Gem in a Box&lt;/a&gt;.
+This article focuses on my workflow with Gemfury.&lt;/p&gt;
+
+&lt;p&gt;&lt;small&gt;Note: we are not affiliated with nor are we sponsored by said provider.&lt;/small&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;gem-skeleton&quot;&gt;Gem Skeleton&lt;/h2&gt;
+
+&lt;p&gt;In order to create all the boilerplate code and to make sure I am following the latest
+conventions, I use Bundler’s &lt;code class=&quot;highlighter-rouge&quot;&gt;gem&lt;/code&gt; command:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bundle gem lolwat --no-coc --no-mit
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;When I &lt;code class=&quot;highlighter-rouge&quot;&gt;cd&lt;/code&gt; into the created directory and load the generated &lt;code class=&quot;highlighter-rouge&quot;&gt;lolwat.gemspec&lt;/code&gt;
+into my editor, I can see that it already includes a setting for &lt;code class=&quot;highlighter-rouge&quot;&gt;allowed_push_host&lt;/code&gt;.
+This prevents me from accidentally pushing proprietary code to RubyGems.org.&lt;/p&gt;
+
+&lt;p&gt;Unfortunately, Gemfury.com doesn’t support a RubyGems compliant API to actually
+push my released Gem so there’s no need to bother with changing the example host
+to something real.&lt;/p&gt;
+
+&lt;p&gt;Instead, we’ll add the following line to the project’s &lt;code class=&quot;highlighter-rouge&quot;&gt;Rakefile&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;no&quot;&gt;ENV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;gem_push&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;no&#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;We’ll get back to it later.&lt;/p&gt;
+
+&lt;h2 id=&quot;gemfury-support&quot;&gt;Gemfury Support&lt;/h2&gt;
+&lt;p&gt;In order to easily push to Gemfury.com, there a few more additions.
+First we have to include the gemfury Gem to our &lt;code class=&quot;highlighter-rouge&quot;&gt;lolwat.gemspec&lt;/code&gt; file:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;add_development_dependency&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;gemfury&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The second file we need to edit is our &lt;code class=&quot;highlighter-rouge&quot;&gt;Rakefile&lt;/code&gt; again. Add the following code
+to the end of the file:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# Rakefile&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;desc&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Push lolwat-&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Lolwat&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.gem to Gemfury.com&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;task&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:gemfury&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;pkg/lolwat-&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Lolwat&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.gem&quot;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;File&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;exist?&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;package&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;system&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;fury push &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;package&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+    &lt;span class=&quot;no&quot;&gt;STDERR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;E: gem `&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;package&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&#39; not found.&quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Here’s a set of shell commands that will automate all this:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;GEMNAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;basename &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;))&lt;/span&gt;
+tail -r &amp;lt;&lt;span class=&quot;nv&quot;&gt;$GEMNAME&lt;/span&gt;.gemspec &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  |sed -E &lt;span class=&quot;s1&quot;&gt;&#39;1s/(.+)/\1\&#39;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$&#39;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;  spec.add_development_dependency &lt;span class=&quot;s2&quot;&gt;&quot;gemfury&quot;&lt;/span&gt;/&lt;span class=&quot;s1&quot;&gt;&#39; \
+  |tail -r &amp;gt;_new.gemspec \
+  &amp;amp;&amp;amp; mv _new.gemspec $GEMNAME.gemspec
+
+GEMVERSION=&quot;$(grep module lib/$GEMNAME/version.rb|sed &#39;&lt;/span&gt;s/module //&lt;span class=&quot;s1&quot;&gt;&#39;)::VERSION&quot;
+cat &amp;gt;&amp;gt;Rakefile &amp;lt;&amp;lt;EOF
+
+desc &quot;$GEMNAME-#{$GEMVERSION}.gem to Gemfury.com&quot;
+task :gemfury do
+  package = &quot;pkg/$GEMNAME-#{$GEMVERSION}.gem&quot;
+  if File.exist? package
+    system &quot;fury push #{package}&quot;
+  else
+    STDERR.puts &quot;E: gem \`#{package}&#39;&lt;/span&gt; not found.&lt;span class=&quot;s2&quot;&gt;&quot;
+    exit 1
+  end
+end
+
+desc &quot;&lt;/span&gt;Gemfury&lt;span class=&quot;s2&quot;&gt;&quot;
+task :release do
+  Rake::Task[:gemfury].invoke
+end
+EOF
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;small&gt;
+Note: This has only been tested on Mac OS which
+uses BSD sed. GNU sed (Linux) may behave differently.
+&lt;/small&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;prepare-release&quot;&gt;Prepare Release&lt;/h2&gt;
+
+&lt;p&gt;While I’m hacking, I track completed features in a &lt;strong&gt;Changelog&lt;/strong&gt; section
+in my &lt;code class=&quot;highlighter-rouge&quot;&gt;README.md&lt;/code&gt;. I list the changes under a &lt;strong&gt;HEAD&lt;/strong&gt; subsection.&lt;/p&gt;
+
+&lt;div class=&quot;language-markdown highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gu&quot;&gt;## Changelog&lt;/span&gt;
+&lt;span class=&quot;gu&quot;&gt;### HEAD (not yet released)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; Add foo to bar
+&lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; Fix: Baz not correctly responds to boo
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Be sure to add your git &lt;code class=&quot;highlighter-rouge&quot;&gt;origin&lt;/code&gt; as explained by GitHub, GitLab, Bitbucket
+or whichever provider you chose.&lt;/p&gt;
+
+&lt;p&gt;For the first version, &lt;code class=&quot;highlighter-rouge&quot;&gt;lib/lolwat/version.rb&lt;/code&gt; is already preconfigured
+with &lt;code class=&quot;highlighter-rouge&quot;&gt;0.1.0&lt;/code&gt;. That’s a sensible default for a first version to play
+around with. For later updates, increase the version number based on
+&lt;a href=&quot;http://semver.org/#summary&quot;&gt;Semantic Versioning (»Semver«)&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;I prefer tracking the Changelog using the GitHub’s Release system
+(I’ll get to that in a bit). To that end, I remove the bullet points
+in my temporary »HEAD (not yet released) and commit the changed &lt;code class=&quot;highlighter-rouge&quot;&gt;README.md&lt;/code&gt;
+together with the changed &lt;code class=&quot;highlighter-rouge&quot;&gt;lib/lolwat/version.rb&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git commit -m &lt;span class=&quot;s1&quot;&gt;&#39;Release v0.2.0&#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;release-the-kraken-gem&quot;&gt;Release the &lt;del&gt;Kraken&lt;/del&gt; Gem!&lt;/h2&gt;
+
+&lt;p&gt;Together with our &lt;a href=&quot;#gemfury-support&quot;&gt;changes to the gemspec and Rakefile&lt;/a&gt;,
+releasing the version is as simple as:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;rake release
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;It will create a git version tag, push everything to your git remote,
+package the gemfile and upload the Gem file to Gemfury.&lt;/p&gt;
+
+&lt;p&gt;The last step is to head over to your GitHub project page, select &lt;strong&gt;releases&lt;/strong&gt;
+and &lt;strong&gt;Draft a new Release&lt;/strong&gt; in the upper right corner.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2017-07-03-github-release-overview.png&quot; alt=&quot;GitHub Releases Overview&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The ensuing form is pretty self-explanatory (check the explanations on
+the right side). For the release name, I just repeat the tag name (e.g. &lt;code class=&quot;highlighter-rouge&quot;&gt;v0.2.0&lt;/code&gt;).
+The text area gets all the info from my temporary Changelog tracker in
+the &lt;code class=&quot;highlighter-rouge&quot;&gt;README.md&lt;/code&gt; file.&lt;/p&gt;
+
+&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Create gem skeleton using &lt;code class=&quot;highlighter-rouge&quot;&gt;bundle gem&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Adapt &lt;code class=&quot;highlighter-rouge&quot;&gt;Rakefile&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;*.gemspec&lt;/code&gt; to prevent pushes to public rubygems.org&lt;/li&gt;
+  &lt;li&gt;Hackedy-hack-hack + track features/bugfixes in README&lt;/li&gt;
+  &lt;li&gt;Update &lt;code class=&quot;highlighter-rouge&quot;&gt;version.rb&lt;/code&gt;, remove changelog info, commit and &lt;code class=&quot;highlighter-rouge&quot;&gt;rake release&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Create release on GitHub and paste changelog data&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Voilá!&lt;/p&gt;
+</description>
+				<pubDate>Mon, 03 Jul 2017 13:55:00 +0200</pubDate>
+				<link>http://devnull.absolventa.de/2017/07/03/authoring-a-private-gem-with-gemfury/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2017/07/03/authoring-a-private-gem-with-gemfury/</guid>
+			</item>
+		
+			<item>
+				<title>We'd like to be your Coaching Company for RGSoC 2017!</title>
+				<description>&lt;p&gt;&lt;a href=&quot;https://railsgirlssummerofcode.org&quot;&gt;Rails Girls Summer of Code&lt;/a&gt; (»RGSoC«) is a three-month
+scholarship to allow women to work on Open Source projects fulltime and by this, fostering
+diversity in Open Source culture.&lt;/p&gt;
+
+&lt;p&gt;ABSOLVENTA’s development team is completely in &amp;lt;3 with the program since its first
+edition back in 2013 where we coached a team of &lt;a href=&quot;http://highwaytorails.tumblr.com&quot;&gt;two super awesome
+women&lt;/a&gt;. Last year we were again blessed
+with a wonderful team of RGSoC students: the amazing &lt;a href=&quot;https://twitter.com/teamjoda2016&quot;&gt;Team
+Joda&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;We’re a bit late to the party compared to &lt;a href=&quot;/2016/02/25/we-want-to-work-with-you-during-rgsoc-2016/&quot;&gt;last year’s announcement&lt;/a&gt;
+but here it goes: We totally want to do this again!&lt;/p&gt;
+
+&lt;div class=&quot;alert&quot;&gt;We already have a team of students and are looking forward to host
+&lt;a href=&quot;https://teams.railsgirlssummerofcode.org/teams/339&quot;&gt;Team berlin diamonds&lt;/a&gt;
+this summer. Fingers crossed!&lt;/div&gt;
+
+&lt;p&gt;If you are Berlin-based and would like to apply for this year’s RGSoC, we want to be your
+&lt;a href=&quot;https://railsgirlssummerofcode.org/guide/coaching-company&quot;&gt;»coaching company«&lt;/a&gt;.
+What we can offer:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Desk space in our office at Friedrichstrasse (if needed: iMac included)&lt;/li&gt;
+  &lt;li&gt;A team of six Ruby/Rails/JS devs to coach you&lt;/li&gt;
+  &lt;li&gt;An inclusive culture and a super friendly work-atmosphere&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;While Rails Girls Summer of Code is language agnostic and there is indeed a host of
+&lt;a href=&quot;https://teams.railsgirlssummerofcode.org/projects&quot;&gt;accepted projects&lt;/a&gt; that are non-Ruby
+ones, we can only really coach Ruby and Rails projects (together with JS and CSS magic):
+this is where we have knowledge to share.&lt;/p&gt;
+
+&lt;p&gt;We are happy to assist in any (Ruby)project you wish, but you may want to consider
+applying for the &lt;a href=&quot;https://teams.railsgirlssummerofcode.org/projects/106-rails-girls-summer-of-code-the-teams-app&quot;&gt;RGSoC Teams App&lt;/a&gt;:
+Yours truly ended up being on the RGSoC Core team in 2014 and so the mentor of
+that project could potentially sit right next to you*.&lt;/p&gt;
+
+&lt;p&gt;So, if you are interested: please don’t hesitate to &lt;a href=&quot;mailto:carsten.zimmermann@absolventa.de&quot;&gt;get
+in touch&lt;/a&gt; – we are looking forward to hearing from you!&lt;/p&gt;
+
+&lt;p&gt;&lt;small&gt;*) That being said, applying for the RGSoC Teams App and with ABSOLVENTA as a
+coaching company doesn’t mean that your application will automatically be accepted.&lt;/small&gt;&lt;/p&gt;
+
+&lt;p&gt;PS: If you’re not interested in applying for the Summer of Code but are otherwise interested
+in supporting the program, we have a &lt;a href=&quot;https://railsgirlssummerofcode.org/campaign/&quot;&gt;crowdfunding program&lt;/a&gt; running :)&lt;/p&gt;
+</description>
+				<pubDate>Mon, 27 Feb 2017 11:59:00 +0100</pubDate>
+				<link>http://devnull.absolventa.de/2017/02/27/we-wanna-be-your-coaching-company-for-rgsoc-2017/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2017/02/27/we-wanna-be-your-coaching-company-for-rgsoc-2017/</guid>
+			</item>
+		
+			<item>
+				<title>Converting a Latin1 encoded HTML Document with Elixir (1)</title>
+				<description>&lt;p&gt;Elixir/Erlang gets some bad rep when it comes to String handling and the
+encoding of character data. Also, detecting/guessing the content encoding just
+based on heuristics is a &lt;a href=&quot;http://stackoverflow.com/questions/3034714/set-a-script-to-automatically-detect-character-encoding-in-a-plain-text-file-in&quot;&gt;reasonably hard problem&lt;/a&gt; to
+solve.&lt;/p&gt;
+
+&lt;p&gt;A recent Elixir/Phoenix project involved getting a remote HTML page with
+&lt;a href=&quot;https://github.com/edgurgel/httpoison&quot; title=&quot;An Elixir HTTP library&quot;&gt;HTTPoison&lt;/a&gt;, modifying parts of it and returning the changed HTML
+document. It works perfectly fine when the source document is in UTF-8 unicode,
+but not so much when the source is ISO-8859-X (Latin1 and its siblings). This
+two-parter illustrates two mechanisms to get hints about the source document’s
+encoding.&lt;/p&gt;
+
+&lt;p&gt;Let’s assume that the HTML document contains a &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;meta http-equiv=&quot;Content-Type&quot;
+content=&quot;text/html; charset=ISO-8859-1&quot; /&amp;gt;&lt;/code&gt; element in its document headers.&lt;/p&gt;
+
+&lt;p&gt;I’ll cover two cases: first, if the &lt;code class=&quot;highlighter-rouge&quot;&gt;Content-Type&lt;/code&gt; header response from the
+remote webserver is missing (is that even allowed?) or not corresponding to
+the actual encoding of the response body. And secondly, when the header and
+the encoding match. Here goes the first part:&lt;/p&gt;
+
+&lt;h2 id=&quot;part-1-the-proper-http-equiv-meta-element&quot;&gt;Part 1: The proper http-equiv meta element&lt;/h2&gt;
+
+&lt;h3 id=&quot;guess-the-content-type-with-this-one-weird-trick&quot;&gt;Guess the content type with this one weird trick&lt;/h3&gt;
+
+&lt;p&gt;Let’s employ &lt;a href=&quot;https://github.com/philss/floki&quot;&gt;Floki&lt;/a&gt; to get the header element from within the HTML document:&lt;/p&gt;
+
+&lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;defmodule&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Latin1Convert&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+
+  &lt;span class=&quot;nv&quot;&gt;@doc&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&quot;&quot;
+  Retrieves the content type indication from `html`.
+
+  iex&amp;gt;&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;meta http-equiv=\&quot;Content-Type\&quot; content=\&quot;text/html; charset=ISO-8859-1\&quot;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;/html&amp;gt;&quot; |&amp;gt; Latin1Convert.meta_http_equiv_encoding
+  &quot;text/html; charset=ISO-8859-1&quot;
+
+  iex&amp;gt;Latin1Convert.meta_http_equiv_encoding(&quot;&amp;lt;html&amp;gt;&amp;lt;/html&amp;gt;&quot;)
+  &quot;&quot;
+  &quot;&quot;&quot;&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;@spec&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;meta_http_equiv_encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;meta_http_equiv_encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;no&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;downcase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;|&amp;gt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Floki&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;attribute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;head &amp;gt; meta[http-equiv=content-type]&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;content&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;|&amp;gt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;List&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;first&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;|&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to_string&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;It’s easier on my brain to map this to atoms:&lt;/p&gt;
+
+&lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;defmodule&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Latin1Convert&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+
+  &lt;span class=&quot;nv&quot;&gt;@doc&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&quot;&quot;
+  Looks for a &amp;lt;meta http-equiv=&quot;Content-Type&quot;&amp;gt; node in the input
+  string&#39;s HTML header and returns an atom representing the encoding.
+  &quot;&quot;&quot;&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;@spec&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;content_type_from_header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;atom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;nil&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;content_type_from_header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;encoding&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;meta_http_equiv_encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;cond&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;no&quot;&gt;Regex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;match?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;iso&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;8859&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;ss&quot;&gt;:latin1&lt;/span&gt;
+      &lt;span class=&quot;no&quot;&gt;Regex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;match?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;utf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;ss&quot;&gt;:unicode&lt;/span&gt;
+      &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;no&quot;&gt;nil&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;meta_http_equiv_encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# See above&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;convert-and-purge-now-erroneous-markup&quot;&gt;Convert and purge (now) erroneous markup&lt;/h3&gt;
+
+&lt;p&gt;The last step would be to convert the HTML input to UTF-8 using the underlying
+Erlang library. However, we don’t want the HTML to identify as Latin1 anymore,
+so we have to remove the &lt;code class=&quot;highlighter-rouge&quot;&gt;meta http-equiv&lt;/code&gt; tag:&lt;/p&gt;
+
+&lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;defmodule&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Latin1Convert&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+
+  &lt;span class=&quot;nv&quot;&gt;@doc&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&quot;&quot;
+  Convert an input HTML string to UTF-8 unicode.
+  &quot;&quot;&quot;&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;@spec&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;content_type&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;content_type_from_header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;cond&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;content_type&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:latin1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;|&amp;gt;&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:unicode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;characters_to_binary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:latin1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;|&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;remove_meta_http_equiv_encoding&lt;/span&gt;
+      &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;# Caveat: not really case-sensitive check for the DOM node.&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# Floki doesn&#39;t seem to understand `$=foo i` queries. We can&#39;t&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# `String.downcase` here as that will mess up the filter chain.&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;defp&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;remove_meta_http_equiv_encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;no&quot;&gt;Floki&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filter_out&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;head &amp;gt; meta[http-equiv*=ontent-]&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;|&amp;gt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Floki&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;raw_html&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;content_type_from_header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# see above&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;meta_http_equiv_encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# See above&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The next part will cover how to take a matching &lt;code class=&quot;highlighter-rouge&quot;&gt;Content-Type&lt;/code&gt; HTTP header to
+short-circuit the guesswork. Check out the file so far:&lt;/p&gt;
+
+&lt;noscript&gt;&lt;pre&gt;defmodule Latin1Convert do
+
+  @doc &amp;quot;&amp;quot;&amp;quot;
+  Convert an input HTML string to UTF-8 unicode.
+  &amp;quot;&amp;quot;&amp;quot;
+  @spec call(String.t) :: String.t
+  def call(html) do
+    content_type = content_type_from_header(html)
+    cond do
+      content_type == :latin1 -&amp;gt;
+        html
+        |&amp;gt; :unicode.characters_to_binary(:latin1)
+        |&amp;gt; remove_meta_http_equiv_encoding
+      true -&amp;gt;
+        html
+    end
+  end
+
+  @doc &amp;quot;&amp;quot;&amp;quot;
+  Looks for a &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot;&amp;gt; node in the input
+  string&amp;#39;s HTML header and returns an atom representing the encoding.
+  &amp;quot;&amp;quot;&amp;quot;
+  @spec content_type_from_header(String.t) :: atom | nil
+  def content_type_from_header(html) do
+    encoding = meta_http_equiv_encoding(html)
+
+    cond do
+      Regex.match?(~r(iso-8859)i, encoding) -&amp;gt;
+        :latin1
+      Regex.match?(~r(utf-8)i, encoding) -&amp;gt;
+        :unicode
+      true -&amp;gt;
+        nil
+    end
+  end
+
+  @doc &amp;quot;&amp;quot;&amp;quot;
+  Retrieves the content type indication from `html`.
+
+  iex&amp;gt;&amp;quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;meta http-equiv=\&amp;quot;Content-Type\&amp;quot; content=\&amp;quot;text/html; charset=ISO-8859-1\&amp;quot;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;/html&amp;gt;&amp;quot; |&amp;gt; Latin1Convert.meta_http_equiv_encoding
+  &amp;quot;text/html; charset=ISO-8859-1&amp;quot;
+
+  iex&amp;gt;Latin1Convert.meta_http_equiv_encoding(&amp;quot;&amp;lt;html&amp;gt;&amp;lt;/html&amp;gt;&amp;quot;)
+  &amp;quot;&amp;quot;
+  &amp;quot;&amp;quot;&amp;quot;
+  @spec meta_http_equiv_encoding(String.t) :: String.t
+  def meta_http_equiv_encoding(html) do
+    String.downcase(html)
+    |&amp;gt; Floki.attribute(&amp;quot;head &amp;gt; meta[http-equiv=content-type]&amp;quot;, &amp;quot;content&amp;quot;)
+    |&amp;gt; List.first
+    |&amp;gt; to_string
+  end
+
+  # Caveat: not really case-sensitive check for the DOM node.
+  # Floki doesn&amp;#39;t seem to understand `$=foo i` queries. We can&amp;#39;t
+  # `String.downcase` here as that will mess up the filter chain.
+  defp remove_meta_http_equiv_encoding(html) do
+    Floki.filter_out(html, &amp;quot;head &amp;gt; meta[http-equiv*=ontent-]&amp;quot;)
+    |&amp;gt; Floki.raw_html
+  end
+end
+&lt;/pre&gt;&lt;/noscript&gt;
+&lt;script src=&quot;https://gist.github.com/carpodaster/2809ebdda26d016860b438e70bc842f2.js&quot;&gt; &lt;/script&gt;
+
+</description>
+				<pubDate>Thu, 09 Feb 2017 00:00:00 +0100</pubDate>
+				<link>http://devnull.absolventa.de/2017/02/09/converting-a-latin1-html-document-with-elixir-part-1/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2017/02/09/converting-a-latin1-html-document-with-elixir-part-1/</guid>
+			</item>
+		
+			<item>
+				<title>Upgrading from a PostgreSQL version Homebrew already abandoned</title>
+				<description>&lt;p&gt;When my PostgreSQL installation didn’t come up after &lt;a href=&quot;https://www.youtube.com/watch?v=EKtPWGvmAXw&quot; title=&quot;I tried turning it on off and on again&quot;&gt;an unexpected reboot&lt;/a&gt;
+and showed errors about a missing &lt;code class=&quot;highlighter-rouge&quot;&gt;libreadline.dylib&lt;/code&gt; (a familiar message after
+upgrading to macOS Sierra), I figured I could remedy it with a simple &lt;code class=&quot;highlighter-rouge&quot;&gt;brew
+reinstall postgresql&lt;/code&gt;. Sadly, the PostgreSQL version Homebrew reinstalled was not
+the one that was already installed, but the most recent version it knew of.&lt;/p&gt;
+
+&lt;p&gt;I may have cranked  &lt;code class=&quot;highlighter-rouge&quot;&gt;brew cleanup postgresql&lt;/code&gt; a tad bit too early 😱 and so I ended up
+with my 9.3 installation files already gone and only v9.6.1 available. Sadly, the
+old binaries are needed to access the old data format.&lt;/p&gt;
+
+&lt;p&gt;The earliest PostgreSQL version Homebrew still had in stock was 9.4. I checked
+&lt;a href=&quot;https://www.postgresql.org/download/macosx/&quot;&gt;postgresql.org&lt;/a&gt; to see whether
+there were old source or binary distribution tarballs available. Indeed, it
+had a link pointing advanced users to a &lt;a href=&quot;https://www.enterprisedb.com/download-postgresql-binaries&quot;&gt;list of zip files containing binaries&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;With all tools prepared (&lt;a href=&quot;https://gist.github.com/chbrown/647a54dc3e1c2e8c7395&quot;&gt;and some cross-referencing&lt;/a&gt;) I could repair
+my broken installation (assuming the new pgsql is already installed):&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Move the old data files out of the way&lt;/span&gt;
+mv /usr/local/var/postgres /usr/local/var/postgres93
+
+&lt;span class=&quot;c&quot;&gt;# Since my computer previously crashed, I had a stale pid file&lt;/span&gt;
+rm /usr/local/var/postgres93/postmaster.pid
+
+&lt;span class=&quot;c&quot;&gt;# Create a new data dir for the most recent pgsql version&lt;/span&gt;
+initdb --pgdata&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/usr/local/var/postgres
+
+&lt;span class=&quot;c&quot;&gt;# Migrate data files, pointing old-bindir to the location of&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# the extracted zip file&lt;/span&gt;
+pg_upgrade &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  --old-datadir&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/usr/local/var/postgres93 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  --new-datadir&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/usr/local/var/postgres &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  --old-bindir&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$HOME&lt;/span&gt;/Downloads/pgsql/bin &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  --new-bindir&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/usr/local/Cellar/postgresql/9.6.1/bin &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  --verbose
+
+&lt;span class=&quot;c&quot;&gt;# Start PostgreSQL again&lt;/span&gt;
+brew services start postgresql
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Everthing should be up and running again.&lt;/p&gt;
+
+</description>
+				<pubDate>Mon, 16 Jan 2017 00:00:00 +0100</pubDate>
+				<link>http://devnull.absolventa.de/2017/01/16/upgrading-old-postgresql-with-homebrew/</link>
+				<guid isPermaLink="true">http://devnull.absolventa.de/2017/01/16/upgrading-old-postgresql-with-homebrew/</guid>
+			</item>
+		
+			<item>
 				<title>Dream of BEMifornication – or how we refactored our scss with linting</title>
 				<description>&lt;p&gt;Writing a lot of code over the years also means to deal with refactoring at some point. Your skills improve over time and technologies evolve. Coming back to an old project often makes it hard to understand what the heck Younger You was thinking when writing and structuring this code.&lt;/p&gt;
 
@@ -555,699 +1145,6 @@ example in a follow-up post.&lt;/p&gt;
 				<pubDate>Fri, 11 Mar 2016 16:34:00 +0100</pubDate>
 				<link>http://devnull.absolventa.de/2016/03/11/include-a-module-with-parameters/</link>
 				<guid isPermaLink="true">http://devnull.absolventa.de/2016/03/11/include-a-module-with-parameters/</guid>
-			</item>
-		
-			<item>
-				<title>Computational web services with R programming language</title>
-				<description>&lt;p&gt;If you encounter computational problems of certain complexity, the &lt;a href=&quot;https://www.r-project.org/&quot;&gt;R programming language&lt;/a&gt;
-is most probably a good tool of choice to satisfy your needs. The main tasks R was developed for
-were dealing with large datasets, statistical analysis and computation. Within this area it has become
-a solid, mature open source platform, widely used in academia.&lt;/p&gt;
-
-&lt;p&gt;What I like about R is that the barriers for usage are low: It’s freely available for nearly 
-every major UNIX enviornment and Windows, it can be used within a special stand-alone stable &lt;a href=&quot;https://www.rstudio.com/home/&quot;&gt;IDE&lt;/a&gt;
-that is very pleasant for beginners or just by the command line if you’re used to.&lt;/p&gt;
-
-&lt;p&gt;In addition to that its maturity has grown so far that even people 
-whithout a degree in mathematics or computer science can have access to advanced statistical 
-techniques in a well designed manner for their projects.&lt;/p&gt;
-
-&lt;p&gt;Most of a web dev’s day-to-day business possibly lives in another neighborhood. The barycenter 
-of web development is organizing the communication of participants of several distributed systems. 
-Its far more often dealing with applications talking HTTP (the lingua franca of web applications!) 
-to each other than optimizing specific algorithms w.r.t to numerical issues or similar.&lt;/p&gt;
-
-&lt;p&gt;But for me the connection of both worlds is very interesting and fruitful: 
-Employing statistical methods can be a benefit for a vast amount of web application types, 
-that’s why it’s interesting to elaborate how this can be achieved. I’d like to describe one 
-possible way here.&lt;/p&gt;
-
-&lt;h3 id=&quot;a-web-application-in-r&quot;&gt;A web application in R&lt;/h3&gt;
-
-&lt;p&gt;The most natural approach would be to implement the desired algorithm and the web application
-in the same language. As mentioned, R is a swiss knife for mathematical
-flavoured problems related to data. But in 2016 most web applications were 
-not typically written in R and I admit this felt a bit unfamiliar for me, too.&lt;/p&gt;
-
-&lt;p&gt;Thanks to the work that a lot of people who put a lot effort into additional libraries of R it 
-actually &lt;em&gt;is&lt;/em&gt; possible and as it turns out it’s not that complicated. Therefore I’d like to 
-explore with you an hello-world example of writing a small web application 
-completely in R. I’d like to share a &lt;code class=&quot;highlighter-rouge&quot;&gt;Hello world!&lt;/code&gt;-example of such a web application: 
-It will take a query string from the URL and serves some basic JSON output including that parameter.&lt;/p&gt;
-
-&lt;p&gt;We are going to use a library for &lt;code class=&quot;highlighter-rouge&quot;&gt;R&lt;/code&gt; named &lt;code class=&quot;highlighter-rouge&quot;&gt;Rook&lt;/code&gt;. If you ever have seen some web development code
-in Ruby, you surely will have faced &lt;a href=&quot;http://rack.github.io/&quot;&gt;Rack&lt;/a&gt; at some point. &lt;code class=&quot;highlighter-rouge&quot;&gt;Rack&lt;/code&gt; is a popular simple web server interface 
-for Ruby. There are more really nice alternatives for doing web application relevant work in R (e.g. &lt;a href=&quot;http://shiny.rstudio.com/&quot;&gt;Shiny&lt;/a&gt; or
-  &lt;a href=&quot;http://plumber.trestletech.com/&quot;&gt;plumber&lt;/a&gt;), but the final point where Rook got me 
-  motivated a lot was because it was highly inspired by Rack - and I knew of the power of simplicity of Rack
-  in the Ruby ecosystem. I am very thankful for having Rook since it was exactly what I was looking for my specific problem.&lt;/p&gt;
-
-&lt;h3 id=&quot;resources-for-learning-basic-r-syntax&quot;&gt;Resources for learning basic R syntax&lt;/h3&gt;
-
-&lt;p&gt;If you’re looking to learn the absolute basics with &lt;code class=&quot;highlighter-rouge&quot;&gt;R&lt;/code&gt; try the 
-&lt;a href=&quot;http://tryr.codeschool.com/&quot;&gt;free Code School course&lt;/a&gt; or have a look at the &lt;a href=&quot;https://cran.r-project.org/doc/manuals/r-devel/R-lang.html&quot;&gt;language definition&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Let’s get started!&lt;/p&gt;
-
-&lt;h3 id=&quot;installation-of-r&quot;&gt;(1/5) Installation of R&lt;/h3&gt;
-
-&lt;p&gt;Installing R on a unixoide system should be pretty easy. My example lives on a Ubuntu machine,
-so I’ll use this as reference. But you are encouraged trying it on other systems, too. It should be
-possible!&lt;/p&gt;
-
-&lt;p&gt;If you’re running Ubuntu you can install it from the universe sources via&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get install r-base r-recommended 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;Afterwards there will be a binary named &lt;code class=&quot;highlighter-rouge&quot;&gt;R&lt;/code&gt; ready for you at th command line. 
-Called without arguments it will open a R console for you. You can exit it by invoking the quit function &lt;code class=&quot;highlighter-rouge&quot;&gt;q()&lt;/code&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;R
-&lt;span class=&quot;gp&quot;&gt;&amp;gt; &lt;/span&gt;s &amp;lt;- &lt;span class=&quot;s2&quot;&gt;&quot;Hello&quot;&lt;/span&gt;
-&lt;span class=&quot;gp&quot;&gt;&amp;gt; &lt;/span&gt;s
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;1] &lt;span class=&quot;s2&quot;&gt;&quot;Hello&quot;&lt;/span&gt;
-&lt;span class=&quot;gp&quot;&gt;&amp;gt; &lt;/span&gt;q&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
-Save workspace image? &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;y/n/c]: n
-&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;installation-of-rapache&quot;&gt;(2/5) Installation of &lt;code class=&quot;highlighter-rouge&quot;&gt;rApache&lt;/code&gt;&lt;/h3&gt;
-
-&lt;p&gt;My example setup uses an Apache2 web server. In addition to the Apache web server
-we need an extension called &lt;a href=&quot;rapache.net&quot;&gt;rApache&lt;/a&gt;. The installation for Ubuntu works
-this way:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo add-apt-repository ppa:opencpu/rapache
-&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get update
-&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get install libapache2-mod-r-base
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;installation-of-rook-library&quot;&gt;(3/5) Installation of &lt;code class=&quot;highlighter-rouge&quot;&gt;Rook&lt;/code&gt; library&lt;/h3&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;R&lt;/code&gt; has its own package/library management system called &lt;a href=&quot;https://cran.r-project.org/&quot;&gt;CRAN&lt;/a&gt;, which
-basically is a network of ftp and web servers delivering R libraries to your machine. To
-install the library ‘Rook’ from the &lt;code class=&quot;highlighter-rouge&quot;&gt;CRAN&lt;/code&gt; package sources, open a &lt;code class=&quot;highlighter-rouge&quot;&gt;R&lt;/code&gt; console and type&lt;/p&gt;
-
-&lt;div class=&quot;language-R highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;install.packages&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;Rook&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Afterwards you can load the package when needed via&lt;/p&gt;
-
-&lt;div class=&quot;language-R highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;Rook&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;You can find detailed information of &lt;code class=&quot;highlighter-rouge&quot;&gt;Rook&lt;/code&gt; &lt;a href=&quot;https://cran.r-project.org/web/packages/Rook/Rook.pdf&quot;&gt;here in the documentation file&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h3 id=&quot;a-hello-world-example-of-rook&quot;&gt;(4/5) A Hello World example of Rook&lt;/h3&gt;
-
-&lt;p&gt;Let’s examine how a Rook application has to look like. In the documentation you’ll find&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;A Rook application is an R reference class object that implements a ’call’ method or an R closure
-that takes exactly one argument, an environment, and returns a list with three named elements:
-‘status’, ‘headers’, and ‘body’.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;Here you can see how Rook quotes Rack: An application as a function of something
-called an environment returning a list of status, header and a body! So basically we need an object 
-we can invoke a function named &lt;code class=&quot;highlighter-rouge&quot;&gt;call&lt;/code&gt; on and we need to return a list 
-containing the response data. But wait, let’s have small break here: What does &lt;code class=&quot;highlighter-rouge&quot;&gt;reference class&lt;/code&gt; mean?&lt;/p&gt;
-
-&lt;p&gt;For historical reasons, R has three distinct object oriented systems
-built in: S3 classes, S4 classes and so-called Reference classes. Each of these are 
-slightly different and completely distinct to each other. They have in common that
-these systems are providing (in different ways) object orientation mechanisms for the 
-R language.&lt;/p&gt;
-
-&lt;p&gt;Let’s concentrate on Reference Classes, or short refclasses, which are introduced in R v2.12. Even there
-is complexity under the hood, let’s simply think of it of a way of defining class-like structures in R. We can define
-a new refclass by&lt;/p&gt;
-
-&lt;div class=&quot;language-R highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;Monkey&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setRefClass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Monkey&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Afterwards one can create instances (“objects”) of a refclass by&lt;/p&gt;
-
-&lt;div class=&quot;language-R highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;leila&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Monkey&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; 
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;leila&lt;/code&gt; is now a ‘Reference class object of class “Monkey”’.&lt;/p&gt;
-
-&lt;p&gt;Heading back to the definition of a Rook application this means two things for us: 
-We have to implement our application logic as a function that returns the desired list with status, header information and a response body.
-Then we need to “attach” this function to a refclass. After this 
-we can construct “instances” of our application that can be used somewhere else.&lt;/p&gt;
-
-&lt;div class=&quot;language-R highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;hello_world&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;&amp;lt;h1&amp;gt;Hello World!&amp;lt;/h1&amp;gt;&#39;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  
-  &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;200L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-      &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;Content-Type&#39;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;text/html&#39;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;application_factory&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setRefClass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;HelloWorld&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;methods&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hello_world&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Having this above we cann create an instance of the refclass &lt;code class=&quot;highlighter-rouge&quot;&gt;HelloWord&lt;/code&gt; and invoke the function &lt;code class=&quot;highlighter-rouge&quot;&gt;call&lt;/code&gt;:&lt;/p&gt;
-
-&lt;div class=&quot;language-R highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# generate a fresh application
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;application_factory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; 
-
-&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# Now invoke the application with an empty environment
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# … just an empty Array
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# will return a list with status, header and body
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;If the whole refclass thing confuses you here’s the good message: 
-You don’t need to state this as explicit as done above. It’s enough
-to implement the raw logic part as a function returning a list. 
-With having a function &lt;code class=&quot;highlighter-rouge&quot;&gt;hello_rook&lt;/code&gt; returning a list of
-status, header and body you can bind our application to a server by calling 
-&lt;code class=&quot;highlighter-rouge&quot;&gt;Rook::Server$call(hello_rook)&lt;/code&gt;. The rest is maintained by Rook internally
-then¹. Here’s a running example:&lt;/p&gt;
-
-&lt;div class=&quot;language-R highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;Rook&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hello_rook&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  
-  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;query_input&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;QUERY_STRING&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-
-  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;paste&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;{&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-      &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;&quot;status&quot;: 200,&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-      &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;&quot;input&quot;:&quot;&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;query_input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;&quot;,&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;}&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; 
-    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;&#39;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-
-  &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;200L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-      &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;Content-Type&#39;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;application/json&#39;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Rook&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hello_rook&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;point-your-apache-server-to-your-r-app&quot;&gt;(5/5) Point your Apache server to your R app&lt;/h3&gt;
-
-&lt;p&gt;We’re almost finished, all pieces of the puzzle are on the table
-now. To “start” your app you just have to invoke &lt;code class=&quot;highlighter-rouge&quot;&gt;rApache&lt;/code&gt; and
-tell your Apache where to look for the script. Head for
-your Apache config file (mine is located in &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/apache2/&lt;/code&gt;). 
-Add the following snippet to use &lt;code class=&quot;highlighter-rouge&quot;&gt;rApache&lt;/code&gt; to run your Rook script:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;LoadModule R_module           /apache/module/path/mod_R.so
-
-&amp;lt;Location /hello_rook&amp;gt;
-    SetHandler r-handler
-    RFileHandler /home/robin/hello_rook/hello_rook.R
-&amp;lt;/Location&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;If you visit &lt;code class=&quot;highlighter-rouge&quot;&gt;http://YOUR_HOST_APACHE_WAS_BOUND_TO/hello_rook&lt;/code&gt;
-you can inspect your sample JSON output!&lt;/p&gt;
-
-&lt;p&gt;If you visit &lt;code class=&quot;highlighter-rouge&quot;&gt;http://YOUR_HOST_APACHE_WAS_BOUND_TO/hello_rook?Yeah!&lt;/code&gt;
-your JSON input should have reflected your query input “Yeah!”.&lt;/p&gt;
-
-&lt;h3 id=&quot;ok-where-to-go-now&quot;&gt;Ok. Where to go now?&lt;/h3&gt;
-
-&lt;p&gt;The problem I’m currently working on is passing data into the R application. You 
-can simply put large CSV files onto the server, loading them with R is
-pretty natural. But up to now I have not tried to catch and parse POST requests 
-with Rook. R is able to maintain a database connection (e.g. with Postgres), too, but
-that’s another undiscovered (yet interesting!) area for me 😉&lt;/p&gt;
-
-&lt;p&gt;Thanks for reading and happy coding!&lt;/p&gt;
-
-&lt;p&gt;¹) In fact I’m not really certain how this works. So finally I decided to document it how 
-&lt;em&gt;I&lt;/em&gt; understood it. Maybe that information is not 100% correct. If you know better, 
-I’d be happy if you’d tell me.&lt;/p&gt;
-</description>
-				<pubDate>Fri, 04 Mar 2016 05:30:00 +0100</pubDate>
-				<link>http://devnull.absolventa.de/2016/03/04/computational-web-services-with-R/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2016/03/04/computational-web-services-with-R/</guid>
-			</item>
-		
-			<item>
-				<title>Let's work together during RGSoC 2016!</title>
-				<description>&lt;p&gt;&lt;a href=&quot;http://railsgirlssummerofcode.org&quot;&gt;Rails Girls Summer of Code&lt;/a&gt; (»RGSoC«) is a three-month
-scholarship to allow women to work on Open Source projects fulltime and by this, fostering
-diversity in Open Source culture.&lt;/p&gt;
-
-&lt;p&gt;ABSOLVENTA’s dev team is completely in &amp;lt;3 with the program since its first edition back in 2013
-where we coached a team of &lt;a href=&quot;http://highwaytorails.tumblr.com&quot;&gt;two super awesome women&lt;/a&gt;.
-It was (and still is) so great to see how the summer of 2013 became the start of two new careers
-in web development.&lt;/p&gt;
-
-&lt;p&gt;We totally want to do this again!&lt;/p&gt;
-
-&lt;p&gt;If you are Berlin-based and would like to apply for this year’s RGSoC, we want to be your
-&lt;a href=&quot;http://railsgirlssummerofcode.org/guide/coaching-company&quot;&gt;»coaching company«&lt;/a&gt;.
-We can offer you:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Desk space in our office at Friedrichstrasse (if needed: iMac included)&lt;/li&gt;
-  &lt;li&gt;A team of six Ruby/Rails/JS devs to coach you&lt;/li&gt;
-  &lt;li&gt;An inclusive culture and a super friendly work-atmosphere&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;While Rails Girls Summer of Code is language agnostic and there is indeed a host of
-&lt;a href=&quot;https://teams.railsgirlssummerofcode.org/projects&quot;&gt;accepted projects&lt;/a&gt; that are non-Ruby
-ones, we can only really coach Ruby and Rails projects (together with JS and CSS magic):
-this is where we have knowledge to share.&lt;/p&gt;
-
-&lt;p&gt;We are happy to assist in any (Ruby)project you wish, but you may want to consider
-applying for the &lt;a href=&quot;https://teams.railsgirlssummerofcode.org/projects/106-rails-girls-summer-of-code-the-teams-app&quot;&gt;RGSoC Teams App&lt;/a&gt;:
-Yours truly ended up being on the RGSoC Core team in 2014 and so the mentor of
-that project would sit right next to you*.&lt;/p&gt;
-
-&lt;p&gt;So, if you are interested: please don’t hesitate to &lt;a href=&quot;mailto:carsten.zimmermann@absolventa.de&quot;&gt;get
-in touch&lt;/a&gt; – we are looking forward to hearing from you!&lt;/p&gt;
-
-&lt;p&gt;&lt;small&gt;*) That being said, applying for the RGSoC Teams App and with ABSOLVENTA as a
-coaching company doesn’t mean that your application will automatically be accepted.&lt;/small&gt;&lt;/p&gt;
-
-&lt;p&gt;PS: If you’re not interested in applying for the Summer of Code but are otherwise interested
-in supporting the program, we have a &lt;a href=&quot;http://railsgirlssummerofcode.org/campaign/&quot;&gt;crowdfunding program&lt;/a&gt; running :)&lt;/p&gt;
-</description>
-				<pubDate>Thu, 25 Feb 2016 14:43:00 +0100</pubDate>
-				<link>http://devnull.absolventa.de/2016/02/25/we-want-to-work-with-you-during-rgsoc-2016/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2016/02/25/we-want-to-work-with-you-during-rgsoc-2016/</guid>
-			</item>
-		
-			<item>
-				<title>Exploring the Levenshtein algorithm with Ruby</title>
-				<description>&lt;p&gt;Today I’d like to introduce you to an algorithm I stumbled over already tiwce
-and that I really like because of its simple idea to address the non-trivial
-problem to &lt;em&gt;quantify&lt;/em&gt; the similarity of two strings: The Levenshtein algorithm.&lt;/p&gt;
-
-&lt;p&gt;The algorithm determines the so-called Levenshtein distance of two strings
-which is a natural number. It’s an example of the mathematical technique of 
-&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Dynamic_programming&quot;&gt;Dynamic Programming&lt;/a&gt;&lt;/em&gt; 
-and was invented by the Russian mathematician &lt;a href=&quot;http://www.keldysh.ru/departments/dpt_10/lev.html&quot;&gt;Vladimir Levenshtein&lt;/a&gt; already 
-in 1965. The algorithm is used by some major companies (e.g. Yahoo!) in 
-production environments until today.&lt;/p&gt;
-
-&lt;h3 id=&quot;how-it-works&quot;&gt;How it works&lt;/h3&gt;
-
-&lt;p&gt;The core idea is to measure similarity by the minimal number of &lt;em&gt;elementary transformations&lt;/em&gt;
-that are needed to turn an arbitrary string &lt;em&gt;S&lt;/em&gt; into another string, say &lt;em&gt;T&lt;/em&gt;. Here, 
-&lt;em&gt;elementary transformations&lt;/em&gt; are defined as precisely three operations:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;a simple insertion of a single character to the string&lt;/li&gt;
-  &lt;li&gt;a deletion of a single character of the string&lt;/li&gt;
-  &lt;li&gt;a substitution of a single character by another&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Mathematically it works with a very elegant trick of computing
-the Levenshtein distances of trivial substrings first (which is very easy) 
-and then successively computing distances of more complex substrings by
-only using previously evaluated values.&lt;/p&gt;
-
-&lt;p&gt;The mathematical formalism is well-explained at &lt;a href=&quot;https://en.wikipedia.org/wiki/Levenshtein_distance&quot;&gt;wikipedia&lt;/a&gt; and other resources
-and I’d like to focus on a walk-through example now. Let’s compute the Levenshtein distance of the words &lt;em&gt;cat&lt;/em&gt; and &lt;em&gt;cute&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;Note that the empty word is denoted by &lt;em&gt;ε&lt;/em&gt;. Practically the algorithm is filling a table (a matrix) where the (i,j)-th entry will 
-contain the Levenshtein distance¹ of the prefix of length &lt;em&gt;i&lt;/em&gt; of the first word and the prefix of the prefix of length &lt;em&gt;j&lt;/em&gt; of the 
-second word.&lt;/p&gt;
-
-&lt;p&gt;We emphasize the (technical) convention that every word starts with the empty word, so &lt;em&gt;cat&lt;/em&gt; can be written as &lt;em&gt;εcat&lt;/em&gt;. 
-Therefore the first entry with indices (0,0) is the Levenshtein distance of the &lt;em&gt;0&lt;/em&gt;-prefix of &lt;em&gt;εcat&lt;/em&gt; and &lt;em&gt;εcute&lt;/em&gt;, which is the
-distance of the empty word &lt;em&gt;ε&lt;/em&gt; with itself - which is simply zero. Furthermore, to construct any word of length &lt;em&gt;i&lt;/em&gt; 
-starting with the empty word we simply need &lt;em&gt;i&lt;/em&gt; insertions. With this in mind it is 
-easy to write down the first row immediately:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;
- &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;This translates as: It takes one elementary transformation to turn &lt;em&gt;ε&lt;/em&gt; into &lt;em&gt;εc&lt;/em&gt; (an insertion), two transformations
-to turn &lt;em&gt;ε&lt;/em&gt; into &lt;em&gt;εca&lt;/em&gt; and so on. The first column can be obtained immediately with the same strategy:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt;
- &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; 
- &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; 
- &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;→&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;four&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;insertions&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;are&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;needed&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;turn&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;into&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;cute&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Let’s combine them. Our recurrence matrix &lt;em&gt;D&lt;/em&gt; has now the form:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;
- &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;All we have to do is to fill the question mark entries by using only the previously computed values. This
-is the point were we need to inspect the mathematical rules the algorithm postulates. Suppose we want to obtain the matrix entry (i, j) and
-remember that this corresponds to the prefix of length &lt;em&gt;i&lt;/em&gt; of the word &lt;em&gt;εcat&lt;/em&gt; and prefix of length &lt;em&gt;j&lt;/em&gt; of the word &lt;em&gt;εcute&lt;/em&gt;:&lt;/p&gt;
-
-&lt;p&gt;When the &lt;em&gt;i&lt;/em&gt;-ith character of the first word &lt;em&gt;S&lt;/em&gt; exactly matches the &lt;em&gt;j&lt;/em&gt;-th character of the second word &lt;em&gt;T&lt;/em&gt; we have
-the optimal case. No “operation” is required, the global costs are the same as for the distance of the (i-1)-th and the (j-1)-th 
-distances of the words, that is in that case. So we take the matrix entry &lt;em&gt;(i-1, j-1)&lt;/em&gt; and put it into &lt;em&gt;(i, j)&lt;/em&gt; as well.
-Otherwise the characters do not match. We have execute one of the elementary operations. But which one? Here’s the answer:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;D_{i, j} = \min \big [ \text{insertion costs}, \text{deletion costs}, \text{substitution costs} \big ] + 1&lt;/script&gt;
-
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;insertion costs&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;deletion costs&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;substitution costs&lt;/code&gt; are nothing else
-than values of neighbor matrix entries we already have computed! So have a look to the neighbors, 
-choose the one with mininal costs and add &lt;em&gt;+1&lt;/em&gt; to its costs, because we need exactly one more operation
-compared to that “minimal” neighbor. Notice that here we have chosen some kind of optimal &lt;em&gt;path&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;Let’s see how it works for our example matrix above. For the entry (1,1) we have the optimal case: 
-A &lt;em&gt;c&lt;/em&gt; is added for both sides (when starting with &lt;em&gt;ε&lt;/em&gt;) and since the same character is added on both sides 
-the Levenshtein distance stays zero because it was for the upper-left neighbor. And it matches the 
-intuition if you recapitulate that entry (1,1) means the distance between &lt;em&gt;εc&lt;/em&gt; and &lt;em&gt;εc&lt;/em&gt;, which still
-is the same string.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;
- &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Now the situation gets more interesting. Let’s focus on the second row, where two question
-marks are left. The more left question mark is the entry &lt;em&gt;(2, 1)&lt;/em&gt; and corresponds to the
-distance of &lt;em&gt;εca&lt;/em&gt; and &lt;em&gt;εc&lt;/em&gt;. The algorithm now postulates looking for the minimal distance
-relative to previously computed substrings. The already-computed neighbors have values &lt;em&gt;2&lt;/em&gt;,
-&lt;em&gt;1&lt;/em&gt; and &lt;em&gt;0&lt;/em&gt;. The mininal one is &lt;em&gt;0&lt;/em&gt;. We now take the minimal value (0) and add +1 to it to obtain
-the value for &lt;em&gt;(2, 1)&lt;/em&gt;. This procedure is repeated successively for each question mark left. If we
-consequently do this we obtain:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;
- &lt;span class=&quot;err&quot;&gt;ε&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
- &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; 
- &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;… and finally the matrix entry (m, n) where &lt;em&gt;m&lt;/em&gt; is the length of the first string and &lt;em&gt;n&lt;/em&gt; is the length of the second string
-is defined as the Levenshtein distance of the two strings. So we have determinded the Levenshtein distance of &lt;em&gt;cat&lt;/em&gt; and 
-&lt;em&gt;cute&lt;/em&gt;: &lt;em&gt;2&lt;/em&gt;.&lt;/p&gt;
-
-&lt;h3 id=&quot;implementation&quot;&gt;Implementation&lt;/h3&gt;
-
-&lt;p&gt;When I reasoned if the algorithm would be good choice for our specific problem I immediately
-started hacking together some naive lines in my editor. I knew there were several stable implementations 
-out there and my solution most probably wouldn’t add any new feature nor would have significant performance improvements,
-but I wanted to go through the algorithm on my own step by step. So basically I started reimplenting
-it. But why reinvent the wheel?&lt;/p&gt;
-
-&lt;p&gt;As developers we’re used to the common folklore law of &lt;em&gt;You-simply-should-not-reinvent-the-wheel&lt;/em&gt;. This is 
-absolutely valid when it comes to the question what to use in production environments (think of
-cryptography!). But if you’re interested in extending your toolset of concepts the answer is different: Rebuilding the 
-algorithm on your own - independent of its difficulty - will make you learn something more than &lt;em&gt;Copy&amp;amp;Paste&lt;/em&gt;. It’s the
-same phenomenon that transcribing something from the blackboard in school by yourself will pay off way more than simply photocopying your neighbor’s notes 😉 .&lt;/p&gt;
-
-&lt;p&gt;By the way, there is no specific advantage in choosing Ruby here. You’re fine to use any turing complete programming 
-language that you like and do the same. Of course there already are plenty of Ruby variants of
-the Levenshtein algorithm, for example I found a very minimalistic implementation &lt;a href=&quot;http://rosettacode.org/wiki/Levenshtein_distance#Ruby&quot;&gt;here&lt;/a&gt;:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Levenshtein&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;distance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;downcase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;downcase&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# i == 0&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nw&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;# j == 0; nw is lev(i-1, j)&lt;/span&gt;
-      &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nw&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nw&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nw&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;costs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Its pretty minified² but therefore hard to read when you want to learn how to
-apply the algorithm by youself. I felt the drive for giving it more structure (and therefore
-bloating it intentionally). The first object I focused on was
-the so-called &lt;em&gt;recurrence matrix&lt;/em&gt;, usually called &lt;em&gt;D&lt;/em&gt; symbolized by the &lt;code class=&quot;highlighter-rouge&quot;&gt;costs&lt;/code&gt; Array in the
-minimalistic version. This is the table we filled in the example above. For me it felt like an own container data type
-(in the fashion of a monad), a somewhat supercharged Array. So I defined an own class for it:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;  &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;RecurrenceMatrix&lt;/span&gt;
-
-    &lt;span class=&quot;kp&quot;&gt;attr_reader&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:store&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;[]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;store&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;[]=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;store&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;initialize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-      &lt;span class=&quot;vi&quot;&gt;@store&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-      &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;store&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-      &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;store&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;The crucial point here is that the &lt;code class=&quot;highlighter-rouge&quot;&gt;RecurrenceMatrix&lt;/code&gt; automatically
-fills the entries that are initially known. This container class may look
-overengineered here, but note that one can explicitly say&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;RecurrenceMatrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;which I really like because it says without any comment what it is, what its purpose
-is and how to use it (“Matrix” in the class name implictly gives the hint to the 
-user to make use of the operator &lt;code class=&quot;highlighter-rouge&quot;&gt;:[]&lt;/code&gt;, at least this is what I would expect).&lt;/p&gt;
-
-&lt;p&gt;Then I thought about how the outer API of my fictional class &lt;code class=&quot;highlighter-rouge&quot;&gt;LevenshteinDistance&lt;/code&gt; could look like. The Levenshtein distance
-is a natural number³, so what I had in mind is&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;result = LevenshteinDistance.new(&#39;cat&#39;, &#39;cute&#39;).to_i
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;And the &lt;code class=&quot;highlighter-rouge&quot;&gt;to_i&lt;/code&gt; method glues the successive computations together
-and returns the last value computed. Here, &lt;code class=&quot;highlighter-rouge&quot;&gt;d&lt;/code&gt; is a recurrence matrix
-as reasoned above.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;  &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;LevenshteinDistance&lt;/span&gt;
-    
-    &lt;span class=&quot;err&quot;&gt;…&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;to_i&lt;/span&gt;
-      &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
-          &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;costs_for_step&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-      &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;The only item missing is the computation of the costs for each matrix entry. Here’s what I 
-did based on the mathematical formulation:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;  &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;LevenshteinDistance&lt;/span&gt;
-    
-    &lt;span class=&quot;err&quot;&gt;…&lt;/span&gt;
-
-
-    &lt;span class=&quot;kp&quot;&gt;private&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;same_character_for_both_words_is_added?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;obtain_minimal_value_from_neighbors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-      &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; 
-        &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; 
-        &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
-      &lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;min&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;costs_for_step&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;same_character_for_both_words_is_added?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;obtain_mininal_value_from_neighbors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;One could take this one step more consequent and move all the computation logic inside the &lt;code class=&quot;highlighter-rouge&quot;&gt;RecurrenceMatrix&lt;/code&gt;.
-But alltogether the state above felt fine to me and made me ready for switching to use a more performant implementation relying on C instead :)&lt;/p&gt;
-
-&lt;p&gt;Note that my implementation works well for strings that aren’t long, say below 500 characters. During my heuristically flavoured 
-(and therefore non-scientific) benchmark on my local machine it took 1.28 seconds to compute the 
-Levenshtein distance of strings of length 1000 and ~30 seconds to compute the Levenshtein distance of 
-strings of length 10000. Theoretically the algorithm itself is of complexity &lt;em&gt;O(mn)&lt;/em&gt; where &lt;em&gt;m&lt;/em&gt; and &lt;em&gt;n&lt;/em&gt; are the sizes 
-of the input strings. So in conclusion, to compare really large strings you may want to use a Ruby gem 
-that relies on native C code extensions or similar like&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/dbalatero/levenshtein-ffi&quot;&gt;levenshtein-ffi&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/GlobalNamesArchitecture/damerau-levenshtein&quot;&gt;damerau-levenshtein&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;further-reading&quot;&gt;Further reading&lt;/h3&gt;
-
-&lt;p&gt;I hope you feel encouraged now playing with algorithms or other concepts from academia that are unknown to you!&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/Absolventa/levenshtein_rb/blob/master/lib/levenshtein_rb/levenshtein_distance.rb&quot;&gt;source code&lt;/a&gt; 
-of the implementation discussed here&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Levenshtein_distance&quot;&gt;Levenshtein algorithm at wikipedia&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://julesjacobs.github.io/2015/06/17/disqus-levenshtein-simple-and-fast.html&quot;&gt;A very interesting blogpost&lt;/a&gt; that takes things one step further
-and includes thoughts about optimizations and the Levenshtein algorithm seen from an autmata theory perspective (including a Python implementation)&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://web.stanford.edu/class/cs124/lec/med.pdf&quot;&gt;A presentation that&lt;/a&gt; summarizes more related variants and optimization ideas&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;¹) I implictly defined the &lt;em&gt;cost&lt;/em&gt; of each operation as +1 as it is “per default”. This can be modified
-of course, but this is not in the scope of this write-up. Just keep in mind
-that this is a feature that can be adjusted.&lt;/p&gt;
-
-&lt;p&gt;²) … which is totally okay because it was intended as a short concise implementation there!&lt;/p&gt;
-
-&lt;p&gt;³) It’s completely off the topic, but an interesting philosophical question indeed: The discussion if zero is treated &lt;a href=&quot;http://math.stackexchange.com/questions/283/is-0-a-natural-number&quot;&gt;as a natural number or not&lt;/a&gt; 😉&lt;/p&gt;
-</description>
-				<pubDate>Tue, 24 Nov 2015 09:00:00 +0100</pubDate>
-				<link>http://devnull.absolventa.de/2015/11/24/exploring-levenshtein-algorithm-with-ruby/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2015/11/24/exploring-levenshtein-algorithm-with-ruby/</guid>
-			</item>
-		
-			<item>
-				<title>Lazy Logic: Efficiently Reduce An Array To A Boolean</title>
-				<description>&lt;p&gt;Robin and I have been playing around with reducing a list using the &lt;code class=&quot;highlighter-rouge&quot;&gt;to_proc&lt;/code&gt;‘ed
-version of the logical &lt;code class=&quot;highlighter-rouge&quot;&gt;AND&lt;/code&gt; operator. It started out whether something like
-&lt;code class=&quot;highlighter-rouge&quot;&gt;my_list.reduce(:&#39;&amp;amp;&amp;amp;&#39;)&lt;/code&gt; would make it through the Ruby interpreter
-(spoiler alert: it doesn’t, it returns &lt;em&gt;NoMethodError: undefined method ‘&amp;amp;&amp;amp;’ for true:TrueClass&lt;/em&gt; instead).&lt;/p&gt;
-
-&lt;p&gt;Since we were dealing with a list of booleans, the next best thing is:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;reduce&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;false&lt;/span&gt;
-
-&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;reduce&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;By the way, there’s an alternative way of calling reduce/inject with an initial
-value and a block in the form of &lt;code class=&quot;highlighter-rouge&quot;&gt;my_list.reduce(false) { |memo, obj| memo &amp;amp;&amp;amp; obj }&lt;/code&gt;
-that I wasn’t aware of:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;reduce&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;false&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Reduce using a logical &lt;code class=&quot;highlighter-rouge&quot;&gt;AND&lt;/code&gt; can be done with the &lt;code class=&quot;highlighter-rouge&quot;&gt;Enumerable#all?&lt;/code&gt; and for me,
-reading a predicate method is far less cognitive load than passed Procs /
-Symbols.&lt;/p&gt;
-
-&lt;p&gt;What we wanted to know is how clever &lt;code class=&quot;highlighter-rouge&quot;&gt;Enumerable#all?&lt;/code&gt; is in terms of lazy
-boolean evaluation. Will it stop iterating when the result is already clear?&lt;/p&gt;
-
-&lt;p&gt;Quick recap: if you &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;amp;&amp;amp;&lt;/code&gt; three expressions and the first two already evaluate
-to false, Ruby instantly breaks the evaluation: there is no way that an already
-falsy statement will return &lt;code class=&quot;highlighter-rouge&quot;&gt;true&lt;/code&gt; when &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;amp;&amp;amp;&lt;/code&gt;‘ed. A good way to take
-advantage of this smart feature is putting the cheap calculations first and the
-more expensive ones on the right side of the expression.&lt;/p&gt;
-
-&lt;p&gt;Our &lt;code class=&quot;highlighter-rouge&quot;&gt;irb&lt;/code&gt; test scenario looked like this:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;false&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;fail&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;Iteration should have stopped before :(&#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;all?&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ƛ&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ƛ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;call&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;We didn’t see the exception, meaning that &lt;code class=&quot;highlighter-rouge&quot;&gt;Enumerable#all?&lt;/code&gt; indeed stopped after
-evaluating the first two elements. Good!&lt;/p&gt;
-
-&lt;p&gt;The use of lambdas as elements instead of eagerly evaluated objects was for our
-quick test, but it also allows taking the concept of evaluating the most
-expensive expressions last (see recap above) one step further:
-When an array is instantiated, all elements will be evaluated. Having lambdas/procs
-as elements will defer their evaluation and we can iterate over “cheap” items
-when reducing them with logical operators.&lt;/p&gt;
-
-&lt;p&gt;Imagine this example:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;cheap1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cheap2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sample&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;expensive1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;false&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;expensive2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cheap1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cheap2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;expensive1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;expensive2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;all?&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:call&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;There is .5 chance that &lt;code class=&quot;highlighter-rouge&quot;&gt;expensive1&lt;/code&gt; will never have to be &lt;code class=&quot;highlighter-rouge&quot;&gt;call&lt;/code&gt;ed (in this case:
-eliminating a 10 second wait-time) and it will &lt;em&gt;never&lt;/em&gt; run &lt;code class=&quot;highlighter-rouge&quot;&gt;expensive2&lt;/code&gt;.&lt;/p&gt;
-</description>
-				<pubDate>Thu, 12 Nov 2015 15:04:00 +0100</pubDate>
-				<link>http://devnull.absolventa.de/2015/11/12/lazy-logic-efficiently-reduce-an-array-to-a-boolean/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2015/11/12/lazy-logic-efficiently-reduce-an-array-to-a-boolean/</guid>
-			</item>
-		
-			<item>
-				<title>Instant Local Nginx SSL/TLS Proxy</title>
-				<description>&lt;p&gt;Ideally, your Rails app just has &lt;code class=&quot;highlighter-rouge&quot;&gt;config.force_ssl = true&lt;/code&gt; configured for its
-production environment. However, if you have TLS- and non-TLS contexts in
-your app, things become tricky to test on your local development machine.&lt;/p&gt;
-
-&lt;p&gt;For &lt;a href=&quot;http://12factor.net/dev-prod-parity&quot;&gt;Dev/Prod Parity&lt;/a&gt;, I want to have the
-same SSL setup locally as on staging/production. Documentation for setting up
-a local Nginx instance &lt;a href=&quot;http://www.cyberciti.biz/faq/howto-linux-unix-setup-nginx-ssl-proxy/&quot;&gt;is readily available&lt;/a&gt;,
-but it’s verbose and involves too many manual steps.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/2015-05-20-nginx-ssl-automate-all-the-things.jpg&quot; alt=&quot;Automate all the things!&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;I’ve written a shell script to automate the happy path of the Nginx setup,
-namely installing Nginx, creating a self-signed SSL-certificate, writing the
-reverse-proxy config directives and optionally starting the Nginx webserver
-right away. The latter requires &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo&lt;/code&gt; superpowers since binding to the SSL
-default port 443 requires root privileges. Furthermore, it makes a few
-assumptions:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;You’re using Mac and Homebrew&lt;/li&gt;
-  &lt;li&gt;You don’t have Nginx installed or don’t care about config files being overwritten&lt;/li&gt;
-  &lt;li&gt;Your Rails app is running on localhost:3000&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;You can download the script from &lt;a href=&quot;https://raw.githubusercontent.com/Absolventa/dotfiles/master/nginx-ssl-setup.sh&quot;&gt;Absolventa’s Github repo&lt;/a&gt;.
-Run it on your machine with &lt;code class=&quot;highlighter-rouge&quot;&gt;bash nginx-ssl-setup.sh&lt;/code&gt; and follow the instructions on your terminal.
-If you stray from the Happy Path™, feel free to send a PR our way!&lt;/p&gt;
-
-</description>
-				<pubDate>Wed, 20 May 2015 17:00:00 +0200</pubDate>
-				<link>http://devnull.absolventa.de/2015/05/20/use-nginx-to-enable-ssl-tls-for-your-rails-development/</link>
-				<guid isPermaLink="true">http://devnull.absolventa.de/2015/05/20/use-nginx-to-enable-ssl-tls-for-your-rails-development/</guid>
 			</item>
 		
 	</channel>

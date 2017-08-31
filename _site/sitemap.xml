@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://devnull.absolventa.de/2017/08/31/custom_negated_matchers_with_rspec/</loc>
+<lastmod>2017-08-31T10:00:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2017/07/03/authoring-a-private-gem-with-gemfury/</loc>
+<lastmod>2017-07-03T13:55:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2017/02/27/we-wanna-be-your-coaching-company-for-rgsoc-2017/</loc>
+<lastmod>2017-02-27T11:59:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2017/02/09/converting-a-latin1-html-document-with-elixir-part-1/</loc>
+<lastmod>2017-02-09T00:00:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/2017/01/16/upgrading-old-postgresql-with-homebrew/</loc>
+<lastmod>2017-01-16T00:00:00+01:00</lastmod>
+</url>
+<url>
 <loc>http://devnull.absolventa.de/2016/10/07/dream-of-bemifornication/</loc>
 <lastmod>2016-10-07T00:00:00+02:00</lastmod>
 </url>
@@ -314,5 +334,17 @@
 </url>
 <url>
 <loc>http://devnull.absolventa.de/tag/SCSS/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/elixir/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/encoding/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/workflow/</loc>
+</url>
+<url>
+<loc>http://devnull.absolventa.de/tag/testing/</loc>
 </url>
 </urlset>
