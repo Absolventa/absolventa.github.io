@@ -10,7 +10,7 @@ tags:
   - testing
 teaser: "Chaining multiple expectations within a single test
 case can get messy when you need to test against negation
-statements. We study a simple trick offered by RSpec dto
+statements. We study a simple trick offered by RSpec to
 define custom negated matchers that will resolve this problem.
 "
 ---
